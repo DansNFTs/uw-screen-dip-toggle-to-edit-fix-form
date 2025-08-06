@@ -1,940 +1,543 @@
-import React, { useState } from 'react';
-import { useEditMode } from '../contexts/EditModeContext';
-import { useAudit } from '../contexts/AuditContext';
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
-import { Textarea } from "@/components/ui/textarea";
-import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
-import { Clock } from 'lucide-react';
-import { useToast } from "@/hooks/use-toast";
-import { useNavigate } from 'react-router-dom';
-import { FieldComparisonModal } from './FieldComparisonModal';
-import { EditableField } from './EditableField';
+import React, { useState, useRef, useEffect } from 'react';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { Button } from '@/components/ui/button';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
+import { useEditMode } from '@/contexts/EditModeContext';
+import { useAudit } from '@/contexts/AuditContext';
+import { useToast } from '@/hooks/use-toast';
+import { Clock, Plus } from 'lucide-react';
+import { FieldComparisonModal } from '@/components/FieldComparisonModal';
+
+interface ApplicantData {
+  // Eligibility
+  courtDecree: string;
+  debtManagement: string;
+  // Personal Details
+  title: string;
+  firstName: string;
+  middleName: string;
+  lastName: string;
+  nameChange: string;
+  birthDay: string;
+  birthMonth: string;
+  birthYear: string;
+  nationality: string;
+  // Addresses
+  currentAddress: string;
+  currentAddressYears: string;
+  currentAddressMonths: string;
+  currentResidencyStatus: string;
+  previousAddress: string;
+  previousAddressYears: string;
+  previousAddressMonths: string;
+  // Income
+  employmentStatus: string;
+  grossBasicIncome: string;
+  frequency: string;
+  annualAmount: string;
+  monthlyNetSalary: string;
+  jobTitle: string;
+  employerName: string;
+  employmentType: string;
+  startMonth: string;
+  startYear: string;
+  expectedRetirementAge: string;
+  // Commitments
+  commitmentType: string;
+  provider: string;
+  monthlyPayment: string;
+  remainingBalance: string;
+}
 
 export const EditablePersonalDetailsPage: React.FC = () => {
-  const { isEditingEnabled, isEditMode, hasUnsavedChanges, hasSavedChanges, setIsEditMode, setHasUnsavedChanges, saveChanges, exitEditMode, storeOriginalState, restoreAllOriginalState } = useEditMode();
-  const { addAuditEntry, auditLog, currentSessionId, startAuditSession, endAuditSession, cancelAuditSession } = useAudit();
-  const { toast } = useToast();
-  const navigate = useNavigate();
-  
-  // Add anchor functionality
+  const [jamesData, setJamesData] = useState<ApplicantData>({
+    // Eligibility
+    courtDecree: 'No',
+    debtManagement: 'No',
+    // Personal Details
+    title: 'Mr',
+    firstName: 'James',
+    middleName: '',
+    lastName: 'Taylor',
+    nameChange: 'No',
+    birthDay: '15',
+    birthMonth: '3',
+    birthYear: '1965',
+    nationality: 'UK Resident',
+    // Addresses
+    currentAddress: '93 Liverpool Drive, Newcastle, Tyne and Wear, NE5 2NS, United Kingdom',
+    currentAddressYears: '1',
+    currentAddressMonths: '0',
+    currentResidencyStatus: 'Owner occupation with mortgage',
+    previousAddress: '',
+    previousAddressYears: '',
+    previousAddressMonths: '',
+    // Income
+    employmentStatus: 'Employed',
+    grossBasicIncome: '£100000.00',
+    frequency: 'Yearly',
+    annualAmount: '£50,000.00',
+    monthlyNetSalary: '£5200',
+    jobTitle: 'Accountant',
+    employerName: 'NBS',
+    employmentType: 'Permanent',
+    startMonth: '9',
+    startYear: '2008',
+    expectedRetirementAge: '70',
+    // Commitments
+    commitmentType: 'Credit card',
+    provider: 'Bank',
+    monthlyPayment: '£100.00',
+    remainingBalance: '£5,000.00'
+  });
+
+  const [janeData, setJaneData] = useState<ApplicantData>({
+    // Eligibility
+    courtDecree: 'No',
+    debtManagement: 'No',
+    // Personal Details
+    title: 'Mrs',
+    firstName: 'Jane',
+    middleName: '',
+    lastName: 'Taylor',
+    nameChange: 'No',
+    birthDay: '8',
+    birthMonth: '4',
+    birthYear: '1968',
+    nationality: 'UK Resident',
+    // Addresses
+    currentAddress: '93 Liverpool Drive, Newcastle, Tyne and Wear, NE5 2NS, United Kingdom',
+    currentAddressYears: '1',
+    currentAddressMonths: '0',
+    currentResidencyStatus: 'Owner occupation with mortgage',
+    previousAddress: '',
+    previousAddressYears: '',
+    previousAddressMonths: '',
+    // Income
+    employmentStatus: 'Employed',
+    grossBasicIncome: '£45000.00',
+    frequency: 'Yearly',
+    annualAmount: '£30,000.00',
+    monthlyNetSalary: '£3100',
+    jobTitle: 'Manager',
+    employerName: 'NHS',
+    employmentType: 'Permanent',
+    startMonth: '9',
+    startYear: '2019',
+    expectedRetirementAge: '70',
+    // Commitments
+    commitmentType: 'Credit card',
+    provider: 'Bank',
+    monthlyPayment: '£50.00',
+    remainingBalance: '£2,500.00'
+  });
+
+  const [originalJamesData, setOriginalJamesData] = useState(jamesData);
+  const [originalJaneData, setOriginalJaneData] = useState(janeData);
+  const [comparisonField, setComparisonField] = useState<string | null>(null);
   const [focusedField, setFocusedField] = useState<string | null>(null);
-  const fieldRefs = React.useRef<{ [key: string]: HTMLInputElement | HTMLButtonElement | null }>({});
-  const sectionRefs = React.useRef<{ [key: string]: HTMLDivElement | null }>({});
+  const fieldRefs = useRef<Record<string, HTMLElement | null>>({});
+  const sectionRefs = useRef<Record<string, HTMLElement | null>>({});
 
-  const initialFormData = {
-    // James Taylor - Eligibility
-    jamesAgeEligibility: 'No',
-    jamesManagementPlan: 'No',
-    
-    // James Taylor - Personal Details
-    jamesTitle: 'Mr',
-    jamesFirstName: 'James',
-    jamesMiddleName: '',
-    jamesLastName: 'Taylor',
-    jamesNameChange: 'No',
-    jamesDateOfBirthDay: '11',
-    jamesDateOfBirthMonth: '11',
-    jamesDateOfBirthYear: '1988',
-    jamesNationality: 'UK Resident',
-    
-    // James Taylor - Address
-    jamesCurrentAddress: '12 Longwood Close',
-    jamesAddressLine2: 'NEWCASTLE UPON TYNE',
-    jamesAddressLine3: 'Tyne and Wear',
-    jamesPostcode: 'NE16 5QB',
-    jamesMovedInMonths: '6',
-    jamesMovedInYears: '2015',
-    jamesResidencyStatus: 'Owner occupier with mortgage',
-    jamesSalePrice: '£350,000',
-    jamesCurrentLender: 'Halifax',
-    jamesOutstandingMortgage: '£280,000',
-    jamesPlansForProperty: 'Continue to live in it',
-    jamesExpectedRemainingBalance: '£250,000',
-    
-    // James Taylor - Income
-    jamesEmploymentStatus: 'Employed',
-    jamesBasicIncome: '£50000.00',
-    jamesFrequencyGrossIncome: 'Yearly',
-    jamesAnnualAmount: '£50,000.00',
-    jamesMonthlyNetSalary: '£3200',
-    jamesJobTitle: 'Manager',
-    jamesEmployerName: 'NHS',
-    jamesEmploymentNature: 'Permanent',
-    jamesStartDate: '9/2020',
-    jamesExpectedRetirement: '70',
-    
-    // Jane Taylor - Eligibility  
-    janeAgeEligibility: 'No',
-    janeManagementPlan: 'No',
-    
-    // Jane Taylor - Personal Details
-    janeTitle: 'Mrs',
-    janeFirstName: 'Jane',
-    janeMiddleName: '',
-    janeLastName: 'Taylor',
-    janeNameChange: 'No',
-    janeDateOfBirthDay: '04',
-    janeDateOfBirthMonth: '04', 
-    janeDateOfBirthYear: '1990',
-    janeNationality: 'UK Resident',
-    
-    // Jane Taylor - Address
-    janeCurrentAddress: '12 Longwood Close',
-    janeAddressLine2: 'NEWCASTLE UPON TYNE',
-    janeAddressLine3: 'Tyne and Wear',
-    janePostcode: 'NE16 5QB',
-    janeMovedInMonths: '4',
-    janeMovedInYears: '2015',
-    janeResidencyStatus: 'Owner occupier with mortgage',
-    janeSalePrice: '£350,000',
-    janeCurrentLender: 'Halifax',
-    janeOutstandingMortgage: '£280,000',
-    janePlansForProperty: 'Continue to live in it',
-    janeExpectedRemainingBalance: '£250,000',
-    
-    // Jane Taylor - Income
-    janeEmploymentStatus: 'Employed',
-    janeBasicIncome: '£45000.00',
-    janeFrequencyGrossIncome: 'Yearly',
-    janeAnnualAmount: '£45,000.00',
-    janeMonthlyNetSalary: '£2800',
-    janeJobTitle: 'Manager',
-    janeEmployerName: 'NHS',
-    janeEmploymentNature: 'Permanent',
-    janeStartDate: '9/2020',
-    janeExpectedRetirement: '70'
-  };
+  const { isEditMode, setIsEditMode, hasUnsavedChanges, setHasUnsavedChanges } = useEditMode();
+  const { startAuditSession, endAuditSession, addAuditEntry, auditLog } = useAudit();
+  const { toast } = useToast();
 
-  const [formData, setFormData] = useState(initialFormData);
-  const [comparisonModal, setComparisonModal] = useState({ open: false, fieldName: '' });
-
-  // Store original state when entering edit mode
-  React.useEffect(() => {
-    if (isEditMode && !currentSessionId) {
+  useEffect(() => {
+    if (isEditMode) {
+      setOriginalJamesData(jamesData);
+      setOriginalJaneData(janeData);
       startAuditSession();
-      Object.entries(formData).forEach(([key, value]) => {
-        storeOriginalState(`formData.${key}`, value);
-      });
     }
-  }, [isEditMode, currentSessionId, storeOriginalState, startAuditSession]);
+  }, [isEditMode]);
 
-  // Focus on specific field and section when entering edit mode
-  React.useEffect(() => {
-    if (isEditMode && focusedField) {
-      console.log('Focusing on field:', focusedField);
-      
-      // Determine which section to scroll to based on field name
-      let sectionToScroll = '';
-      if (focusedField.startsWith('james')) {
-        sectionToScroll = 'james-section';
-      } else if (focusedField.startsWith('jane')) {
-        sectionToScroll = 'jane-section';
+  useEffect(() => {
+    const handleEditModeCancel = () => {
+      setJamesData(originalJamesData);
+      setJaneData(originalJaneData);
+      endAuditSession();
+    };
+
+    window.addEventListener('editModeCancel', handleEditModeCancel);
+    return () => window.removeEventListener('editModeCancel', handleEditModeCancel);
+  }, [originalJamesData, originalJaneData, endAuditSession]);
+
+  useEffect(() => {
+    if (focusedField && isEditMode) {
+      const fieldElement = fieldRefs.current[focusedField];
+      const sectionKey = getSectionForField(focusedField);
+      const sectionElement = sectionRefs.current[sectionKey];
+
+      if (sectionElement) {
+        sectionElement.scrollIntoView({ behavior: 'smooth', block: 'start' });
       }
 
-      console.log('Section to scroll:', sectionToScroll);
-      console.log('Section ref available:', !!sectionRefs.current[sectionToScroll]);
-      console.log('Field ref available:', !!fieldRefs.current[focusedField]);
+      if (fieldElement) {
+        setTimeout(() => {
+          fieldElement.focus();
+        }, 300);
+      }
 
-      setTimeout(() => {
-        // First scroll to the section
-        if (sectionToScroll && sectionRefs.current[sectionToScroll]) {
-          console.log('Scrolling to section:', sectionToScroll);
-          sectionRefs.current[sectionToScroll]?.scrollIntoView({ behavior: 'smooth', block: 'start' });
-        }
-        
-        // Then focus on the specific field
-        if (fieldRefs.current[focusedField]) {
-          setTimeout(() => {
-            console.log('Focusing on field element');
-            fieldRefs.current[focusedField]?.focus();
-          }, 500);
-        }
-      }, 100);
+      setFocusedField(null);
     }
-  }, [isEditMode, focusedField]);
+  }, [focusedField, isEditMode]);
 
-  // Listen for cancel events to restore original state
-  React.useEffect(() => {
-    const handleRestore = () => {
-      const originalState = restoreAllOriginalState();
-      const restoredFormData: any = {};
-      
-      Object.keys(initialFormData).forEach(key => {
-        const originalValue = originalState[`formData.${key}`];
-        if (originalValue !== undefined) {
-          restoredFormData[key] = originalValue;
-        } else {
-          restoredFormData[key] = initialFormData[key as keyof typeof initialFormData];
-        }
-      });
-      
-      setFormData(restoredFormData);
-      cancelAuditSession();
-    };
+  const getSectionForField = (fieldName: string) => {
+    if (fieldName.startsWith('james')) {
+      return 'james-section';
+    }
+    if (fieldName.startsWith('jane')) {
+      return 'jane-section';
+    }
+    return 'james-section';
+  };
 
-    window.addEventListener('editModeCancel', handleRestore);
-    return () => {
-      window.removeEventListener('editModeCancel', handleRestore);
-    };
-  }, [restoreAllOriginalState, cancelAuditSession]);
+  const handleInputChange = (field: string, value: string, applicant: 'james' | 'jane') => {
+    const currentData = applicant === 'james' ? jamesData : janeData;
+    const setData = applicant === 'james' ? setJamesData : setJaneData;
+    const fieldKey = field as keyof ApplicantData;
+    const oldValue = currentData[fieldKey];
+    
+    if (oldValue !== value) {
+      setData(prev => ({ ...prev, [field]: value }));
+      addAuditEntry(`${applicant}-${field}`, oldValue, value, `${applicant === 'james' ? 'James Taylor' : 'Jane Taylor'} Personal Details`);
+      setHasUnsavedChanges(true);
+    }
+  };
 
-  const handleInputChange = (field: string, value: string, section: string = 'Personal Details') => {
-    const oldValue = formData[field as keyof typeof formData];
-    
-    setFormData(prev => ({
-      ...prev,
-      [field]: value
-    }));
-    
-    console.log('Field changed:', { field, oldValue, value, section, currentSessionId });
-    
-    addAuditEntry(field, oldValue, value, section);
-    setHasUnsavedChanges(true);
+  const handleFieldDoubleClick = (fieldName: string) => {
+    if (!isEditMode) {
+      setFocusedField(fieldName);
+      setIsEditMode(true);
+    }
   };
 
   const handleSave = () => {
-    saveChanges();
     endAuditSession();
+    setHasUnsavedChanges(false);
+    setIsEditMode(false);
     toast({
-      title: "Changes saved",
-      description: "Your personal details have been updated.",
+      title: "Changes saved successfully",
+      description: "Personal details have been updated.",
     });
-  };
-
-  const handleFieldDoubleClick = (field: string) => {
-    console.log('Double clicked field:', field);
-    if (isEditingEnabled && !isEditMode) {
-      setFocusedField(field);
-      setIsEditMode(true);
-      if (!currentSessionId) {
-        startAuditSession();
-        Object.entries(formData).forEach(([key, value]) => {
-          storeOriginalState(`formData.${key}`, value);
-        });
-      }
-    }
-  };
-
-  const handleFieldComparisonClick = (fieldName: string) => {
-    setComparisonModal({ open: true, fieldName });
   };
 
   const isFieldEdited = (fieldName: string) => {
     return auditLog.some(entry => entry.field === fieldName);
   };
 
-  // Render form sections based on edit mode
-  const renderApplicantSection = (
-    applicantName: string, 
-    prefix: string,
-    title: string
+  const handleFieldComparisonClick = (fieldName: string) => {
+    setComparisonField(fieldName);
+  };
+
+  const getButtonText = () => {
+    if (!isEditMode) return "Edit";
+    return hasUnsavedChanges ? "Save" : "Exit Edit Mode";
+  };
+
+  const getButtonVariant = () => {
+    if (!isEditMode) return "default";
+    return hasUnsavedChanges ? "default" : "outline";
+  };
+
+  const handleMainButtonClick = () => {
+    if (!isEditMode) {
+      setIsEditMode(true);
+    } else if (hasUnsavedChanges) {
+      handleSave();
+    } else {
+      setIsEditMode(false);
+    }
+  };
+
+  const renderField = (
+    field: keyof ApplicantData,
+    label: string,
+    applicant: 'james' | 'jane',
+    type: 'input' | 'select' | 'radio' = 'input',
+    options?: { value: string; label: string }[] | string[]
   ) => {
+    const data = applicant === 'james' ? jamesData : janeData;
+    const value = data[field];
+    const fieldName = `${applicant}-${field}`;
+
     if (isEditMode) {
-      // Form view when editing
+      if (type === 'select') {
+        return (
+          <div className="space-y-2">
+            <Label htmlFor={fieldName}>{label}</Label>
+            <Select
+              value={value}
+              onValueChange={(newValue) => handleInputChange(field, newValue, applicant)}
+            >
+              <SelectTrigger
+                ref={(el) => { fieldRefs.current[fieldName] = el; }}
+                className="w-full"
+              >
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                {options?.map((option) => {
+                  const optionValue = typeof option === 'string' ? option : option.value;
+                  const optionLabel = typeof option === 'string' ? option : option.label;
+                  return (
+                    <SelectItem key={optionValue} value={optionValue}>
+                      {optionLabel}
+                    </SelectItem>
+                  );
+                })}
+              </SelectContent>
+            </Select>
+          </div>
+        );
+      }
+
+      if (type === 'radio' && options) {
+        return (
+          <div className="space-y-2">
+            <Label>{label}</Label>
+            <RadioGroup
+              value={value}
+              onValueChange={(newValue) => handleInputChange(field, newValue, applicant)}
+              className="flex gap-4"
+            >
+              {options.map((option) => {
+                const optionValue = typeof option === 'string' ? option : option.value;
+                const optionLabel = typeof option === 'string' ? option : option.label;
+                return (
+                  <div key={optionValue} className="flex items-center space-x-2">
+                    <RadioGroupItem value={optionValue} id={`${fieldName}-${optionValue}`} />
+                    <Label htmlFor={`${fieldName}-${optionValue}`}>{optionLabel}</Label>
+                  </div>
+                );
+              })}
+            </RadioGroup>
+          </div>
+        );
+      }
+
       return (
-        <div className="space-y-6" ref={(ref) => sectionRefs.current[`${prefix}-section`] = ref}>
-          <h2 className="text-[#165788] text-lg font-medium">{applicantName}</h2>
-          
-          {/* Eligibility Section */}
-          <EditableField isEdited={isFieldEdited(`${prefix}AgeEligibility`) || isFieldEdited(`${prefix}ManagementPlan`)}>
-            <div className="space-y-4">
-              <h3 className="text-[#165788] text-base font-medium">Eligibility</h3>
-              <div className="text-sm text-gray-600 mb-4">
-                Is the {prefix === 'james' ? 'first' : 'second'} applicant satisfied any of the following:
-              </div>
-              
-              <div className="space-y-3">
-                <div>
-                  <Label className="text-sm text-gray-700">Bankruptcy which has not been satisfied for at least 3 years?</Label>
-                  <RadioGroup 
-                    value={formData[`${prefix}AgeEligibility` as keyof typeof formData]}
-                    onValueChange={(value) => handleInputChange(`${prefix}AgeEligibility`, value, `${applicantName} Eligibility`)}
-                    className="flex gap-4 mt-2"
-                  >
-                    <div className="flex items-center space-x-2">
-                      <RadioGroupItem value="Yes" id={`${prefix}-age-yes`} />
-                      <Label htmlFor={`${prefix}-age-yes`}>Yes</Label>
-                    </div>
-                    <div className="flex items-center space-x-2">
-                      <RadioGroupItem value="No" id={`${prefix}-age-no`} />
-                      <Label htmlFor={`${prefix}-age-no`}>No</Label>
-                    </div>
-                  </RadioGroup>
-                </div>
-                
-                <div>
-                  <Label className="text-sm text-gray-700">Had an active debt management plan</Label>
-                  <RadioGroup 
-                    value={formData[`${prefix}ManagementPlan` as keyof typeof formData]}
-                    onValueChange={(value) => handleInputChange(`${prefix}ManagementPlan`, value, `${applicantName} Eligibility`)}
-                    className="flex gap-4 mt-2"
-                  >
-                    <div className="flex items-center space-x-2">
-                      <RadioGroupItem value="Yes" id={`${prefix}-plan-yes`} />
-                      <Label htmlFor={`${prefix}-plan-yes`}>Yes</Label>
-                    </div>
-                    <div className="flex items-center space-x-2">
-                      <RadioGroupItem value="No" id={`${prefix}-plan-no`} />
-                      <Label htmlFor={`${prefix}-plan-no`}>No</Label>
-                    </div>
-                  </RadioGroup>
-                </div>
-              </div>
-            </div>
-          </EditableField>
-
-          {/* Personal Details Section */}
-          <EditableField isEdited={isFieldEdited(`${prefix}Title`) || isFieldEdited(`${prefix}FirstName`) || isFieldEdited(`${prefix}LastName`)}>
-            <div className="space-y-4">
-              <h3 className="text-[#165788] text-base font-medium">Personal details</h3>
-              
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div>
-                  <Label htmlFor={`${prefix}-title`}>Title</Label>
-                  <Select 
-                    value={formData[`${prefix}Title` as keyof typeof formData]}
-                    onValueChange={(value) => handleInputChange(`${prefix}Title`, value, `${applicantName} Personal Details`)}
-                  >
-                    <SelectTrigger ref={(ref) => fieldRefs.current[`${prefix}Title`] = ref}>
-                      <SelectValue />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="Mr">Mr</SelectItem>
-                      <SelectItem value="Mrs">Mrs</SelectItem>
-                      <SelectItem value="Miss">Miss</SelectItem>
-                      <SelectItem value="Ms">Ms</SelectItem>
-                      <SelectItem value="Dr">Dr</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
-              </div>
-              
-              <div>
-                <Label htmlFor={`${prefix}-firstname`}>First name</Label>
-                <Input 
-                  id={`${prefix}-firstname`}
-                  ref={(ref) => fieldRefs.current[`${prefix}FirstName`] = ref}
-                  value={formData[`${prefix}FirstName` as keyof typeof formData]}
-                  onChange={(e) => handleInputChange(`${prefix}FirstName`, e.target.value, `${applicantName} Personal Details`)}
-                />
-              </div>
-              
-              <div>
-                <Label htmlFor={`${prefix}-middlename`}>Middle name</Label>
-                <Input 
-                  id={`${prefix}-middlename`}
-                  ref={(ref) => fieldRefs.current[`${prefix}MiddleName`] = ref}
-                  value={formData[`${prefix}MiddleName` as keyof typeof formData]}
-                  onChange={(e) => handleInputChange(`${prefix}MiddleName`, e.target.value, `${applicantName} Personal Details`)}
-                />
-              </div>
-              
-              <div>
-                <Label htmlFor={`${prefix}-lastname`}>Last name</Label>
-                <Input 
-                  id={`${prefix}-lastname`}
-                  ref={(ref) => fieldRefs.current[`${prefix}LastName`] = ref}
-                  value={formData[`${prefix}LastName` as keyof typeof formData]}
-                  onChange={(e) => handleInputChange(`${prefix}LastName`, e.target.value, `${applicantName} Personal Details`)}
-                />
-              </div>
-              
-              <div>
-                <Label className="text-sm text-gray-700">Name change in the last 6 years?</Label>
-                <RadioGroup 
-                  value={formData[`${prefix}NameChange` as keyof typeof formData]}
-                  onValueChange={(value) => handleInputChange(`${prefix}NameChange`, value, `${applicantName} Personal Details`)}
-                  className="flex gap-4 mt-2"
-                >
-                  <div className="flex items-center space-x-2">
-                    <RadioGroupItem value="Yes" id={`${prefix}-namechange-yes`} />
-                    <Label htmlFor={`${prefix}-namechange-yes`}>Yes</Label>
-                  </div>
-                  <div className="flex items-center space-x-2">
-                    <RadioGroupItem value="No" id={`${prefix}-namechange-no`} />
-                    <Label htmlFor={`${prefix}-namechange-no`}>No</Label>
-                  </div>
-                </RadioGroup>
-              </div>
-
-              <div>
-                <Label>Date of birth</Label>
-                <div className="flex gap-2 mt-1">
-                  <Input 
-                    placeholder="DD"
-                    className="w-16"
-                    ref={(ref) => fieldRefs.current[`${prefix}DateOfBirthDay`] = ref}
-                    value={formData[`${prefix}DateOfBirthDay` as keyof typeof formData]}
-                    onChange={(e) => handleInputChange(`${prefix}DateOfBirthDay`, e.target.value, `${applicantName} Personal Details`)}
-                  />
-                  <Input 
-                    placeholder="MM"
-                    className="w-16"
-                    ref={(ref) => fieldRefs.current[`${prefix}DateOfBirthMonth`] = ref}
-                    value={formData[`${prefix}DateOfBirthMonth` as keyof typeof formData]}
-                    onChange={(e) => handleInputChange(`${prefix}DateOfBirthMonth`, e.target.value, `${applicantName} Personal Details`)}
-                  />
-                  <Input 
-                    placeholder="YYYY"
-                    className="w-20"
-                    ref={(ref) => fieldRefs.current[`${prefix}DateOfBirthYear`] = ref}
-                    value={formData[`${prefix}DateOfBirthYear` as keyof typeof formData]}
-                    onChange={(e) => handleInputChange(`${prefix}DateOfBirthYear`, e.target.value, `${applicantName} Personal Details`)}
-                  />
-                </div>
-              </div>
-
-              <div>
-                <Label className="text-sm text-gray-700">Nationality</Label>
-                <RadioGroup 
-                  value={formData[`${prefix}Nationality` as keyof typeof formData]}
-                  onValueChange={(value) => handleInputChange(`${prefix}Nationality`, value, `${applicantName} Personal Details`)}
-                  className="space-y-2 mt-2"
-                >
-                  <div className="flex items-center space-x-2">
-                    <RadioGroupItem value="UK Resident" id={`${prefix}-nat-uk`} />
-                    <Label htmlFor={`${prefix}-nat-uk`}>UK Resident</Label>
-                  </div>
-                  <div className="flex items-center space-x-2">
-                    <RadioGroupItem value="EEA or Swiss National" id={`${prefix}-nat-eea`} />
-                    <Label htmlFor={`${prefix}-nat-eea`}>EEA or Swiss National</Label>
-                  </div>
-                  <div className="flex items-center space-x-2">
-                    <RadioGroupItem value="Non EEA" id={`${prefix}-nat-non`} />
-                    <Label htmlFor={`${prefix}-nat-non`}>Non EEA</Label>
-                  </div>
-                </RadioGroup>
-              </div>
-            </div>
-          </EditableField>
-
-          {/* Address Section */}
-          <EditableField isEdited={isFieldEdited(`${prefix}CurrentAddress`) || isFieldEdited(`${prefix}Postcode`)}>
-            <div className="space-y-4">
-              <h3 className="text-[#165788] text-base font-medium">Address</h3>
-              
-              <div>
-                <Label htmlFor={`${prefix}-address`}>Current address</Label>
-                <Input 
-                  id={`${prefix}-address`}
-                  ref={(ref) => fieldRefs.current[`${prefix}CurrentAddress`] = ref}
-                  value={formData[`${prefix}CurrentAddress` as keyof typeof formData]}
-                  onChange={(e) => handleInputChange(`${prefix}CurrentAddress`, e.target.value, `${applicantName} Address`)}
-                />
-              </div>
-              
-              <div>
-                <Label htmlFor={`${prefix}-address2`}>Address line 2</Label>
-                <Input 
-                  id={`${prefix}-address2`}
-                  ref={(ref) => fieldRefs.current[`${prefix}AddressLine2`] = ref}
-                  value={formData[`${prefix}AddressLine2` as keyof typeof formData]}
-                  onChange={(e) => handleInputChange(`${prefix}AddressLine2`, e.target.value, `${applicantName} Address`)}
-                />
-              </div>
-              
-              <div>
-                <Label htmlFor={`${prefix}-address3`}>Address line 3</Label>
-                <Input 
-                  id={`${prefix}-address3`}
-                  ref={(ref) => fieldRefs.current[`${prefix}AddressLine3`] = ref}
-                  value={formData[`${prefix}AddressLine3` as keyof typeof formData]}
-                  onChange={(e) => handleInputChange(`${prefix}AddressLine3`, e.target.value, `${applicantName} Address`)}
-                />
-              </div>
-              
-              <div>
-                <Label htmlFor={`${prefix}-postcode`}>Postcode</Label>
-                <Input 
-                  id={`${prefix}-postcode`}
-                  ref={(ref) => fieldRefs.current[`${prefix}Postcode`] = ref}
-                  value={formData[`${prefix}Postcode` as keyof typeof formData]}
-                  onChange={(e) => handleInputChange(`${prefix}Postcode`, e.target.value, `${applicantName} Address`)}
-                />
-              </div>
-              
-              <div>
-                <Label>When did the applicant move into the property?</Label>
-                <div className="flex gap-2 mt-1">
-                  <Input 
-                    placeholder="Months"
-                    className="w-24"
-                    ref={(ref) => fieldRefs.current[`${prefix}MovedInMonths`] = ref}
-                    value={formData[`${prefix}MovedInMonths` as keyof typeof formData]}
-                    onChange={(e) => handleInputChange(`${prefix}MovedInMonths`, e.target.value, `${applicantName} Address`)}
-                  />
-                  <span className="self-center text-gray-500">/</span>
-                  <Input 
-                    placeholder="Year"
-                    className="w-24"
-                    ref={(ref) => fieldRefs.current[`${prefix}MovedInYears`] = ref}
-                    value={formData[`${prefix}MovedInYears` as keyof typeof formData]}
-                    onChange={(e) => handleInputChange(`${prefix}MovedInYears`, e.target.value, `${applicantName} Address`)}
-                  />
-                </div>
-              </div>
-              
-              <div>
-                <Label htmlFor={`${prefix}-residency`}>Current residency status</Label>
-                <Select 
-                  value={formData[`${prefix}ResidencyStatus` as keyof typeof formData]}
-                  onValueChange={(value) => handleInputChange(`${prefix}ResidencyStatus`, value, `${applicantName} Address`)}
-                >
-                  <SelectTrigger ref={(ref) => fieldRefs.current[`${prefix}ResidencyStatus`] = ref}>
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="Owner occupier with mortgage">Owner occupier with mortgage</SelectItem>
-                    <SelectItem value="Owner occupier without mortgage">Owner occupier without mortgage</SelectItem>
-                    <SelectItem value="Tenant">Tenant</SelectItem>
-                    <SelectItem value="Living with family">Living with family</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
-            </div>
-          </EditableField>
-
-          {/* Property Details Section */}
-          <EditableField isEdited={isFieldEdited(`${prefix}SalePrice`) || isFieldEdited(`${prefix}CurrentLender`)}>
-            <div className="space-y-4">
-              <h3 className="text-[#165788] text-base font-medium">Property Details</h3>
-              
-              <div>
-                <Label htmlFor={`${prefix}-saleprice`}>Sale price</Label>
-                <Input 
-                  id={`${prefix}-saleprice`}
-                  ref={(ref) => fieldRefs.current[`${prefix}SalePrice`] = ref}
-                  value={formData[`${prefix}SalePrice` as keyof typeof formData]}
-                  onChange={(e) => handleInputChange(`${prefix}SalePrice`, e.target.value, `${applicantName} Property`)}
-                />
-              </div>
-              
-              <div>
-                <Label htmlFor={`${prefix}-lender`}>Current lender</Label>
-                <Input 
-                  id={`${prefix}-lender`}
-                  ref={(ref) => fieldRefs.current[`${prefix}CurrentLender`] = ref}
-                  value={formData[`${prefix}CurrentLender` as keyof typeof formData]}
-                  onChange={(e) => handleInputChange(`${prefix}CurrentLender`, e.target.value, `${applicantName} Property`)}
-                />
-              </div>
-              
-              <div>
-                <Label htmlFor={`${prefix}-outstanding`}>Outstanding mortgage balance</Label>
-                <Input 
-                  id={`${prefix}-outstanding`}
-                  ref={(ref) => fieldRefs.current[`${prefix}OutstandingMortgage`] = ref}
-                  value={formData[`${prefix}OutstandingMortgage` as keyof typeof formData]}
-                  onChange={(e) => handleInputChange(`${prefix}OutstandingMortgage`, e.target.value, `${applicantName} Property`)}
-                />
-              </div>
-              
-              <div>
-                <Label htmlFor={`${prefix}-plans`}>Plans for property</Label>
-                <Select 
-                  value={formData[`${prefix}PlansForProperty` as keyof typeof formData]}
-                  onValueChange={(value) => handleInputChange(`${prefix}PlansForProperty`, value, `${applicantName} Property`)}
-                >
-                  <SelectTrigger ref={(ref) => fieldRefs.current[`${prefix}PlansForProperty`] = ref}>
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="Continue to live in it">Continue to live in it</SelectItem>
-                    <SelectItem value="Sell it">Sell it</SelectItem>
-                    <SelectItem value="Rent it out">Rent it out</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
-              
-              <div>
-                <Label htmlFor={`${prefix}-remaining`}>Expected remaining mortgage balance</Label>
-                <Input 
-                  id={`${prefix}-remaining`}
-                  ref={(ref) => fieldRefs.current[`${prefix}ExpectedRemainingBalance`] = ref}
-                  value={formData[`${prefix}ExpectedRemainingBalance` as keyof typeof formData]}
-                  onChange={(e) => handleInputChange(`${prefix}ExpectedRemainingBalance`, e.target.value, `${applicantName} Property`)}
-                />
-              </div>
-            </div>
-          </EditableField>
+        <div className="space-y-2">
+          <Label htmlFor={fieldName}>{label}</Label>
+          <Input
+            ref={(el) => { fieldRefs.current[fieldName] = el; }}
+            id={fieldName}
+            value={value}
+            onChange={(e) => handleInputChange(field, e.target.value, applicant)}
+            className="w-full"
+          />
         </div>
       );
     }
 
-    // Display view when not editing
     return (
-      <div className="space-y-6">
-        <h3 className="text-[#165788] text-lg font-medium">{applicantName}</h3>
-        
-        <div className="w-full">
-          <div className={`flex w-full gap-4 text-base flex-wrap p-1 bg-[#F7F8FA]`}>
-            <div className="text-[#505A5F] font-normal flex-1 shrink basis-[0%]">
-              Name change in last 6 years
-            </div>
-            <div 
-              className="text-black font-medium flex-1 shrink basis-[0%] flex items-center gap-2 cursor-pointer hover:text-blue-600"
-              onDoubleClick={() => handleFieldDoubleClick(`${prefix}NameChange`)}
-              title={isEditingEnabled && !isEditMode ? "Double-click to edit this field" : ""}
-            >
-              {formData[`${prefix}NameChange` as keyof typeof formData]}
-              {isFieldEdited(`${prefix}NameChange`) && (
-                <TooltipProvider>
-                  <Tooltip>
-                    <TooltipTrigger asChild>
-                      <button 
-                        onClick={() => handleFieldComparisonClick(`${prefix}NameChange`)}
-                        className="text-blue-500 hover:text-blue-700"
-                      >
-                        <Clock className="w-3 h-3" />
-                      </button>
-                    </TooltipTrigger>
-                    <TooltipContent>
-                      <p>This field has been edited. Click to view audit log.</p>
-                    </TooltipContent>
-                  </Tooltip>
-                </TooltipProvider>
-              )}
-            </div>
-          </div>
-          
-          <div className={`flex w-full gap-4 text-base flex-wrap p-1`}>
-            <div className="text-[#505A5F] font-normal flex-1 shrink basis-[0%]">
-              D.O.B - Age
-            </div>
-            <div 
-              className="text-black font-medium flex-1 shrink basis-[0%] flex items-center gap-2 cursor-pointer hover:text-blue-600"
-              onDoubleClick={() => handleFieldDoubleClick(`${prefix}DateOfBirthDay`)}
-              title={isEditingEnabled && !isEditMode ? "Double-click to edit this field" : ""}
-            >
-              {formData[`${prefix}DateOfBirthDay` as keyof typeof formData]}/{formData[`${prefix}DateOfBirthMonth` as keyof typeof formData]}/{formData[`${prefix}DateOfBirthYear` as keyof typeof formData]}
-              {(isFieldEdited(`${prefix}DateOfBirthDay`) || isFieldEdited(`${prefix}DateOfBirthMonth`) || isFieldEdited(`${prefix}DateOfBirthYear`)) && (
-                <TooltipProvider>
-                  <Tooltip>
-                    <TooltipTrigger asChild>
-                      <button 
-                        onClick={() => handleFieldComparisonClick(`${prefix}DateOfBirthDay`)}
-                        className="text-blue-500 hover:text-blue-700"
-                      >
-                        <Clock className="w-3 h-3" />
-                      </button>
-                    </TooltipTrigger>
-                    <TooltipContent>
-                      <p>This field has been edited. Click to view audit log.</p>
-                    </TooltipContent>
-                  </Tooltip>
-                </TooltipProvider>
-              )}
-            </div>
-          </div>
-          
-          <div className={`flex w-full gap-4 text-base flex-wrap p-1 bg-[#F7F8FA]`}>
-            <div className="text-[#505A5F] font-normal flex-1 shrink basis-[0%]">
-              Current address
-            </div>
-            <div 
-              className="text-black font-medium flex-1 shrink basis-[0%] flex items-center gap-2 cursor-pointer hover:text-blue-600"
-              onDoubleClick={() => handleFieldDoubleClick(`${prefix}CurrentAddress`)}
-              title={isEditingEnabled && !isEditMode ? "Double-click to edit this field" : ""}
-            >
-              {formData[`${prefix}CurrentAddress` as keyof typeof formData]} {formData[`${prefix}AddressLine2` as keyof typeof formData]} {formData[`${prefix}AddressLine3` as keyof typeof formData]}
-              {(isFieldEdited(`${prefix}CurrentAddress`) || isFieldEdited(`${prefix}AddressLine2`) || isFieldEdited(`${prefix}AddressLine3`)) && (
-                <TooltipProvider>
-                  <Tooltip>
-                    <TooltipTrigger asChild>
-                      <button 
-                        onClick={() => handleFieldComparisonClick(`${prefix}CurrentAddress`)}
-                        className="text-blue-500 hover:text-blue-700"
-                      >
-                        <Clock className="w-3 h-3" />
-                      </button>
-                    </TooltipTrigger>
-                    <TooltipContent>
-                      <p>This field has been edited. Click to view audit log.</p>
-                    </TooltipContent>
-                  </Tooltip>
-                </TooltipProvider>
-              )}
-            </div>
-          </div>
-          
-          <div className={`flex w-full gap-4 text-base flex-wrap p-1`}>
-            <div className="text-[#505A5F] font-normal flex-1 shrink basis-[0%]">
-              Postcode
-            </div>
-            <div 
-              className="text-black font-medium flex-1 shrink basis-[0%] flex items-center gap-2 cursor-pointer hover:text-blue-600"
-              onDoubleClick={() => handleFieldDoubleClick(`${prefix}Postcode`)}
-              title={isEditingEnabled && !isEditMode ? "Double-click to edit this field" : ""}
-            >
-              {formData[`${prefix}Postcode` as keyof typeof formData]}
-              {isFieldEdited(`${prefix}Postcode`) && (
-                <TooltipProvider>
-                  <Tooltip>
-                    <TooltipTrigger asChild>
-                      <button 
-                        onClick={() => handleFieldComparisonClick(`${prefix}Postcode`)}
-                        className="text-blue-500 hover:text-blue-700"
-                      >
-                        <Clock className="w-3 h-3" />
-                      </button>
-                    </TooltipTrigger>
-                    <TooltipContent>
-                      <p>This field has been edited. Click to view audit log.</p>
-                    </TooltipContent>
-                  </Tooltip>
-                </TooltipProvider>
-              )}
-            </div>
-          </div>
-          
-          <div className={`flex w-full gap-4 text-base flex-wrap p-1 bg-[#F7F8FA]`}>
-            <div className="text-[#505A5F] font-normal flex-1 shrink basis-[0%]">
-              When did the applicant move into the property
-            </div>
-            <div 
-              className="text-black font-medium flex-1 shrink basis-[0%] flex items-center gap-2 cursor-pointer hover:text-blue-600"
-              onDoubleClick={() => handleFieldDoubleClick(`${prefix}MovedInMonths`)}
-              title={isEditingEnabled && !isEditMode ? "Double-click to edit this field" : ""}
-            >
-              {formData[`${prefix}MovedInMonths` as keyof typeof formData]}/{formData[`${prefix}MovedInYears` as keyof typeof formData]}
-              {(isFieldEdited(`${prefix}MovedInMonths`) || isFieldEdited(`${prefix}MovedInYears`)) && (
-                <TooltipProvider>
-                  <Tooltip>
-                    <TooltipTrigger asChild>
-                      <button 
-                        onClick={() => handleFieldComparisonClick(`${prefix}MovedInMonths`)}
-                        className="text-blue-500 hover:text-blue-700"
-                      >
-                        <Clock className="w-3 h-3" />
-                      </button>
-                    </TooltipTrigger>
-                    <TooltipContent>
-                      <p>This field has been edited. Click to view audit log.</p>
-                    </TooltipContent>
-                  </Tooltip>
-                </TooltipProvider>
-              )}
-            </div>
-          </div>
-          
-          <div className={`flex w-full gap-4 text-base flex-wrap p-1`}>
-            <div className="text-[#505A5F] font-normal flex-1 shrink basis-[0%]">
-              Sale price
-            </div>
-            <div 
-              className="text-black font-medium flex-1 shrink basis-[0%] flex items-center gap-2 cursor-pointer hover:text-blue-600"
-              onDoubleClick={() => handleFieldDoubleClick(`${prefix}SalePrice`)}
-              title={isEditingEnabled && !isEditMode ? "Double-click to edit this field" : ""}
-            >
-              {formData[`${prefix}SalePrice` as keyof typeof formData]}
-              {isFieldEdited(`${prefix}SalePrice`) && (
-                <TooltipProvider>
-                  <Tooltip>
-                    <TooltipTrigger asChild>
-                      <button 
-                        onClick={() => handleFieldComparisonClick(`${prefix}SalePrice`)}
-                        className="text-blue-500 hover:text-blue-700"
-                      >
-                        <Clock className="w-3 h-3" />
-                      </button>
-                    </TooltipTrigger>
-                    <TooltipContent>
-                      <p>This field has been edited. Click to view audit log.</p>
-                    </TooltipContent>
-                  </Tooltip>
-                </TooltipProvider>
-              )}
-            </div>
-          </div>
-          
-          <div className={`flex w-full gap-4 text-base flex-wrap p-1 bg-[#F7F8FA]`}>
-            <div className="text-[#505A5F] font-normal flex-1 shrink basis-[0%]">
-              Current residency status
-            </div>
-            <div 
-              className="text-black font-medium flex-1 shrink basis-[0%] flex items-center gap-2 cursor-pointer hover:text-blue-600"
-              onDoubleClick={() => handleFieldDoubleClick(`${prefix}ResidencyStatus`)}
-              title={isEditingEnabled && !isEditMode ? "Double-click to edit this field" : ""}
-            >
-              {formData[`${prefix}ResidencyStatus` as keyof typeof formData]}
-              {isFieldEdited(`${prefix}ResidencyStatus`) && (
-                <TooltipProvider>
-                  <Tooltip>
-                    <TooltipTrigger asChild>
-                      <button 
-                        onClick={() => handleFieldComparisonClick(`${prefix}ResidencyStatus`)}
-                        className="text-blue-500 hover:text-blue-700"
-                      >
-                        <Clock className="w-3 h-3" />
-                      </button>
-                    </TooltipTrigger>
-                    <TooltipContent>
-                      <p>This field has been edited. Click to view audit log.</p>
-                    </TooltipContent>
-                  </Tooltip>
-                </TooltipProvider>
-              )}
-            </div>
-          </div>
-          
-          <div className={`flex w-full gap-4 text-base flex-wrap p-1`}>
-            <div className="text-[#505A5F] font-normal flex-1 shrink basis-[0%]">
-              Current lender
-            </div>
-            <div 
-              className="text-black font-medium flex-1 shrink basis-[0%] flex items-center gap-2 cursor-pointer hover:text-blue-600"
-              onDoubleClick={() => handleFieldDoubleClick(`${prefix}CurrentLender`)}
-              title={isEditingEnabled && !isEditMode ? "Double-click to edit this field" : ""}
-            >
-              {formData[`${prefix}CurrentLender` as keyof typeof formData]}
-              {isFieldEdited(`${prefix}CurrentLender`) && (
-                <TooltipProvider>
-                  <Tooltip>
-                    <TooltipTrigger asChild>
-                      <button 
-                        onClick={() => handleFieldComparisonClick(`${prefix}CurrentLender`)}
-                        className="text-blue-500 hover:text-blue-700"
-                      >
-                        <Clock className="w-3 h-3" />
-                      </button>
-                    </TooltipTrigger>
-                    <TooltipContent>
-                      <p>This field has been edited. Click to view audit log.</p>
-                    </TooltipContent>
-                  </Tooltip>
-                </TooltipProvider>
-              )}
-            </div>
-          </div>
-          
-          <div className={`flex w-full gap-4 text-base flex-wrap p-1 bg-[#F7F8FA]`}>
-            <div className="text-[#505A5F] font-normal flex-1 shrink basis-[0%]">
-              Outstanding mortgage balance
-            </div>
-            <div 
-              className="text-black font-medium flex-1 shrink basis-[0%] flex items-center gap-2 cursor-pointer hover:text-blue-600"
-              onDoubleClick={() => handleFieldDoubleClick(`${prefix}OutstandingMortgage`)}
-              title={isEditingEnabled && !isEditMode ? "Double-click to edit this field" : ""}
-            >
-              {formData[`${prefix}OutstandingMortgage` as keyof typeof formData]}
-              {isFieldEdited(`${prefix}OutstandingMortgage`) && (
-                <TooltipProvider>
-                  <Tooltip>
-                    <TooltipTrigger asChild>
-                      <button 
-                        onClick={() => handleFieldComparisonClick(`${prefix}OutstandingMortgage`)}
-                        className="text-blue-500 hover:text-blue-700"
-                      >
-                        <Clock className="w-3 h-3" />
-                      </button>
-                    </TooltipTrigger>
-                    <TooltipContent>
-                      <p>This field has been edited. Click to view audit log.</p>
-                    </TooltipContent>
-                  </Tooltip>
-                </TooltipProvider>
-              )}
-            </div>
-          </div>
-          
-          <div className={`flex w-full gap-4 text-base flex-wrap p-1`}>
-            <div className="text-[#505A5F] font-normal flex-1 shrink basis-[0%]">
-              Plans for property
-            </div>
-            <div 
-              className="text-black font-medium flex-1 shrink basis-[0%] flex items-center gap-2 cursor-pointer hover:text-blue-600"
-              onDoubleClick={() => handleFieldDoubleClick(`${prefix}PlansForProperty`)}
-              title={isEditingEnabled && !isEditMode ? "Double-click to edit this field" : ""}
-            >
-              {formData[`${prefix}PlansForProperty` as keyof typeof formData]}
-              {isFieldEdited(`${prefix}PlansForProperty`) && (
-                <TooltipProvider>
-                  <Tooltip>
-                    <TooltipTrigger asChild>
-                      <button 
-                        onClick={() => handleFieldComparisonClick(`${prefix}PlansForProperty`)}
-                        className="text-blue-500 hover:text-blue-700"
-                      >
-                        <Clock className="w-3 h-3" />
-                      </button>
-                    </TooltipTrigger>
-                    <TooltipContent>
-                      <p>This field has been edited. Click to view audit log.</p>
-                    </TooltipContent>
-                  </Tooltip>
-                </TooltipProvider>
-              )}
-            </div>
-          </div>
-          
-          <div className={`flex w-full gap-4 text-base flex-wrap p-1 bg-[#F7F8FA]`}>
-            <div className="text-[#505A5F] font-normal flex-1 shrink basis-[0%]">
-              Expected remaining mortgage balance
-            </div>
-            <div 
-              className="text-black font-medium flex-1 shrink basis-[0%] flex items-center gap-2 cursor-pointer hover:text-blue-600"
-              onDoubleClick={() => handleFieldDoubleClick(`${prefix}ExpectedRemainingBalance`)}
-              title={isEditingEnabled && !isEditMode ? "Double-click to edit this field" : ""}
-            >
-              {formData[`${prefix}ExpectedRemainingBalance` as keyof typeof formData]}
-              {isFieldEdited(`${prefix}ExpectedRemainingBalance`) && (
-                <TooltipProvider>
-                  <Tooltip>
-                    <TooltipTrigger asChild>
-                      <button 
-                        onClick={() => handleFieldComparisonClick(`${prefix}ExpectedRemainingBalance`)}
-                        className="text-blue-500 hover:text-blue-700"
-                      >
-                        <Clock className="w-3 h-3" />
-                      </button>
-                    </TooltipTrigger>
-                    <TooltipContent>
-                      <p>This field has been edited. Click to view audit log.</p>
-                    </TooltipContent>
-                  </Tooltip>
-                </TooltipProvider>
-              )}
-            </div>
-          </div>
+      <div className="space-y-2" onDoubleClick={() => handleFieldDoubleClick(fieldName)}>
+        <Label className="text-muted-foreground">{label}</Label>
+        <div className="flex items-center gap-2">
+          <span className="text-sm">{value}</span>
+          {isFieldEdited(fieldName) && (
+            <Clock
+              className="h-4 w-4 text-muted-foreground cursor-pointer"
+              onClick={() => handleFieldComparisonClick(fieldName)}
+            />
+          )}
         </div>
       </div>
     );
   };
 
-  return (
-    <>
-      <div className="p-8 max-md:px-5">
-        <div className="shadow-[0px_0px_10px_rgba(0,0,0,0.05)] bg-white p-6 rounded">
-          <div className="mb-8">
-            <h1 className="text-[#165788] text-[22px] font-medium">
-              Personal Details
-            </h1>
-          </div>
-        
-          <div className="space-y-8">
-            {/* James Taylor Section */}
-            <section className="w-full">
-              {renderApplicantSection("James Taylor", "james", "Mr")}
-            </section>
+  const renderApplicantSection = (applicant: 'james' | 'jane', title: string) => {
+    const data = applicant === 'james' ? jamesData : janeData;
+    
+    return (
+      <div className="space-y-6">
+        <Card ref={(el) => { sectionRefs.current[`${applicant}-section`] = el; }}>
+          <CardHeader>
+            <CardTitle className="text-[#165788] text-xl">{title}</CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-6">
+            {/* Eligibility Section */}
+            <div className="space-y-4">
+              <h3 className="text-lg font-medium">Eligibility</h3>
+              <p className="text-sm text-muted-foreground">
+                In the last 3 years has this applicant had or satisfied any of the following:
+              </p>
+              <div className="space-y-4">
+                {renderField('courtDecree', 'CCJ (court of decree in Scotland)', applicant, 'radio', ['Yes', 'No'])}
+                {renderField('debtManagement', 'Had an active or settled debt management plan', applicant, 'radio', ['Yes', 'No'])}
+              </div>
+            </div>
 
-            {/* Jane Taylor Section */}
-            <section className="w-full">
-              {renderApplicantSection("Jane Taylor", "jane", "Mrs")}
-            </section>
-          </div>
-        </div>
+            {/* Personal Details Section */}
+            <div className="space-y-4">
+              <h3 className="text-lg font-medium">Personal details</h3>
+              <p className="text-sm text-muted-foreground">
+                Please complete this to the applicant and in form of official identification such as passport or driving licence.
+              </p>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                {renderField('title', 'Title', applicant, 'select', ['Mr', 'Mrs', 'Miss', 'Ms', 'Dr'])}
+                {renderField('firstName', 'First name', applicant)}
+                {renderField('middleName', 'Middle name', applicant)}
+                {renderField('lastName', 'Last name', applicant)}
+                {renderField('nameChange', 'Name change in the last 3 years?', applicant, 'radio', ['Yes', 'No'])}
+              </div>
+
+              <div className="space-y-4">
+                <Label>Date of birth</Label>
+                <div className="grid grid-cols-3 gap-4">
+                  {renderField('birthDay', 'Day', applicant)}
+                  {renderField('birthMonth', 'Month', applicant)}
+                  {renderField('birthYear', 'Year', applicant)}
+                </div>
+              </div>
+
+              {renderField('nationality', 'Nationality', applicant, 'radio', ['UK Resident', 'EEA or Swiss National', 'Non EEA'])}
+            </div>
+
+            {/* Addresses Section */}
+            <div className="space-y-4">
+              <h3 className="text-lg font-medium">{title}'s addresses</h3>
+              <p className="text-sm text-muted-foreground">
+                Please complete the applicant's address over the last 3 years.
+              </p>
+              
+              <div className="space-y-4">
+                <h4 className="font-medium">Current address</h4>
+                {renderField('currentAddress', 'Address', applicant)}
+                <div className="grid grid-cols-2 gap-4">
+                  {renderField('currentAddressYears', 'Years', applicant)}
+                  {renderField('currentAddressMonths', 'Months', applicant)}
+                </div>
+                {renderField('currentResidencyStatus', 'Current residency status', applicant, 'select', [
+                  'Owner occupation with mortgage',
+                  'Owner occupation without mortgage',
+                  'Privately rented',
+                  'Living with parents',
+                  'Council rented',
+                  'Housing association rented',
+                  'Other'
+                ])}
+              </div>
+
+              <div className="space-y-4">
+                <h4 className="font-medium">Previous address</h4>
+                {renderField('previousAddress', 'Address', applicant)}
+                <div className="grid grid-cols-2 gap-4">
+                  {renderField('previousAddressYears', 'Years', applicant)}
+                  {renderField('previousAddressMonths', 'Months', applicant)}
+                </div>
+              </div>
+            </div>
+
+            {/* Income Section */}
+            <div className="space-y-4">
+              <h3 className="text-lg font-medium">{title}'s income</h3>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                {renderField('employmentStatus', 'Employment status', applicant, 'select', ['Employed', 'Self-employed', 'Unemployed', 'Retired'])}
+                {renderField('grossBasicIncome', 'Gross basic income', applicant)}
+                {renderField('frequency', 'Payment frequency of gross basic income', applicant, 'select', ['Weekly', 'Monthly', 'Yearly'])}
+                {renderField('annualAmount', 'Annual amount', applicant)}
+                {renderField('monthlyNetSalary', 'Monthly net salary/net income', applicant)}
+                {renderField('jobTitle', 'Job title', applicant)}
+                {renderField('employerName', 'Employer name', applicant)}
+                {renderField('employmentType', 'Employment nature', applicant, 'radio', ['Permanent', 'Contract'])}
+              </div>
+
+              <div className="space-y-4">
+                <Label>Start date of permanent employment</Label>
+                <div className="grid grid-cols-2 gap-4">
+                  {renderField('startMonth', 'Month', applicant)}
+                  {renderField('startYear', 'Year', applicant)}
+                </div>
+              </div>
+
+              {renderField('expectedRetirementAge', 'Expected retirement age', applicant)}
+
+              <div className="space-y-4">
+                <h4 className="font-medium">Please add all additional income sources relevant to this applicant:</h4>
+                <div className="grid grid-cols-3 gap-4">
+                  <div>
+                    <Label>Income source</Label>
+                    <Select defaultValue="Before tax return">
+                      <SelectTrigger>
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="Before tax return">Before tax return</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+                  <div>
+                    <Label>Amount</Label>
+                    <Input placeholder="£" />
+                  </div>
+                  <div>
+                    <Label>Frequency</Label>
+                    <Select defaultValue="Yearly">
+                      <SelectTrigger>
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="Yearly">Yearly</SelectItem>
+                        <SelectItem value="Monthly">Monthly</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+                </div>
+                <Button variant="outline" className="w-full">
+                  <Plus className="w-4 h-4 mr-2" />
+                  Add an income source
+                </Button>
+              </div>
+            </div>
+
+            {/* Commitments Section */}
+            <div className="space-y-4">
+              <h3 className="text-lg font-medium">{title}'s commitments</h3>
+              <p className="text-sm text-muted-foreground">
+                Please add all current commitments related to this applicant, even if they will be redeemed or consolidated upon completion.
+                Please also include, but are not limited to: credit cards, hire purchase, commercial finance, student finance payments, etc.
+              </p>
+
+              <div className="grid grid-cols-4 gap-4">
+                {renderField('commitmentType', 'Commitment type', applicant, 'select', ['Credit card', 'Personal loan', 'Hire purchase', 'Student loan'])}
+                {renderField('provider', 'Provider', applicant, 'select', ['Bank', 'Building Society', 'Finance Company'])}
+                {renderField('monthlyPayment', 'Monthly payment', applicant)}
+                {renderField('remainingBalance', 'Remaining balance', applicant)}
+              </div>
+
+              <Button variant="outline" className="w-full">
+                <Plus className="w-4 h-4 mr-2" />
+                Add a commitment
+              </Button>
+            </div>
+          </CardContent>
+        </Card>
+      </div>
+    );
+  };
+
+  return (
+    <div className="container mx-auto p-6 space-y-6">
+      <div className="flex justify-between items-center">
+        <h1 className="text-3xl font-bold">Personal Details</h1>
+        <Button onClick={handleMainButtonClick} variant={getButtonVariant()}>
+          {getButtonText()}
+        </Button>
       </div>
 
+      {renderApplicantSection('james', 'James Taylor')}
+      {renderApplicantSection('jane', 'Jane Taylor')}
+
       <FieldComparisonModal
-        open={comparisonModal.open}
-        onOpenChange={(open) => setComparisonModal({ open, fieldName: '' })}
-        fieldName={comparisonModal.fieldName}
+        open={!!comparisonField}
+        onOpenChange={(open) => !open && setComparisonField(null)}
+        fieldName={comparisonField || ''}
         auditEntries={auditLog}
       />
-    </>
+    </div>
   );
 };

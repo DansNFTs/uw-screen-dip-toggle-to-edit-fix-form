@@ -33,15 +33,12 @@ export const AppSidebar: React.FC = () => {
   
   const mainMenuItems: NavigationItem[] = [
     { label: 'Summary', path: '/' },
-    { label: 'Mortgage details (Detailed)', path: '/mortgage-details' },
     { label: 'Loan details', path: '/loan-details' },
     { label: 'Property details', path: '/property-details' },
     { label: 'Credit information', path: '/credit-information' },
     { label: 'Affordability', path: '/affordability' },
     { label: 'Commitments & Expenses', path: '/commitments-expenses' },
     { label: 'Personal details', path: '/personal-details' },
-    { label: 'James Taylor (Detailed)', path: '/detailed-personal/1' },
-    { label: 'Jane Taylor (Detailed)', path: '/detailed-personal/2' },
     { label: 'Income & Employment', path: '/income-employment' },
     { label: 'Policy rules & Notes', path: '/policy-rules-notes' },
   ];

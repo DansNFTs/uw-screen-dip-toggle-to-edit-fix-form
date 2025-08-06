@@ -15,8 +15,6 @@ import { CommitmentsExpensesPage } from "./pages/CommitmentsExpensesPage";
 import { PersonalDetailsPage } from "./pages/PersonalDetailsPage";
 import { AuditLogPage } from "./pages/AuditLogPage";
 import { PolicyRulesNotesPage } from "./pages/PolicyRulesNotesPage";
-import { MortgageDetailsPage } from "./pages/MortgageDetailsPage";
-import { DetailedPersonalDetailsPage } from "./pages/DetailedPersonalDetailsPage";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -37,8 +35,6 @@ const App = () => (
             <Route path="/affordability" element={<AffordabilityPage />} />
             <Route path="/commitments-expenses" element={<CommitmentsExpensesPage />} />
             <Route path="/personal-details" element={<PersonalDetailsPage />} />
-            <Route path="/mortgage-details" element={<MortgageDetailsPage />} />
-            <Route path="/detailed-personal/:applicantNumber" element={<DetailedPersonalDetailsPage />} />
             <Route path="/policy-rules-notes" element={<PolicyRulesNotesPage />} />
             <Route path="/audit-log" element={<AuditLogPage />} />
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
