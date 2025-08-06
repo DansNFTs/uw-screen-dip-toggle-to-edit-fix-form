@@ -1,5 +1,5 @@
 
-import React, { useState } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { useEditMode } from '../contexts/EditModeContext';
 import { useAudit } from '../contexts/AuditContext';
 import { Button } from "@/components/ui/button";
@@ -15,6 +15,10 @@ export const SummaryPage: React.FC = () => {
   const { isEditMode, hasUnsavedChanges, hasSavedChanges, toggleEditMode, setHasUnsavedChanges, saveChanges, exitEditMode } = useEditMode();
   const { addAuditEntry } = useAudit();
   const { toast } = useToast();
+
+  const [focusedField, setFocusedField] = useState<string | null>(null);
+  const fieldRefs = useRef<{ [key: string]: HTMLInputElement | HTMLButtonElement | null }>({});
+  const sectionRefs = useRef<{ [key: string]: HTMLDivElement | null }>({});
 
   const [formData, setFormData] = useState({
     // Loan details
@@ -100,6 +104,48 @@ export const SummaryPage: React.FC = () => {
     return "destructive";
   };
 
+  // Focus on specific field and section when entering edit mode
+  useEffect(() => {
+    if (isEditMode && focusedField) {
+      // Determine which section to scroll to based on field name
+      let sectionToScroll = '';
+      if (focusedField.includes('applicant1')) {
+        sectionToScroll = 'applicant1';
+      } else if (focusedField.includes('applicant2')) {
+        sectionToScroll = 'applicant2';
+      } else if (['loanAmount', 'depositAmount', 'sourceOfDeposit', 'valueOfApplicantShare', 'totalPurchasePriceFullMarketValue', 'ltv', 'term', 'repaymentType', 'outstandingMortgageValue', 'newMortgageExceedsCurrentBalance'].includes(focusedField)) {
+        sectionToScroll = 'loanDetails';
+      } else if (['region', 'address', 'postCode'].includes(focusedField)) {
+        sectionToScroll = 'propertyDetails';
+      } else if (['creditScore', 'customerIndebtednessScore'].includes(focusedField)) {
+        sectionToScroll = 'creditInformation';
+      } else if (['affordabilityScore', 'basedOnDetails', 'freeDisposableIncome', 'mortgageSubUnder'].includes(focusedField)) {
+        sectionToScroll = 'affordability';
+      }
+
+      setTimeout(() => {
+        // First scroll to the section
+        if (sectionToScroll && sectionRefs.current[sectionToScroll]) {
+          sectionRefs.current[sectionToScroll]?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
+        
+        // Then focus on the specific field
+        if (fieldRefs.current[focusedField]) {
+          setTimeout(() => {
+            fieldRefs.current[focusedField]?.focus();
+          }, 300);
+        }
+      }, 100);
+    }
+  }, [isEditMode, focusedField]);
+
+  const handleFieldDoubleClick = (field: string) => {
+    if (!isEditMode) {
+      setFocusedField(field);
+      toggleEditMode();
+    }
+  };
+
   const handleMainButtonClick = () => {
     if (hasSavedChanges) {
       exitEditMode();
@@ -119,7 +165,10 @@ export const SummaryPage: React.FC = () => {
           </Label>
           {type === 'select' && options ? (
             <Select value={value} onValueChange={(newValue) => handleInputChange(field, newValue)}>
-              <SelectTrigger className="w-1/2">
+              <SelectTrigger 
+                ref={(ref) => fieldRefs.current[field] = ref}
+                className="w-1/2"
+              >
                 <SelectValue />
               </SelectTrigger>
               <SelectContent>
@@ -132,6 +181,7 @@ export const SummaryPage: React.FC = () => {
             </Select>
           ) : (
             <Input
+              ref={(ref) => fieldRefs.current[field] = ref}
               value={value}
               onChange={(e) => handleInputChange(field, e.target.value)}
               className="w-1/2"
@@ -142,7 +192,10 @@ export const SummaryPage: React.FC = () => {
     }
 
     return (
-      <div className={`flex justify-between items-center py-2 px-3 ${bgColor}`}>
+      <div 
+        className={`flex justify-between items-center py-2 px-3 ${bgColor} cursor-pointer hover:bg-gray-100`}
+        onDoubleClick={() => handleFieldDoubleClick(field)}
+      >
         <span className="text-gray-600 font-normal text-sm">{label}</span>
         <span className="font-medium text-sm">{value}</span>
       </div>
@@ -173,7 +226,7 @@ export const SummaryPage: React.FC = () => {
       
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {/* Loan Details */}
-        <Card>
+        <Card ref={(ref) => sectionRefs.current['loanDetails'] = ref}>
           <CardHeader>
             <CardTitle className="text-[#165788] text-lg font-medium">Loan details</CardTitle>
           </CardHeader>
@@ -192,7 +245,7 @@ export const SummaryPage: React.FC = () => {
         </Card>
 
         {/* Property Details */}
-        <Card>
+        <Card ref={(ref) => sectionRefs.current['propertyDetails'] = ref}>
           <CardHeader>
             <CardTitle className="text-[#165788] text-lg font-medium">Property details</CardTitle>
           </CardHeader>
@@ -204,7 +257,7 @@ export const SummaryPage: React.FC = () => {
         </Card>
 
         {/* Applicant 1 Details */}
-        <Card>
+        <Card ref={(ref) => sectionRefs.current['applicant1'] = ref}>
           <CardHeader>
             <CardTitle className="text-[#165788] text-lg font-medium">Applicant 1 details</CardTitle>
             <div className="font-medium">{formData.applicant1Name}</div>
@@ -221,7 +274,7 @@ export const SummaryPage: React.FC = () => {
         </Card>
 
         {/* Applicant 2 Details */}
-        <Card>
+        <Card ref={(ref) => sectionRefs.current['applicant2'] = ref}>
           <CardHeader>
             <CardTitle className="text-[#165788] text-lg font-medium">Applicant 2 details</CardTitle>
             <div className="font-medium">{formData.applicant2Name}</div>
@@ -241,7 +294,7 @@ export const SummaryPage: React.FC = () => {
       {/* Full width cards */}
       <div className="space-y-6 mt-6">
         {/* Credit Information */}
-        <Card>
+        <Card ref={(ref) => sectionRefs.current['creditInformation'] = ref}>
           <CardHeader>
             <CardTitle className="text-[#165788] text-lg font-medium">Credit information</CardTitle>
             <div className="flex items-center gap-2">
@@ -290,7 +343,7 @@ export const SummaryPage: React.FC = () => {
         </Card>
 
         {/* Affordability */}
-        <Card>
+        <Card ref={(ref) => sectionRefs.current['affordability'] = ref}>
           <CardHeader>
             <CardTitle className="text-[#165788] text-lg font-medium">Affordability</CardTitle>
           </CardHeader>
