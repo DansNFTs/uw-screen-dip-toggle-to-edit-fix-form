@@ -20,6 +20,11 @@ export const EditablePersonalDetailsPage: React.FC = () => {
   const { toast } = useToast();
   const navigate = useNavigate();
   
+  // Add anchor functionality
+  const [focusedField, setFocusedField] = useState<string | null>(null);
+  const fieldRefs = React.useRef<{ [key: string]: HTMLInputElement | HTMLButtonElement | null }>({});
+  const sectionRefs = React.useRef<{ [key: string]: HTMLDivElement | null }>({});
+
   const initialFormData = {
     // James Taylor - Eligibility
     jamesAgeEligibility: 'No',
@@ -117,6 +122,41 @@ export const EditablePersonalDetailsPage: React.FC = () => {
     }
   }, [isEditMode, currentSessionId, storeOriginalState, startAuditSession]);
 
+  // Focus on specific field and section when entering edit mode
+  React.useEffect(() => {
+    if (isEditMode && focusedField) {
+      console.log('Focusing on field:', focusedField);
+      
+      // Determine which section to scroll to based on field name
+      let sectionToScroll = '';
+      if (focusedField.startsWith('james')) {
+        sectionToScroll = 'james-section';
+      } else if (focusedField.startsWith('jane')) {
+        sectionToScroll = 'jane-section';
+      }
+
+      console.log('Section to scroll:', sectionToScroll);
+      console.log('Section ref available:', !!sectionRefs.current[sectionToScroll]);
+      console.log('Field ref available:', !!fieldRefs.current[focusedField]);
+
+      setTimeout(() => {
+        // First scroll to the section
+        if (sectionToScroll && sectionRefs.current[sectionToScroll]) {
+          console.log('Scrolling to section:', sectionToScroll);
+          sectionRefs.current[sectionToScroll]?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
+        
+        // Then focus on the specific field
+        if (fieldRefs.current[focusedField]) {
+          setTimeout(() => {
+            console.log('Focusing on field element');
+            fieldRefs.current[focusedField]?.focus();
+          }, 500);
+        }
+      }, 100);
+    }
+  }, [isEditMode, focusedField]);
+
   // Listen for cancel events to restore original state
   React.useEffect(() => {
     const handleRestore = () => {
@@ -166,7 +206,9 @@ export const EditablePersonalDetailsPage: React.FC = () => {
   };
 
   const handleFieldDoubleClick = (field: string) => {
+    console.log('Double clicked field:', field);
     if (isEditingEnabled && !isEditMode) {
+      setFocusedField(field);
       setIsEditMode(true);
       if (!currentSessionId) {
         startAuditSession();
@@ -194,7 +236,7 @@ export const EditablePersonalDetailsPage: React.FC = () => {
     if (isEditMode) {
       // Form view when editing
       return (
-        <div className="space-y-6">
+        <div className="space-y-6" ref={(ref) => sectionRefs.current[`${prefix}-section`] = ref}>
           <h2 className="text-[#165788] text-lg font-medium">{applicantName}</h2>
           
           {/* Eligibility Section */}
@@ -257,7 +299,7 @@ export const EditablePersonalDetailsPage: React.FC = () => {
                     value={formData[`${prefix}Title` as keyof typeof formData]}
                     onValueChange={(value) => handleInputChange(`${prefix}Title`, value, `${applicantName} Personal Details`)}
                   >
-                    <SelectTrigger>
+                    <SelectTrigger ref={(ref) => fieldRefs.current[`${prefix}Title`] = ref}>
                       <SelectValue />
                     </SelectTrigger>
                     <SelectContent>
@@ -275,6 +317,7 @@ export const EditablePersonalDetailsPage: React.FC = () => {
                 <Label htmlFor={`${prefix}-firstname`}>First name</Label>
                 <Input 
                   id={`${prefix}-firstname`}
+                  ref={(ref) => fieldRefs.current[`${prefix}FirstName`] = ref}
                   value={formData[`${prefix}FirstName` as keyof typeof formData]}
                   onChange={(e) => handleInputChange(`${prefix}FirstName`, e.target.value, `${applicantName} Personal Details`)}
                 />
@@ -284,6 +327,7 @@ export const EditablePersonalDetailsPage: React.FC = () => {
                 <Label htmlFor={`${prefix}-middlename`}>Middle name</Label>
                 <Input 
                   id={`${prefix}-middlename`}
+                  ref={(ref) => fieldRefs.current[`${prefix}MiddleName`] = ref}
                   value={formData[`${prefix}MiddleName` as keyof typeof formData]}
                   onChange={(e) => handleInputChange(`${prefix}MiddleName`, e.target.value, `${applicantName} Personal Details`)}
                 />
@@ -293,6 +337,7 @@ export const EditablePersonalDetailsPage: React.FC = () => {
                 <Label htmlFor={`${prefix}-lastname`}>Last name</Label>
                 <Input 
                   id={`${prefix}-lastname`}
+                  ref={(ref) => fieldRefs.current[`${prefix}LastName`] = ref}
                   value={formData[`${prefix}LastName` as keyof typeof formData]}
                   onChange={(e) => handleInputChange(`${prefix}LastName`, e.target.value, `${applicantName} Personal Details`)}
                 />
@@ -322,18 +367,21 @@ export const EditablePersonalDetailsPage: React.FC = () => {
                   <Input 
                     placeholder="DD"
                     className="w-16"
+                    ref={(ref) => fieldRefs.current[`${prefix}DateOfBirthDay`] = ref}
                     value={formData[`${prefix}DateOfBirthDay` as keyof typeof formData]}
                     onChange={(e) => handleInputChange(`${prefix}DateOfBirthDay`, e.target.value, `${applicantName} Personal Details`)}
                   />
                   <Input 
                     placeholder="MM"
                     className="w-16"
+                    ref={(ref) => fieldRefs.current[`${prefix}DateOfBirthMonth`] = ref}
                     value={formData[`${prefix}DateOfBirthMonth` as keyof typeof formData]}
                     onChange={(e) => handleInputChange(`${prefix}DateOfBirthMonth`, e.target.value, `${applicantName} Personal Details`)}
                   />
                   <Input 
                     placeholder="YYYY"
                     className="w-20"
+                    ref={(ref) => fieldRefs.current[`${prefix}DateOfBirthYear`] = ref}
                     value={formData[`${prefix}DateOfBirthYear` as keyof typeof formData]}
                     onChange={(e) => handleInputChange(`${prefix}DateOfBirthYear`, e.target.value, `${applicantName} Personal Details`)}
                   />
@@ -373,6 +421,7 @@ export const EditablePersonalDetailsPage: React.FC = () => {
                 <Label htmlFor={`${prefix}-address`}>Current address</Label>
                 <Input 
                   id={`${prefix}-address`}
+                  ref={(ref) => fieldRefs.current[`${prefix}CurrentAddress`] = ref}
                   value={formData[`${prefix}CurrentAddress` as keyof typeof formData]}
                   onChange={(e) => handleInputChange(`${prefix}CurrentAddress`, e.target.value, `${applicantName} Address`)}
                 />
@@ -382,6 +431,7 @@ export const EditablePersonalDetailsPage: React.FC = () => {
                 <Label htmlFor={`${prefix}-address2`}>Address line 2</Label>
                 <Input 
                   id={`${prefix}-address2`}
+                  ref={(ref) => fieldRefs.current[`${prefix}AddressLine2`] = ref}
                   value={formData[`${prefix}AddressLine2` as keyof typeof formData]}
                   onChange={(e) => handleInputChange(`${prefix}AddressLine2`, e.target.value, `${applicantName} Address`)}
                 />
@@ -391,6 +441,7 @@ export const EditablePersonalDetailsPage: React.FC = () => {
                 <Label htmlFor={`${prefix}-address3`}>Address line 3</Label>
                 <Input 
                   id={`${prefix}-address3`}
+                  ref={(ref) => fieldRefs.current[`${prefix}AddressLine3`] = ref}
                   value={formData[`${prefix}AddressLine3` as keyof typeof formData]}
                   onChange={(e) => handleInputChange(`${prefix}AddressLine3`, e.target.value, `${applicantName} Address`)}
                 />
@@ -400,6 +451,7 @@ export const EditablePersonalDetailsPage: React.FC = () => {
                 <Label htmlFor={`${prefix}-postcode`}>Postcode</Label>
                 <Input 
                   id={`${prefix}-postcode`}
+                  ref={(ref) => fieldRefs.current[`${prefix}Postcode`] = ref}
                   value={formData[`${prefix}Postcode` as keyof typeof formData]}
                   onChange={(e) => handleInputChange(`${prefix}Postcode`, e.target.value, `${applicantName} Address`)}
                 />
@@ -411,6 +463,7 @@ export const EditablePersonalDetailsPage: React.FC = () => {
                   <Input 
                     placeholder="Months"
                     className="w-24"
+                    ref={(ref) => fieldRefs.current[`${prefix}MovedInMonths`] = ref}
                     value={formData[`${prefix}MovedInMonths` as keyof typeof formData]}
                     onChange={(e) => handleInputChange(`${prefix}MovedInMonths`, e.target.value, `${applicantName} Address`)}
                   />
@@ -418,6 +471,7 @@ export const EditablePersonalDetailsPage: React.FC = () => {
                   <Input 
                     placeholder="Year"
                     className="w-24"
+                    ref={(ref) => fieldRefs.current[`${prefix}MovedInYears`] = ref}
                     value={formData[`${prefix}MovedInYears` as keyof typeof formData]}
                     onChange={(e) => handleInputChange(`${prefix}MovedInYears`, e.target.value, `${applicantName} Address`)}
                   />
@@ -430,7 +484,7 @@ export const EditablePersonalDetailsPage: React.FC = () => {
                   value={formData[`${prefix}ResidencyStatus` as keyof typeof formData]}
                   onValueChange={(value) => handleInputChange(`${prefix}ResidencyStatus`, value, `${applicantName} Address`)}
                 >
-                  <SelectTrigger>
+                  <SelectTrigger ref={(ref) => fieldRefs.current[`${prefix}ResidencyStatus`] = ref}>
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent>
@@ -453,6 +507,7 @@ export const EditablePersonalDetailsPage: React.FC = () => {
                 <Label htmlFor={`${prefix}-saleprice`}>Sale price</Label>
                 <Input 
                   id={`${prefix}-saleprice`}
+                  ref={(ref) => fieldRefs.current[`${prefix}SalePrice`] = ref}
                   value={formData[`${prefix}SalePrice` as keyof typeof formData]}
                   onChange={(e) => handleInputChange(`${prefix}SalePrice`, e.target.value, `${applicantName} Property`)}
                 />
@@ -462,6 +517,7 @@ export const EditablePersonalDetailsPage: React.FC = () => {
                 <Label htmlFor={`${prefix}-lender`}>Current lender</Label>
                 <Input 
                   id={`${prefix}-lender`}
+                  ref={(ref) => fieldRefs.current[`${prefix}CurrentLender`] = ref}
                   value={formData[`${prefix}CurrentLender` as keyof typeof formData]}
                   onChange={(e) => handleInputChange(`${prefix}CurrentLender`, e.target.value, `${applicantName} Property`)}
                 />
@@ -471,6 +527,7 @@ export const EditablePersonalDetailsPage: React.FC = () => {
                 <Label htmlFor={`${prefix}-outstanding`}>Outstanding mortgage balance</Label>
                 <Input 
                   id={`${prefix}-outstanding`}
+                  ref={(ref) => fieldRefs.current[`${prefix}OutstandingMortgage`] = ref}
                   value={formData[`${prefix}OutstandingMortgage` as keyof typeof formData]}
                   onChange={(e) => handleInputChange(`${prefix}OutstandingMortgage`, e.target.value, `${applicantName} Property`)}
                 />
@@ -482,7 +539,7 @@ export const EditablePersonalDetailsPage: React.FC = () => {
                   value={formData[`${prefix}PlansForProperty` as keyof typeof formData]}
                   onValueChange={(value) => handleInputChange(`${prefix}PlansForProperty`, value, `${applicantName} Property`)}
                 >
-                  <SelectTrigger>
+                  <SelectTrigger ref={(ref) => fieldRefs.current[`${prefix}PlansForProperty`] = ref}>
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent>
@@ -497,6 +554,7 @@ export const EditablePersonalDetailsPage: React.FC = () => {
                 <Label htmlFor={`${prefix}-remaining`}>Expected remaining mortgage balance</Label>
                 <Input 
                   id={`${prefix}-remaining`}
+                  ref={(ref) => fieldRefs.current[`${prefix}ExpectedRemainingBalance`] = ref}
                   value={formData[`${prefix}ExpectedRemainingBalance` as keyof typeof formData]}
                   onChange={(e) => handleInputChange(`${prefix}ExpectedRemainingBalance`, e.target.value, `${applicantName} Property`)}
                 />
