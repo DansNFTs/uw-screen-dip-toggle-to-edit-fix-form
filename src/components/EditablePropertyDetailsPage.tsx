@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { useEditMode } from '../contexts/EditModeContext';
 import { useAudit } from '../contexts/AuditContext';
 import { Button } from "@/components/ui/button";
@@ -30,6 +30,8 @@ export const EditablePropertyDetailsPage: React.FC = () => {
 
   const [formData, setFormData] = useState(initialFormData);
   const [comparisonModal, setComparisonModal] = useState({ open: false, fieldName: '' });
+  const [focusedField, setFocusedField] = useState<string | null>(null);
+  const fieldRefs = useRef<{ [key: string]: HTMLInputElement | HTMLButtonElement | null }>({});
 
   // Store original state when entering edit mode
   React.useEffect(() => {
@@ -92,8 +94,22 @@ export const EditablePropertyDetailsPage: React.FC = () => {
     });
   };
 
+  // Focus on specific field when entering edit mode
+  useEffect(() => {
+    if (isEditMode && focusedField && fieldRefs.current[focusedField]) {
+      const fieldElement = fieldRefs.current[focusedField];
+      // Small delay to ensure DOM is updated
+      setTimeout(() => {
+        fieldElement?.focus();
+        fieldElement?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      }, 100);
+    }
+  }, [isEditMode, focusedField]);
+
   const handleFieldDoubleClick = (field: string) => {
     if (isEditingEnabled && !isEditMode) {
+      // Store which field was clicked to enter edit mode
+      setFocusedField(field);
       // Start editing this specific field
       setIsEditMode(true);
       if (!currentSessionId) {
@@ -128,7 +144,10 @@ export const EditablePropertyDetailsPage: React.FC = () => {
           </Label>
           {type === 'select' && options ? (
             <Select value={value} onValueChange={(newValue) => handleInputChange(field, newValue, section)}>
-              <SelectTrigger className="flex-1 shrink basis-[0%]">
+              <SelectTrigger 
+                ref={(ref) => fieldRefs.current[field] = ref}
+                className="flex-1 shrink basis-[0%]"
+              >
                 <SelectValue />
               </SelectTrigger>
               <SelectContent>
@@ -141,6 +160,7 @@ export const EditablePropertyDetailsPage: React.FC = () => {
             </Select>
           ) : (
             <Input
+              ref={(ref) => fieldRefs.current[field] = ref}
               value={value}
               onChange={(e) => handleInputChange(field, e.target.value, section)}
               className="flex-1 shrink basis-[0%]"
