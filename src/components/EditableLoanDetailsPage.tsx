@@ -1,330 +1,257 @@
-import React, { useState, useRef, useEffect } from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { Button } from '@/components/ui/button';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
-import { useEditMode } from '@/contexts/EditModeContext';
-import { useAudit } from '@/contexts/AuditContext';
-import { useToast } from '@/hooks/use-toast';
+import React, { useState } from 'react';
+import { useEditMode } from '../contexts/EditModeContext';
+import { useAudit } from '../contexts/AuditContext';
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import { Clock } from 'lucide-react';
-import { FieldComparisonModal } from '@/components/FieldComparisonModal';
+import { useToast } from "@/hooks/use-toast";
+import { useNavigate } from 'react-router-dom';
+import { FieldComparisonModal } from './FieldComparisonModal';
 
 export const EditableLoanDetailsPage: React.FC = () => {
-  const [formData, setFormData] = useState({
-    // Mortgage Details
-    bankruptcySubject: 'No',
-    ivaSubject: 'No',
-    propertyRepossessed: 'No',
+  const { isEditingEnabled, isEditMode, hasUnsavedChanges, hasSavedChanges, setIsEditMode, setHasUnsavedChanges, saveChanges, exitEditMode, storeOriginalState, restoreAllOriginalState } = useEditMode();
+  const { addAuditEntry, auditLog, currentSessionId, startAuditSession, endAuditSession, cancelAuditSession } = useAudit();
+  const { toast } = useToast();
+  const navigate = useNavigate();
+  
+  const initialFormData = {
     applicationPurpose: 'Residential',
     applicationType: 'Purchase',
-    residentialSubType: 'Standard',
-    propertyRegion: 'North',
-    totalPurchasePrice: '£590,000',
+    applicationSubtype: 'Standard',
+    totalPurchasePrice: '£290,000',
+    loanAmount: '£175,000',
     depositAmount: '£75,000',
-    requiredLoanAmount: '£515,000',
-    loanToValue: '70%',
-    termYears: '25',
+    sourceOfDeposit: '£75,000 Own savings',
+    valueOfApplicantShare: '100.00%',
+    currentMortgageBalance: '£56,000',
+    outstandingMortgageValue: '£58,000',
+    term: '25 years',
+    ltv: '70.00%',
+    maxLtvAllowed: '95.00%',
     repaymentType: 'Repayment',
-    monthlyGroundRent: '£0',
-    initialFixedTerm: 'No',
-    // Household Details
-    numberOfApplicants: 'Two',
-    sameAddress: 'Yes',
-    dependentsUnder13: '2',
-    childBenefit: 'No',
-    dependents14Plus: '0',
-    // Household Expenditure
-    expenditureCalculation: 'ONS'
-  });
+    initialFixedRate: 'No',
+    stressRate: '6.85%'
+  };
 
-  const [originalFormData, setOriginalFormData] = useState(formData);
-  const [comparisonField, setComparisonField] = useState<string | null>(null);
-  const [focusedField, setFocusedField] = useState<string | null>(null);
-  const fieldRefs = useRef<Record<string, HTMLElement | null>>({});
-  const sectionRefs = useRef<Record<string, HTMLElement | null>>({});
+  const [formData, setFormData] = useState(initialFormData);
+  const [comparisonModal, setComparisonModal] = useState({ open: false, fieldName: '' });
 
-  const { isEditMode, setIsEditMode, hasUnsavedChanges, setHasUnsavedChanges } = useEditMode();
-  const { startAuditSession, endAuditSession, addAuditEntry, auditLog } = useAudit();
-  const { toast } = useToast();
-
-  useEffect(() => {
-    if (isEditMode) {
-      setOriginalFormData(formData);
-      startAuditSession();
+  // Store original state when entering edit mode
+  React.useEffect(() => {
+    if (isEditMode && !currentSessionId) {
+      startAuditSession(); // Start tracking audit entries for this session
+      Object.entries(formData).forEach(([key, value]) => {
+        storeOriginalState(`formData.${key}`, value);
+      });
     }
-  }, [isEditMode]);
+  }, [isEditMode, currentSessionId, storeOriginalState, startAuditSession]);
 
-  useEffect(() => {
-    const handleEditModeCancel = () => {
-      setFormData(originalFormData);
-      endAuditSession();
+  // Listen for cancel events to restore original state
+  React.useEffect(() => {
+    const handleRestore = () => {
+      const originalState = restoreAllOriginalState();
+      const restoredFormData: any = {};
+      
+      Object.keys(initialFormData).forEach(key => {
+        const originalValue = originalState[`formData.${key}`];
+        if (originalValue !== undefined) {
+          restoredFormData[key] = originalValue;
+        } else {
+          restoredFormData[key] = initialFormData[key as keyof typeof initialFormData];
+        }
+      });
+      
+      setFormData(restoredFormData);
+      cancelAuditSession(); // Remove all audit entries from this session
     };
 
-    window.addEventListener('editModeCancel', handleEditModeCancel);
-    return () => window.removeEventListener('editModeCancel', handleEditModeCancel);
-  }, [originalFormData, endAuditSession]);
+    // We need a way to detect when cancel is pressed
+    // For now, we'll use a custom event listener
+    window.addEventListener('editModeCancel', handleRestore);
+    
+    return () => {
+      window.removeEventListener('editModeCancel', handleRestore);
+    };
+  }, [restoreAllOriginalState, cancelAuditSession]);
 
-  useEffect(() => {
-    if (focusedField && isEditMode) {
-      const fieldElement = fieldRefs.current[focusedField];
-      const sectionKey = getSectionForField(focusedField);
-      const sectionElement = sectionRefs.current[sectionKey];
-
-      if (sectionElement) {
-        sectionElement.scrollIntoView({ behavior: 'smooth', block: 'start' });
-      }
-
-      if (fieldElement) {
-        setTimeout(() => {
-          fieldElement.focus();
-        }, 300);
-      }
-
-      setFocusedField(null);
-    }
-  }, [focusedField, isEditMode]);
-
-  const getSectionForField = (fieldName: string) => {
-    if (['bankruptcySubject', 'ivaSubject', 'propertyRepossessed', 'applicationPurpose', 'applicationType', 'residentialSubType', 'propertyRegion', 'totalPurchasePrice', 'depositAmount', 'requiredLoanAmount', 'loanToValue', 'termYears', 'repaymentType', 'monthlyGroundRent', 'initialFixedTerm'].includes(fieldName)) {
-      return 'mortgageDetails';
-    }
-    if (['numberOfApplicants', 'sameAddress', 'dependentsUnder13', 'childBenefit', 'dependents14Plus'].includes(fieldName)) {
-      return 'householdDetails';
-    }
-    if (['expenditureCalculation'].includes(fieldName)) {
-      return 'householdExpenditure';
-    }
-    return 'mortgageDetails';
-  };
-
-  const handleInputChange = (field: string, value: string) => {
+  const handleInputChange = (field: string, value: string, section: string = 'Loan Details') => {
     const oldValue = formData[field as keyof typeof formData];
-    if (oldValue !== value) {
-      setFormData(prev => ({ ...prev, [field]: value }));
-      addAuditEntry(field, oldValue, value, 'Mortgage Details');
-      setHasUnsavedChanges(true);
-    }
-  };
-
-  const handleFieldDoubleClick = (fieldName: string) => {
-    if (!isEditMode) {
-      setFocusedField(fieldName);
-      setIsEditMode(true);
-    }
+    setFormData(prev => ({
+      ...prev,
+      [field]: value
+    }));
+    
+    console.log('Field changed:', { field, oldValue, value, section, currentSessionId });
+    
+    // Add audit entry for the change
+    addAuditEntry(field, oldValue, value, section);
+    setHasUnsavedChanges(true);
   };
 
   const handleSave = () => {
-    endAuditSession();
-    setHasUnsavedChanges(false);
-    setIsEditMode(false);
+    saveChanges();
+    endAuditSession(); // End the current audit session when saving
     toast({
-      title: "Changes saved successfully",
-      description: "Mortgage details have been updated.",
+      title: "Changes saved",
+      description: "Your loan details have been updated.",
     });
+  };
+
+  const handleFieldDoubleClick = (field: string) => {
+    if (isEditingEnabled && !isEditMode) {
+      // Start editing this specific field
+      setIsEditMode(true);
+      if (!currentSessionId) {
+        startAuditSession();
+        Object.entries(formData).forEach(([key, value]) => {
+          storeOriginalState(`formData.${key}`, value);
+        });
+      }
+    }
+  };
+
+  const handleAuditClick = () => {
+    navigate('/audit-log');
+  };
+
+  const handleFieldComparisonClick = (fieldName: string) => {
+    setComparisonModal({ open: true, fieldName });
   };
 
   const isFieldEdited = (fieldName: string) => {
     return auditLog.some(entry => entry.field === fieldName);
   };
 
-  const handleFieldComparisonClick = (fieldName: string) => {
-    setComparisonField(fieldName);
-  };
-
-  const getButtonText = () => {
-    if (!isEditMode) return "Edit";
-    return hasUnsavedChanges ? "Save" : "Exit Edit Mode";
-  };
-
-  const getButtonVariant = () => {
-    if (!isEditMode) return "default";
-    return hasUnsavedChanges ? "default" : "outline";
-  };
-
-  const handleMainButtonClick = () => {
-    if (!isEditMode) {
-      setIsEditMode(true);
-    } else if (hasUnsavedChanges) {
-      handleSave();
-    } else {
-      setIsEditMode(false);
-    }
-  };
-
-  const renderField = (
-    field: keyof typeof formData,
-    label: string,
-    type: 'input' | 'select' | 'radio' = 'input',
-    options?: { value: string; label: string }[] | string[]
-  ) => {
-    const value = formData[field];
-    const fieldName = field as string;
+  const renderField = (label: string, field: string, value: string, isEven: boolean, section: string = 'Loan Details', type: 'input' | 'select' = 'input', options?: string[]) => {
+    const edited = isFieldEdited(field);
 
     if (isEditMode) {
-      if (type === 'select') {
-        return (
-          <div className="space-y-2">
-            <Label htmlFor={fieldName}>{label}</Label>
-            <Select
-              value={value}
-              onValueChange={(newValue) => handleInputChange(fieldName, newValue)}
-            >
-              <SelectTrigger
-                ref={(el) => { fieldRefs.current[fieldName] = el; }}
-                className="w-full"
-              >
+      return (
+        <div key={field} className={`flex w-full gap-4 items-center p-2 ${isEven ? 'bg-[#F7F8FA]' : ''}`}>
+          <Label className="text-[#505A5F] font-normal flex-1 shrink basis-[0%]">
+            {label}
+          </Label>
+          {type === 'select' && options ? (
+            <Select value={value} onValueChange={(newValue) => handleInputChange(field, newValue, section)}>
+              <SelectTrigger className="flex-1 shrink basis-[0%]">
                 <SelectValue />
               </SelectTrigger>
               <SelectContent>
-                {options?.map((option) => {
-                  const optionValue = typeof option === 'string' ? option : option.value;
-                  const optionLabel = typeof option === 'string' ? option : option.label;
-                  return (
-                    <SelectItem key={optionValue} value={optionValue}>
-                      {optionLabel}
-                    </SelectItem>
-                  );
-                })}
+                {options.map((option) => (
+                  <SelectItem key={option} value={option}>
+                    {option}
+                  </SelectItem>
+                ))}
               </SelectContent>
             </Select>
-          </div>
-        );
-      }
-
-      if (type === 'radio' && options) {
-        return (
-          <div className="space-y-2">
-            <Label>{label}</Label>
-            <RadioGroup
+          ) : (
+            <Input
               value={value}
-              onValueChange={(newValue) => handleInputChange(fieldName, newValue)}
-              className="flex gap-4"
-            >
-              {options.map((option) => {
-                const optionValue = typeof option === 'string' ? option : option.value;
-                const optionLabel = typeof option === 'string' ? option : option.label;
-                return (
-                  <div key={optionValue} className="flex items-center space-x-2">
-                    <RadioGroupItem value={optionValue} id={`${fieldName}-${optionValue}`} />
-                    <Label htmlFor={`${fieldName}-${optionValue}`}>{optionLabel}</Label>
-                  </div>
-                );
-              })}
-            </RadioGroup>
-          </div>
-        );
-      }
-
-      return (
-        <div className="space-y-2">
-          <Label htmlFor={fieldName}>{label}</Label>
-          <Input
-            ref={(el) => { fieldRefs.current[fieldName] = el; }}
-            id={fieldName}
-            value={value}
-            onChange={(e) => handleInputChange(fieldName, e.target.value)}
-            className="w-full"
-          />
+              onChange={(e) => handleInputChange(field, e.target.value, section)}
+              className="flex-1 shrink basis-[0%]"
+            />
+          )}
         </div>
       );
     }
 
+    const fieldClasses = isEditingEnabled 
+      ? `flex w-full gap-4 text-base flex-wrap p-1 cursor-pointer hover:bg-gray-50 ${isEven ? 'bg-[#F7F8FA]' : ''}`
+      : `flex w-full gap-4 text-base flex-wrap p-1 ${isEven ? 'bg-[#F7F8FA]' : ''}`;
+
     return (
-      <div className="space-y-2" onDoubleClick={() => handleFieldDoubleClick(fieldName)}>
-        <Label className="text-muted-foreground">{label}</Label>
-        <div className="flex items-center gap-2">
-          <span className="text-sm">{value}</span>
-          {isFieldEdited(fieldName) && (
-            <Clock
-              className="h-4 w-4 text-muted-foreground cursor-pointer"
-              onClick={() => handleFieldComparisonClick(fieldName)}
-            />
+      <div 
+        key={field} 
+        className={fieldClasses}
+        onDoubleClick={() => handleFieldDoubleClick(field)}
+        title={isEditingEnabled && !isEditMode ? "Double-click to edit this field" : ""}
+      >
+        <div className="text-[#505A5F] font-normal flex-1 shrink basis-[0%]">
+          {label}
+        </div>
+        <div className="text-black font-medium flex-1 shrink basis-[0%] flex items-center gap-2">
+          {value}
+          {edited && (
+            <TooltipProvider>
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <button 
+                    onClick={() => handleFieldComparisonClick(field)}
+                    className="text-blue-500 hover:text-blue-700"
+                  >
+                    <Clock className="w-3 h-3" />
+                  </button>
+                </TooltipTrigger>
+                <TooltipContent>
+                  <p>This field has been edited. Click to view audit log.</p>
+                </TooltipContent>
+              </Tooltip>
+            </TooltipProvider>
           )}
         </div>
       </div>
     );
   };
 
+  const loanFields = [
+    { label: 'Application purpose', field: 'applicationPurpose', type: 'select' as const, options: ['Residential', 'Commercial', 'Buy to Let'] },
+    { label: 'Application type', field: 'applicationType', type: 'select' as const, options: ['Purchase', 'Remortgage', 'Additional Borrowing'] },
+    { label: 'Application subtype', field: 'applicationSubtype', type: 'select' as const, options: ['Standard', 'Help to Buy', 'Right to Buy'] },
+    { label: 'Total Purchase Price/Full Market Value', field: 'totalPurchasePrice' },
+    { label: 'Loan amount', field: 'loanAmount' },
+    { label: 'Deposit amount', field: 'depositAmount' },
+    { label: 'Source of deposit', field: 'sourceOfDeposit' },
+    { label: 'Value of applicant share', field: 'valueOfApplicantShare' },
+    { label: 'Current mortgage balance', field: 'currentMortgageBalance' },
+    { label: 'Outstanding mortgage value', field: 'outstandingMortgageValue' },
+    { label: 'Term', field: 'term' },
+    { label: 'LTV', field: 'ltv' },
+    { label: 'Max LTV allowed for total loan', field: 'maxLtvAllowed' },
+    { label: 'Repayment type', field: 'repaymentType', type: 'select' as const, options: ['Repayment', 'Interest Only', 'Part and Part'] },
+    { label: 'Initial fixed rate of 5 years or more', field: 'initialFixedRate', type: 'select' as const, options: ['Yes', 'No'] },
+    { label: 'Stress rate', field: 'stressRate' }
+  ];
+
   return (
-    <div className="container mx-auto p-6 space-y-6">
-      <div className="flex justify-between items-center">
-        <h1 className="text-3xl font-bold">Mortgage</h1>
-        <Button onClick={handleMainButtonClick} variant={getButtonVariant()}>
-          {getButtonText()}
-        </Button>
+    <>
+      <div className="p-8 max-md:px-5">
+        <div className="shadow-[0px_0px_10px_rgba(0,0,0,0.05)] bg-white p-6 rounded">
+          <div className="mb-8">
+            <h1 className="text-[#165788] text-[22px] font-medium">
+              Loan Details
+            </h1>
+          </div>
+        
+          <div className="space-y-6">
+            {/* Loan Details Section */}
+            <section className="w-full">
+              <div className="w-full">
+                {loanFields.map((field, index) => 
+                  renderField(
+                    field.label, 
+                    field.field, 
+                    formData[field.field as keyof typeof formData], 
+                    index % 2 === 0,
+                    'Loan Details',
+                    field.type,
+                    field.options
+                  )
+                )}
+              </div>
+            </section>
+          </div>
+        </div>
       </div>
 
-      <Card ref={(el) => { sectionRefs.current['mortgageDetails'] = el; }}>
-        <CardHeader>
-          <CardTitle className="text-[#165788] text-xl">Mortgage details</CardTitle>
-        </CardHeader>
-        <CardContent className="space-y-6">
-          <div className="space-y-4">
-            <h3 className="text-lg font-medium">Have any applicants been subject to:</h3>
-            <div className="space-y-4">
-              {renderField('bankruptcySubject', 'A bankruptcy which has not been satisfied for at least 3 years?', 'radio', ['Yes', 'No'])}
-              {renderField('ivaSubject', 'An Individual Voluntary arrangement (IVA) or debt relief order (DRO) that has not been satisfied for at least 3 years?', 'radio', ['Yes', 'No'])}
-              {renderField('propertyRepossessed', 'Property repossession at any time?', 'radio', ['Yes', 'No'])}
-            </div>
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            {renderField('applicationPurpose', 'Application purpose', 'radio', ['Residential', 'Buy to Let'])}
-            {renderField('applicationType', 'Application type', 'radio', ['Purchase', 'Remortgage'])}
-            {renderField('residentialSubType', 'Residential purchase sub-type', 'select', ['Standard', 'Help to Buy', 'Shared Ownership'])}
-            {renderField('propertyRegion', 'Region of the property to be mortgaged', 'select', ['North', 'South', 'East', 'West', 'Central'])}
-            {renderField('totalPurchasePrice', 'Total purchase price')}
-            {renderField('depositAmount', 'Deposit amount')}
-            {renderField('requiredLoanAmount', 'Required loan amount')}
-            {renderField('loanToValue', 'Loan to value')}
-            {renderField('termYears', 'Term (years)')}
-            {renderField('repaymentType', 'Repayment type', 'radio', ['Repayment', 'Interest Only', 'Part And Part'])}
-            {renderField('monthlyGroundRent', 'Monthly ground rent/service charge of the property to be purchased')}
-            {renderField('initialFixedTerm', 'Will the initial fixed term be 60 months or more?', 'radio', ['Yes', 'No'])}
-          </div>
-        </CardContent>
-      </Card>
-
-      <Card ref={(el) => { sectionRefs.current['householdDetails'] = el; }}>
-        <CardHeader>
-          <CardTitle className="text-[#165788] text-xl">Household details</CardTitle>
-        </CardHeader>
-        <CardContent className="space-y-6">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            {renderField('numberOfApplicants', 'Number of applicants', 'radio', ['One', 'Two'])}
-            {renderField('sameAddress', 'Will all applicants live at the same address once the mortgage completes?', 'radio', ['Yes', 'No'])}
-            {renderField('dependentsUnder13', 'Number of household dependents aged 0-13')}
-            {renderField('childBenefit', 'Does the applicant receive child benefit?', 'radio', ['Yes', 'No'])}
-            {renderField('dependents14Plus', 'Number of household dependents aged 14 and over')}
-          </div>
-        </CardContent>
-      </Card>
-
-      <Card ref={(el) => { sectionRefs.current['householdExpenditure'] = el; }}>
-        <CardHeader>
-          <CardTitle className="text-[#165788] text-xl">Household expenditure</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <p className="text-sm text-muted-foreground mb-4">
-            Newcastle Building Society uses Office of National Statistics (ONS) data to calculate affordability, which considers 
-            typical household expenditure for the region. Alternatively, we can calculate affordability using the applicant's 
-            expected total monthly expenditure.
-          </p>
-          <p className="text-sm text-muted-foreground mb-4">
-            Please select how you would like us to calculate the applicant's affordability:
-          </p>
-          {renderField('expenditureCalculation', 'Calculation method', 'radio', ['ONS', 'Enter expenditure'])}
-        </CardContent>
-      </Card>
-
       <FieldComparisonModal
-        open={!!comparisonField}
-        onOpenChange={(open) => !open && setComparisonField(null)}
-        fieldName={comparisonField || ''}
+        open={comparisonModal.open}
+        onOpenChange={(open) => setComparisonModal({ open, fieldName: '' })}
+        fieldName={comparisonModal.fieldName}
         auditEntries={auditLog}
       />
-    </div>
+    </>
   );
 };
