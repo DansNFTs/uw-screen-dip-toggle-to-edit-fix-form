@@ -12,7 +12,6 @@ import { Clock } from 'lucide-react';
 import { useToast } from "@/hooks/use-toast";
 import { useNavigate } from 'react-router-dom';
 import { FieldComparisonModal } from './FieldComparisonModal';
-import { EditableField } from './EditableField';
 
 export const EditablePersonalDetailsPage: React.FC = () => {
   const { isEditingEnabled, isEditMode, hasUnsavedChanges, hasSavedChanges, setIsEditMode, setHasUnsavedChanges, saveChanges, exitEditMode, storeOriginalState, restoreAllOriginalState } = useEditMode();
@@ -27,8 +26,8 @@ export const EditablePersonalDetailsPage: React.FC = () => {
 
   const initialFormData = {
     // James Taylor - Eligibility
-    jamesAgeEligibility: 'No',
-    jamesManagementPlan: 'No',
+    jamesAge3Years: 'No',
+    jamesDirectorShip: 'No',
     
     // James Taylor - Personal Details
     jamesTitle: 'Mr',
@@ -41,72 +40,50 @@ export const EditablePersonalDetailsPage: React.FC = () => {
     jamesDateOfBirthYear: '1988',
     jamesNationality: 'UK Resident',
     
-    // James Taylor - Address
+    // James Taylor's addresses
     jamesCurrentAddress: '12 Longwood Close',
-    jamesAddressLine2: 'NEWCASTLE UPON TYNE',
+    jamesAddressLine2: 'NEWCASTLE',
     jamesAddressLine3: 'Tyne and Wear',
     jamesPostcode: 'NE16 5QB',
+    jamesCounty: 'NORTHUMBERLAND',
     jamesMovedInMonths: '6',
     jamesMovedInYears: '2015',
     jamesResidencyStatus: 'Owner occupier with mortgage',
-    jamesSalePrice: '£350,000',
+    jamesOwnershipLength: 'More than 3 years',
+    jamesSalePrice: '£1000000',
     jamesCurrentLender: 'Halifax',
-    jamesOutstandingMortgage: '£280,000',
-    jamesPlansForProperty: 'Continue to live in it',
-    jamesExpectedRemainingBalance: '£250,000',
+    jamesOutstandingMortgage: '£500000',
+    jamesPlansForProperty: 'Sell',
+    jamesExpectedRemainingBalance: '£400000',
     
-    // James Taylor - Income
+    // James Taylor's Income
     jamesEmploymentStatus: 'Employed',
     jamesBasicIncome: '£50000.00',
     jamesFrequencyGrossIncome: 'Yearly',
     jamesAnnualAmount: '£50,000.00',
     jamesMonthlyNetSalary: '£3200',
-    jamesJobTitle: 'Manager',
-    jamesEmployerName: 'NHS',
+    jamesJobTitle: 'Accountant',
+    jamesEmployerName: 'Self Employed',
     jamesEmploymentNature: 'Permanent',
-    jamesStartDate: '9/2020',
+    jamesStartDate: 'Self Employed',
     jamesExpectedRetirement: '70',
+    jamesAdditionalIncome1: 'Bonus/commission',
+    jamesAdditionalIncome1Amount: '£',
+    jamesAdditionalIncome1Frequency: 'Yearly',
     
-    // Jane Taylor - Eligibility  
-    janeAgeEligibility: 'No',
-    janeManagementPlan: 'No',
+    // James Taylor's commitments
+    jamesCommitmentType1: 'Credit card',
+    jamesCommitmentProvider1: 'Tesco',
+    jamesCommitmentBalance1: '£300.00',
+    jamesCommitmentType2: 'Personal loan',
+    jamesCommitmentProvider2: 'Santander Finance',
+    jamesCommitmentBalance2: '£500.00',
+    jamesRedemptionPenalty: 'No',
     
-    // Jane Taylor - Personal Details
+    // Jane Taylor - for existing functionality
     janeTitle: 'Mrs',
     janeFirstName: 'Jane',
-    janeMiddleName: '',
-    janeLastName: 'Taylor',
-    janeNameChange: 'No',
-    janeDateOfBirthDay: '04',
-    janeDateOfBirthMonth: '04', 
-    janeDateOfBirthYear: '1990',
-    janeNationality: 'UK Resident',
-    
-    // Jane Taylor - Address
-    janeCurrentAddress: '12 Longwood Close',
-    janeAddressLine2: 'NEWCASTLE UPON TYNE',
-    janeAddressLine3: 'Tyne and Wear',
-    janePostcode: 'NE16 5QB',
-    janeMovedInMonths: '4',
-    janeMovedInYears: '2015',
-    janeResidencyStatus: 'Owner occupier with mortgage',
-    janeSalePrice: '£350,000',
-    janeCurrentLender: 'Halifax',
-    janeOutstandingMortgage: '£280,000',
-    janePlansForProperty: 'Continue to live in it',
-    janeExpectedRemainingBalance: '£250,000',
-    
-    // Jane Taylor - Income
-    janeEmploymentStatus: 'Employed',
-    janeBasicIncome: '£45000.00',
-    janeFrequencyGrossIncome: 'Yearly',
-    janeAnnualAmount: '£45,000.00',
-    janeMonthlyNetSalary: '£2800',
-    janeJobTitle: 'Manager',
-    janeEmployerName: 'NHS',
-    janeEmploymentNature: 'Permanent',
-    janeStartDate: '9/2020',
-    janeExpectedRetirement: '70'
+    janeLastName: 'Taylor'
   };
 
   const [formData, setFormData] = useState(initialFormData);
@@ -127,23 +104,11 @@ export const EditablePersonalDetailsPage: React.FC = () => {
     if (isEditMode && focusedField) {
       console.log('Focusing on field:', focusedField);
       
-      // Determine which section to scroll to based on field name
-      let sectionToScroll = '';
-      if (focusedField.startsWith('james')) {
-        sectionToScroll = 'james-section';
-      } else if (focusedField.startsWith('jane')) {
-        sectionToScroll = 'jane-section';
-      }
-
-      console.log('Section to scroll:', sectionToScroll);
-      console.log('Section ref available:', !!sectionRefs.current[sectionToScroll]);
-      console.log('Field ref available:', !!fieldRefs.current[focusedField]);
-
       setTimeout(() => {
         // First scroll to the section
-        if (sectionToScroll && sectionRefs.current[sectionToScroll]) {
-          console.log('Scrolling to section:', sectionToScroll);
-          sectionRefs.current[sectionToScroll]?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        if (sectionRefs.current['james-section']) {
+          console.log('Scrolling to james section');
+          sectionRefs.current['james-section']?.scrollIntoView({ behavior: 'smooth', block: 'start' });
         }
         
         // Then focus on the specific field
@@ -227,373 +192,618 @@ export const EditablePersonalDetailsPage: React.FC = () => {
     return auditLog.some(entry => entry.field === fieldName);
   };
 
-  // Render form sections based on edit mode
-  const renderApplicantSection = (
-    applicantName: string, 
-    prefix: string,
-    title: string
-  ) => {
+  const renderJamesTaylorForm = () => {
     if (isEditMode) {
-      // Form view when editing
       return (
-        <div className="space-y-6" ref={(ref) => sectionRefs.current[`${prefix}-section`] = ref}>
-          <h2 className="text-[#165788] text-lg font-medium">{applicantName}</h2>
+        <div className="space-y-8" ref={(ref) => sectionRefs.current['james-section'] = ref}>
+          <h2 className="text-[#165788] text-xl font-medium border-b border-gray-200 pb-3">James Taylor</h2>
           
           {/* Eligibility Section */}
-          <EditableField isEdited={isFieldEdited(`${prefix}AgeEligibility`) || isFieldEdited(`${prefix}ManagementPlan`)}>
-            <div className="space-y-4">
-              <h3 className="text-[#165788] text-base font-medium">Eligibility</h3>
-              <div className="text-sm text-gray-600 mb-4">
-                Is the {prefix === 'james' ? 'first' : 'second'} applicant satisfied any of the following:
+          <div className="bg-blue-50 p-6 rounded-lg">
+            <h3 className="text-[#165788] text-lg font-medium mb-4">Eligibility</h3>
+            <div className="text-sm text-gray-600 mb-6">
+              Is the applicant have if satisfied any of the following:
+            </div>
+            
+            <div className="space-y-6">
+              <div>
+                <Label className="text-sm font-medium text-gray-800 mb-2 block">Bankruptcy or insolvency</Label>
+                <p className="text-xs text-gray-600 mb-3">
+                  Had an insolvency order made that has not been satisfied
+                </p>
+                <RadioGroup 
+                  value={formData.jamesAge3Years}
+                  onValueChange={(value) => handleInputChange('jamesAge3Years', value, 'James Taylor Eligibility')}
+                  className="flex gap-6"
+                >
+                  <div className="flex items-center space-x-2">
+                    <RadioGroupItem value="Yes" id="james-age-yes" />
+                    <Label htmlFor="james-age-yes" className="text-sm">Yes</Label>
+                  </div>
+                  <div className="flex items-center space-x-2">
+                    <RadioGroupItem value="No" id="james-age-no" />
+                    <Label htmlFor="james-age-no" className="text-sm">No</Label>
+                  </div>
+                </RadioGroup>
               </div>
               
-              <div className="space-y-3">
-                <div>
-                  <Label className="text-sm text-gray-700">Bankruptcy which has not been satisfied for at least 3 years?</Label>
-                  <RadioGroup 
-                    value={formData[`${prefix}AgeEligibility` as keyof typeof formData]}
-                    onValueChange={(value) => handleInputChange(`${prefix}AgeEligibility`, value, `${applicantName} Eligibility`)}
-                    className="flex gap-4 mt-2"
-                  >
-                    <div className="flex items-center space-x-2">
-                      <RadioGroupItem value="Yes" id={`${prefix}-age-yes`} />
-                      <Label htmlFor={`${prefix}-age-yes`}>Yes</Label>
-                    </div>
-                    <div className="flex items-center space-x-2">
-                      <RadioGroupItem value="No" id={`${prefix}-age-no`} />
-                      <Label htmlFor={`${prefix}-age-no`}>No</Label>
-                    </div>
-                  </RadioGroup>
-                </div>
-                
-                <div>
-                  <Label className="text-sm text-gray-700">Had an active debt management plan</Label>
-                  <RadioGroup 
-                    value={formData[`${prefix}ManagementPlan` as keyof typeof formData]}
-                    onValueChange={(value) => handleInputChange(`${prefix}ManagementPlan`, value, `${applicantName} Eligibility`)}
-                    className="flex gap-4 mt-2"
-                  >
-                    <div className="flex items-center space-x-2">
-                      <RadioGroupItem value="Yes" id={`${prefix}-plan-yes`} />
-                      <Label htmlFor={`${prefix}-plan-yes`}>Yes</Label>
-                    </div>
-                    <div className="flex items-center space-x-2">
-                      <RadioGroupItem value="No" id={`${prefix}-plan-no`} />
-                      <Label htmlFor={`${prefix}-plan-no`}>No</Label>
-                    </div>
-                  </RadioGroup>
-                </div>
+              <div>
+                <Label className="text-sm font-medium text-gray-800 mb-2 block">Directorship</Label>
+                <p className="text-xs text-gray-600 mb-3">
+                  Had or current has a director ship management plan<br/>
+                  Had any partnership with active guarantees
+                </p>
+                <RadioGroup 
+                  value={formData.jamesDirectorShip}
+                  onValueChange={(value) => handleInputChange('jamesDirectorShip', value, 'James Taylor Eligibility')}
+                  className="flex gap-6"
+                >
+                  <div className="flex items-center space-x-2">
+                    <RadioGroupItem value="Yes" id="james-director-yes" />
+                    <Label htmlFor="james-director-yes" className="text-sm">Yes</Label>
+                  </div>
+                  <div className="flex items-center space-x-2">
+                    <RadioGroupItem value="No" id="james-director-no" />
+                    <Label htmlFor="james-director-no" className="text-sm">No</Label>
+                  </div>
+                </RadioGroup>
               </div>
             </div>
-          </EditableField>
+          </div>
 
           {/* Personal Details Section */}
-          <EditableField isEdited={isFieldEdited(`${prefix}Title`) || isFieldEdited(`${prefix}FirstName`) || isFieldEdited(`${prefix}LastName`)}>
+          <div className="bg-white border border-gray-200 p-6 rounded-lg">
+            <h3 className="text-[#165788] text-lg font-medium mb-6">Personal details</h3>
+            
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
+              <div>
+                <Label htmlFor="james-title" className="text-sm font-medium">Title</Label>
+                <Select 
+                  value={formData.jamesTitle}
+                  onValueChange={(value) => handleInputChange('jamesTitle', value, 'James Taylor Personal Details')}
+                >
+                  <SelectTrigger ref={(ref) => fieldRefs.current['jamesTitle'] = ref}>
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="Mr">Mr</SelectItem>
+                    <SelectItem value="Mrs">Mrs</SelectItem>
+                    <SelectItem value="Miss">Miss</SelectItem>
+                    <SelectItem value="Ms">Ms</SelectItem>
+                    <SelectItem value="Dr">Dr</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+            </div>
+            
+            <div className="grid grid-cols-1 gap-4 mb-4">
+              <div>
+                <Label htmlFor="james-firstname" className="text-sm font-medium">First name</Label>
+                <Input 
+                  id="james-firstname"
+                  ref={(ref) => fieldRefs.current['jamesFirstName'] = ref}
+                  value={formData.jamesFirstName}
+                  onChange={(e) => handleInputChange('jamesFirstName', e.target.value, 'James Taylor Personal Details')}
+                  className="w-full"
+                />
+              </div>
+              
+              <div>
+                <Label htmlFor="james-middlename" className="text-sm font-medium">Middle name</Label>
+                <Input 
+                  id="james-middlename"
+                  ref={(ref) => fieldRefs.current['jamesMiddleName'] = ref}
+                  value={formData.jamesMiddleName}
+                  onChange={(e) => handleInputChange('jamesMiddleName', e.target.value, 'James Taylor Personal Details')}
+                  className="w-full"
+                />
+              </div>
+              
+              <div>
+                <Label htmlFor="james-lastname" className="text-sm font-medium">Last name</Label>
+                <Input 
+                  id="james-lastname"
+                  ref={(ref) => fieldRefs.current['jamesLastName'] = ref}
+                  value={formData.jamesLastName}
+                  onChange={(e) => handleInputChange('jamesLastName', e.target.value, 'James Taylor Personal Details')}
+                  className="w-full"
+                />
+              </div>
+            </div>
+            
+            <div className="mb-4">
+              <Label className="text-sm font-medium text-gray-800 mb-3 block">Name change in the last 6 years?</Label>
+              <RadioGroup 
+                value={formData.jamesNameChange}
+                onValueChange={(value) => handleInputChange('jamesNameChange', value, 'James Taylor Personal Details')}
+                className="flex gap-6"
+              >
+                <div className="flex items-center space-x-2">
+                  <RadioGroupItem value="Yes" id="james-namechange-yes" />
+                  <Label htmlFor="james-namechange-yes" className="text-sm">Yes</Label>
+                </div>
+                <div className="flex items-center space-x-2">
+                  <RadioGroupItem value="No" id="james-namechange-no" />
+                  <Label htmlFor="james-namechange-no" className="text-sm">No</Label>
+                </div>
+              </RadioGroup>
+            </div>
+
+            <div className="mb-4">
+              <Label className="text-sm font-medium text-gray-800 mb-3 block">Date of birth</Label>
+              <div className="flex gap-2">
+                <Input 
+                  placeholder="11"
+                  className="w-16"
+                  ref={(ref) => fieldRefs.current['jamesDateOfBirthDay'] = ref}
+                  value={formData.jamesDateOfBirthDay}
+                  onChange={(e) => handleInputChange('jamesDateOfBirthDay', e.target.value, 'James Taylor Personal Details')}
+                />
+                <Input 
+                  placeholder="11"
+                  className="w-16"
+                  ref={(ref) => fieldRefs.current['jamesDateOfBirthMonth'] = ref}
+                  value={formData.jamesDateOfBirthMonth}
+                  onChange={(e) => handleInputChange('jamesDateOfBirthMonth', e.target.value, 'James Taylor Personal Details')}
+                />
+                <Input 
+                  placeholder="1988"
+                  className="w-20"
+                  ref={(ref) => fieldRefs.current['jamesDateOfBirthYear'] = ref}
+                  value={formData.jamesDateOfBirthYear}
+                  onChange={(e) => handleInputChange('jamesDateOfBirthYear', e.target.value, 'James Taylor Personal Details')}
+                />
+              </div>
+            </div>
+
+            <div>
+              <Label className="text-sm font-medium text-gray-800 mb-3 block">Nationality</Label>
+              <RadioGroup 
+                value={formData.jamesNationality}
+                onValueChange={(value) => handleInputChange('jamesNationality', value, 'James Taylor Personal Details')}
+                className="space-y-2"
+              >
+                <div className="flex items-center space-x-2">
+                  <RadioGroupItem value="UK Resident" id="james-nat-uk" />
+                  <Label htmlFor="james-nat-uk" className="text-sm">UK Resident</Label>
+                </div>
+                <div className="flex items-center space-x-2">
+                  <RadioGroupItem value="EEA or Swiss National" id="james-nat-eea" />
+                  <Label htmlFor="james-nat-eea" className="text-sm">EEA or Swiss National</Label>
+                </div>
+                <div className="flex items-center space-x-2">
+                  <RadioGroupItem value="Non EEA" id="james-nat-non" />
+                  <Label htmlFor="james-nat-non" className="text-sm">Non EEA</Label>
+                </div>
+              </RadioGroup>
+            </div>
+          </div>
+
+          {/* James Taylor's addresses */}
+          <div className="bg-white border border-gray-200 p-6 rounded-lg">
+            <h3 className="text-[#165788] text-lg font-medium mb-6">James Taylor's addresses</h3>
+            <p className="text-sm text-gray-600 mb-6">
+              Please enter the applicant's address history. Start with current address.
+            </p>
+            
             <div className="space-y-4">
-              <h3 className="text-[#165788] text-base font-medium">Personal details</h3>
+              <div>
+                <Label className="text-sm font-medium">Current address</Label>
+                <Input 
+                  value={formData.jamesCurrentAddress}
+                  onChange={(e) => handleInputChange('jamesCurrentAddress', e.target.value, 'James Taylor Address')}
+                  className="w-full mt-1"
+                  placeholder="12 Longwood Close"
+                />
+              </div>
               
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
-                  <Label htmlFor={`${prefix}-title`}>Title</Label>
-                  <Select 
-                    value={formData[`${prefix}Title` as keyof typeof formData]}
-                    onValueChange={(value) => handleInputChange(`${prefix}Title`, value, `${applicantName} Personal Details`)}
-                  >
-                    <SelectTrigger ref={(ref) => fieldRefs.current[`${prefix}Title`] = ref}>
-                      <SelectValue />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="Mr">Mr</SelectItem>
-                      <SelectItem value="Mrs">Mrs</SelectItem>
-                      <SelectItem value="Miss">Miss</SelectItem>
-                      <SelectItem value="Ms">Ms</SelectItem>
-                      <SelectItem value="Dr">Dr</SelectItem>
-                    </SelectContent>
-                  </Select>
+                  <Input 
+                    value={formData.jamesAddressLine2}
+                    onChange={(e) => handleInputChange('jamesAddressLine2', e.target.value, 'James Taylor Address')}
+                    placeholder="NEWCASTLE"
+                  />
+                </div>
+                <div>
+                  <Input 
+                    value={formData.jamesAddressLine3}
+                    onChange={(e) => handleInputChange('jamesAddressLine3', e.target.value, 'James Taylor Address')}
+                    placeholder="Tyne and Wear"
+                  />
+                </div>
+              </div>
+              
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                  <Input 
+                    value={formData.jamesPostcode}
+                    onChange={(e) => handleInputChange('jamesPostcode', e.target.value, 'James Taylor Address')}
+                    placeholder="NE16 5QB"
+                  />
+                </div>
+                <div>
+                  <Input 
+                    value={formData.jamesCounty}
+                    onChange={(e) => handleInputChange('jamesCounty', e.target.value, 'James Taylor Address')}
+                    placeholder="NORTHUMBERLAND"
+                  />
                 </div>
               </div>
               
               <div>
-                <Label htmlFor={`${prefix}-firstname`}>First name</Label>
-                <Input 
-                  id={`${prefix}-firstname`}
-                  ref={(ref) => fieldRefs.current[`${prefix}FirstName`] = ref}
-                  value={formData[`${prefix}FirstName` as keyof typeof formData]}
-                  onChange={(e) => handleInputChange(`${prefix}FirstName`, e.target.value, `${applicantName} Personal Details`)}
-                />
-              </div>
-              
-              <div>
-                <Label htmlFor={`${prefix}-middlename`}>Middle name</Label>
-                <Input 
-                  id={`${prefix}-middlename`}
-                  ref={(ref) => fieldRefs.current[`${prefix}MiddleName`] = ref}
-                  value={formData[`${prefix}MiddleName` as keyof typeof formData]}
-                  onChange={(e) => handleInputChange(`${prefix}MiddleName`, e.target.value, `${applicantName} Personal Details`)}
-                />
-              </div>
-              
-              <div>
-                <Label htmlFor={`${prefix}-lastname`}>Last name</Label>
-                <Input 
-                  id={`${prefix}-lastname`}
-                  ref={(ref) => fieldRefs.current[`${prefix}LastName`] = ref}
-                  value={formData[`${prefix}LastName` as keyof typeof formData]}
-                  onChange={(e) => handleInputChange(`${prefix}LastName`, e.target.value, `${applicantName} Personal Details`)}
-                />
-              </div>
-              
-              <div>
-                <Label className="text-sm text-gray-700">Name change in the last 6 years?</Label>
-                <RadioGroup 
-                  value={formData[`${prefix}NameChange` as keyof typeof formData]}
-                  onValueChange={(value) => handleInputChange(`${prefix}NameChange`, value, `${applicantName} Personal Details`)}
-                  className="flex gap-4 mt-2"
-                >
-                  <div className="flex items-center space-x-2">
-                    <RadioGroupItem value="Yes" id={`${prefix}-namechange-yes`} />
-                    <Label htmlFor={`${prefix}-namechange-yes`}>Yes</Label>
-                  </div>
-                  <div className="flex items-center space-x-2">
-                    <RadioGroupItem value="No" id={`${prefix}-namechange-no`} />
-                    <Label htmlFor={`${prefix}-namechange-no`}>No</Label>
-                  </div>
-                </RadioGroup>
-              </div>
-
-              <div>
-                <Label>Date of birth</Label>
-                <div className="flex gap-2 mt-1">
+                <Label className="text-sm font-medium mb-2 block">When did the applicant move to this property?</Label>
+                <div className="flex gap-2">
                   <Input 
-                    placeholder="DD"
-                    className="w-16"
-                    ref={(ref) => fieldRefs.current[`${prefix}DateOfBirthDay`] = ref}
-                    value={formData[`${prefix}DateOfBirthDay` as keyof typeof formData]}
-                    onChange={(e) => handleInputChange(`${prefix}DateOfBirthDay`, e.target.value, `${applicantName} Personal Details`)}
-                  />
-                  <Input 
-                    placeholder="MM"
-                    className="w-16"
-                    ref={(ref) => fieldRefs.current[`${prefix}DateOfBirthMonth`] = ref}
-                    value={formData[`${prefix}DateOfBirthMonth` as keyof typeof formData]}
-                    onChange={(e) => handleInputChange(`${prefix}DateOfBirthMonth`, e.target.value, `${applicantName} Personal Details`)}
-                  />
-                  <Input 
-                    placeholder="YYYY"
-                    className="w-20"
-                    ref={(ref) => fieldRefs.current[`${prefix}DateOfBirthYear`] = ref}
-                    value={formData[`${prefix}DateOfBirthYear` as keyof typeof formData]}
-                    onChange={(e) => handleInputChange(`${prefix}DateOfBirthYear`, e.target.value, `${applicantName} Personal Details`)}
-                  />
-                </div>
-              </div>
-
-              <div>
-                <Label className="text-sm text-gray-700">Nationality</Label>
-                <RadioGroup 
-                  value={formData[`${prefix}Nationality` as keyof typeof formData]}
-                  onValueChange={(value) => handleInputChange(`${prefix}Nationality`, value, `${applicantName} Personal Details`)}
-                  className="space-y-2 mt-2"
-                >
-                  <div className="flex items-center space-x-2">
-                    <RadioGroupItem value="UK Resident" id={`${prefix}-nat-uk`} />
-                    <Label htmlFor={`${prefix}-nat-uk`}>UK Resident</Label>
-                  </div>
-                  <div className="flex items-center space-x-2">
-                    <RadioGroupItem value="EEA or Swiss National" id={`${prefix}-nat-eea`} />
-                    <Label htmlFor={`${prefix}-nat-eea`}>EEA or Swiss National</Label>
-                  </div>
-                  <div className="flex items-center space-x-2">
-                    <RadioGroupItem value="Non EEA" id={`${prefix}-nat-non`} />
-                    <Label htmlFor={`${prefix}-nat-non`}>Non EEA</Label>
-                  </div>
-                </RadioGroup>
-              </div>
-            </div>
-          </EditableField>
-
-          {/* Address Section */}
-          <EditableField isEdited={isFieldEdited(`${prefix}CurrentAddress`) || isFieldEdited(`${prefix}Postcode`)}>
-            <div className="space-y-4">
-              <h3 className="text-[#165788] text-base font-medium">Address</h3>
-              
-              <div>
-                <Label htmlFor={`${prefix}-address`}>Current address</Label>
-                <Input 
-                  id={`${prefix}-address`}
-                  ref={(ref) => fieldRefs.current[`${prefix}CurrentAddress`] = ref}
-                  value={formData[`${prefix}CurrentAddress` as keyof typeof formData]}
-                  onChange={(e) => handleInputChange(`${prefix}CurrentAddress`, e.target.value, `${applicantName} Address`)}
-                />
-              </div>
-              
-              <div>
-                <Label htmlFor={`${prefix}-address2`}>Address line 2</Label>
-                <Input 
-                  id={`${prefix}-address2`}
-                  ref={(ref) => fieldRefs.current[`${prefix}AddressLine2`] = ref}
-                  value={formData[`${prefix}AddressLine2` as keyof typeof formData]}
-                  onChange={(e) => handleInputChange(`${prefix}AddressLine2`, e.target.value, `${applicantName} Address`)}
-                />
-              </div>
-              
-              <div>
-                <Label htmlFor={`${prefix}-address3`}>Address line 3</Label>
-                <Input 
-                  id={`${prefix}-address3`}
-                  ref={(ref) => fieldRefs.current[`${prefix}AddressLine3`] = ref}
-                  value={formData[`${prefix}AddressLine3` as keyof typeof formData]}
-                  onChange={(e) => handleInputChange(`${prefix}AddressLine3`, e.target.value, `${applicantName} Address`)}
-                />
-              </div>
-              
-              <div>
-                <Label htmlFor={`${prefix}-postcode`}>Postcode</Label>
-                <Input 
-                  id={`${prefix}-postcode`}
-                  ref={(ref) => fieldRefs.current[`${prefix}Postcode`] = ref}
-                  value={formData[`${prefix}Postcode` as keyof typeof formData]}
-                  onChange={(e) => handleInputChange(`${prefix}Postcode`, e.target.value, `${applicantName} Address`)}
-                />
-              </div>
-              
-              <div>
-                <Label>When did the applicant move into the property?</Label>
-                <div className="flex gap-2 mt-1">
-                  <Input 
+                    value={formData.jamesMovedInMonths}
+                    onChange={(e) => handleInputChange('jamesMovedInMonths', e.target.value, 'James Taylor Address')}
                     placeholder="Months"
                     className="w-24"
-                    ref={(ref) => fieldRefs.current[`${prefix}MovedInMonths`] = ref}
-                    value={formData[`${prefix}MovedInMonths` as keyof typeof formData]}
-                    onChange={(e) => handleInputChange(`${prefix}MovedInMonths`, e.target.value, `${applicantName} Address`)}
                   />
-                  <span className="self-center text-gray-500">/</span>
                   <Input 
-                    placeholder="Year"
+                    value={formData.jamesMovedInYears}
+                    onChange={(e) => handleInputChange('jamesMovedInYears', e.target.value, 'James Taylor Address')}
+                    placeholder="2015"
                     className="w-24"
-                    ref={(ref) => fieldRefs.current[`${prefix}MovedInYears`] = ref}
-                    value={formData[`${prefix}MovedInYears` as keyof typeof formData]}
-                    onChange={(e) => handleInputChange(`${prefix}MovedInYears`, e.target.value, `${applicantName} Address`)}
                   />
                 </div>
               </div>
               
               <div>
-                <Label htmlFor={`${prefix}-residency`}>Current residency status</Label>
+                <Label className="text-sm font-medium mb-2 block">Current residency status</Label>
                 <Select 
-                  value={formData[`${prefix}ResidencyStatus` as keyof typeof formData]}
-                  onValueChange={(value) => handleInputChange(`${prefix}ResidencyStatus`, value, `${applicantName} Address`)}
+                  value={formData.jamesResidencyStatus}
+                  onValueChange={(value) => handleInputChange('jamesResidencyStatus', value, 'James Taylor Address')}
                 >
-                  <SelectTrigger ref={(ref) => fieldRefs.current[`${prefix}ResidencyStatus`] = ref}>
+                  <SelectTrigger>
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent>
                     <SelectItem value="Owner occupier with mortgage">Owner occupier with mortgage</SelectItem>
                     <SelectItem value="Owner occupier without mortgage">Owner occupier without mortgage</SelectItem>
                     <SelectItem value="Tenant">Tenant</SelectItem>
-                    <SelectItem value="Living with family">Living with family</SelectItem>
+                    <SelectItem value="Living with parents">Living with parents</SelectItem>
                   </SelectContent>
                 </Select>
               </div>
-            </div>
-          </EditableField>
-
-          {/* Property Details Section */}
-          <EditableField isEdited={isFieldEdited(`${prefix}SalePrice`) || isFieldEdited(`${prefix}CurrentLender`)}>
-            <div className="space-y-4">
-              <h3 className="text-[#165788] text-base font-medium">Property Details</h3>
               
               <div>
-                <Label htmlFor={`${prefix}-saleprice`}>Sale price</Label>
-                <Input 
-                  id={`${prefix}-saleprice`}
-                  ref={(ref) => fieldRefs.current[`${prefix}SalePrice`] = ref}
-                  value={formData[`${prefix}SalePrice` as keyof typeof formData]}
-                  onChange={(e) => handleInputChange(`${prefix}SalePrice`, e.target.value, `${applicantName} Property`)}
-                />
-              </div>
-              
-              <div>
-                <Label htmlFor={`${prefix}-lender`}>Current lender</Label>
-                <Input 
-                  id={`${prefix}-lender`}
-                  ref={(ref) => fieldRefs.current[`${prefix}CurrentLender`] = ref}
-                  value={formData[`${prefix}CurrentLender` as keyof typeof formData]}
-                  onChange={(e) => handleInputChange(`${prefix}CurrentLender`, e.target.value, `${applicantName} Property`)}
-                />
-              </div>
-              
-              <div>
-                <Label htmlFor={`${prefix}-outstanding`}>Outstanding mortgage balance</Label>
-                <Input 
-                  id={`${prefix}-outstanding`}
-                  ref={(ref) => fieldRefs.current[`${prefix}OutstandingMortgage`] = ref}
-                  value={formData[`${prefix}OutstandingMortgage` as keyof typeof formData]}
-                  onChange={(e) => handleInputChange(`${prefix}OutstandingMortgage`, e.target.value, `${applicantName} Property`)}
-                />
-              </div>
-              
-              <div>
-                <Label htmlFor={`${prefix}-plans`}>Plans for property</Label>
+                <Label className="text-sm font-medium mb-2 block">If not owner occupier</Label>
                 <Select 
-                  value={formData[`${prefix}PlansForProperty` as keyof typeof formData]}
-                  onValueChange={(value) => handleInputChange(`${prefix}PlansForProperty`, value, `${applicantName} Property`)}
+                  value={formData.jamesOwnershipLength}
+                  onValueChange={(value) => handleInputChange('jamesOwnershipLength', value, 'James Taylor Address')}
                 >
-                  <SelectTrigger ref={(ref) => fieldRefs.current[`${prefix}PlansForProperty`] = ref}>
+                  <SelectTrigger>
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="Continue to live in it">Continue to live in it</SelectItem>
-                    <SelectItem value="Sell it">Sell it</SelectItem>
-                    <SelectItem value="Rent it out">Rent it out</SelectItem>
+                    <SelectItem value="More than 3 years">More than 3 years</SelectItem>
+                    <SelectItem value="Less than 3 years">Less than 3 years</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+              
+              <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+                <div>
+                  <Label className="text-sm">Current market value</Label>
+                  <Input 
+                    value={formData.jamesSalePrice}
+                    onChange={(e) => handleInputChange('jamesSalePrice', e.target.value, 'James Taylor Address')}
+                    placeholder="£1000000"
+                  />
+                </div>
+                <div>
+                  <Label className="text-sm">Current outstanding mortgage</Label>
+                  <Input 
+                    value={formData.jamesOutstandingMortgage}
+                    onChange={(e) => handleInputChange('jamesOutstandingMortgage', e.target.value, 'James Taylor Address')}
+                    placeholder="£500000"
+                  />
+                </div>
+                <div>
+                  <Label className="text-sm">Remaining outstanding balance</Label>
+                  <Input 
+                    value={formData.jamesExpectedRemainingBalance}
+                    onChange={(e) => handleInputChange('jamesExpectedRemainingBalance', e.target.value, 'James Taylor Address')}
+                    placeholder="£400000"
+                  />
+                </div>
+                <div>
+                  <Label className="text-sm">Sale price</Label>
+                  <Input 
+                    value={formData.jamesExpectedRemainingBalance}
+                    onChange={(e) => handleInputChange('jamesExpectedRemainingBalance', e.target.value, 'James Taylor Address')}
+                    placeholder="£400000"
+                  />
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* James Taylor's Income */}
+          <div className="bg-white border border-gray-200 p-6 rounded-lg">
+            <h3 className="text-[#165788] text-lg font-medium mb-6">James Taylor's Income</h3>
+            
+            <div className="space-y-6">
+              <div>
+                <Label className="text-sm font-medium mb-2 block">Employment Status</Label>
+                <Select 
+                  value={formData.jamesEmploymentStatus}
+                  onValueChange={(value) => handleInputChange('jamesEmploymentStatus', value, 'James Taylor Income')}
+                >
+                  <SelectTrigger>
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="Employed">Employed</SelectItem>
+                    <SelectItem value="Self Employed">Self Employed</SelectItem>
+                    <SelectItem value="Contract">Contract</SelectItem>
+                    <SelectItem value="Unemployed">Unemployed</SelectItem>
                   </SelectContent>
                 </Select>
               </div>
               
               <div>
-                <Label htmlFor={`${prefix}-remaining`}>Expected remaining mortgage balance</Label>
+                <Label className="text-sm font-medium mb-2 block">Basic Income</Label>
                 <Input 
-                  id={`${prefix}-remaining`}
-                  ref={(ref) => fieldRefs.current[`${prefix}ExpectedRemainingBalance`] = ref}
-                  value={formData[`${prefix}ExpectedRemainingBalance` as keyof typeof formData]}
-                  onChange={(e) => handleInputChange(`${prefix}ExpectedRemainingBalance`, e.target.value, `${applicantName} Property`)}
+                  value={formData.jamesBasicIncome}
+                  onChange={(e) => handleInputChange('jamesBasicIncome', e.target.value, 'James Taylor Income')}
+                  placeholder="£50000.00"
                 />
               </div>
+              
+              <div>
+                <Label className="text-sm font-medium mb-2 block">Frequency of gross basic income</Label>
+                <Select 
+                  value={formData.jamesFrequencyGrossIncome}
+                  onValueChange={(value) => handleInputChange('jamesFrequencyGrossIncome', value, 'James Taylor Income')}
+                >
+                  <SelectTrigger>
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="Yearly">Yearly</SelectItem>
+                    <SelectItem value="Monthly">Monthly</SelectItem>
+                    <SelectItem value="Weekly">Weekly</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+              
+              <div>
+                <Label className="text-sm font-medium mb-2 block">Annual amount</Label>
+                <Input 
+                  value={formData.jamesAnnualAmount}
+                  onChange={(e) => handleInputChange('jamesAnnualAmount', e.target.value, 'James Taylor Income')}
+                  placeholder="£50,000.00"
+                />
+              </div>
+              
+              <div>
+                <Label className="text-sm font-medium mb-2 block">Monthly net salary (after tax, NI, pension, childcare expenses, child tax employment and cap guarantee payments)</Label>
+                <p className="text-xs text-gray-600 mb-2">
+                  Enter any monthly payment amount per recipient
+                </p>
+                <Input 
+                  value={formData.jamesMonthlyNetSalary}
+                  onChange={(e) => handleInputChange('jamesMonthlyNetSalary', e.target.value, 'James Taylor Income')}
+                  placeholder="£3200"
+                />
+              </div>
+              
+              <div>
+                <Label className="text-sm font-medium mb-2 block">Job title</Label>
+                <Input 
+                  value={formData.jamesJobTitle}
+                  onChange={(e) => handleInputChange('jamesJobTitle', e.target.value, 'James Taylor Income')}
+                  placeholder="Accountant"
+                />
+              </div>
+              
+              <div>
+                <Label className="text-sm font-medium mb-2 block">Employer name</Label>
+                <Input 
+                  value={formData.jamesEmployerName}
+                  onChange={(e) => handleInputChange('jamesEmployerName', e.target.value, 'James Taylor Income')}
+                  placeholder="Self Employed"
+                />
+              </div>
+              
+              <div>
+                <Label className="text-sm font-medium mb-2 block">Employment nature</Label>
+                <RadioGroup 
+                  value={formData.jamesEmploymentNature}
+                  onValueChange={(value) => handleInputChange('jamesEmploymentNature', value, 'James Taylor Income')}
+                  className="flex gap-6"
+                >
+                  <div className="flex items-center space-x-2">
+                    <RadioGroupItem value="Permanent" id="james-emp-permanent" />
+                    <Label htmlFor="james-emp-permanent" className="text-sm">Permanent</Label>
+                  </div>
+                  <div className="flex items-center space-x-2">
+                    <RadioGroupItem value="Contract" id="james-emp-contract" />
+                    <Label htmlFor="james-emp-contract" className="text-sm">Contract</Label>
+                  </div>
+                </RadioGroup>
+              </div>
+              
+              <div>
+                <Label className="text-sm font-medium mb-2 block">Start date of previous employment</Label>
+                <Input 
+                  value={formData.jamesStartDate}
+                  onChange={(e) => handleInputChange('jamesStartDate', e.target.value, 'James Taylor Income')}
+                  placeholder="Self Employed"
+                />
+              </div>
+              
+              <div>
+                <Label className="text-sm font-medium mb-2 block">Expected retirement age</Label>
+                <Input 
+                  value={formData.jamesExpectedRetirement}
+                  onChange={(e) => handleInputChange('jamesExpectedRetirement', e.target.value, 'James Taylor Income')}
+                  placeholder="70"
+                  className="w-20"
+                />
+              </div>
+              
+              <div>
+                <Label className="text-sm font-medium mb-4 block">Please add all additional income sources relevant to this application:</Label>
+                
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
+                  <div>
+                    <Label className="text-xs">Income amount</Label>
+                    <Input 
+                      value={formData.jamesAdditionalIncome1Amount}
+                      onChange={(e) => handleInputChange('jamesAdditionalIncome1Amount', e.target.value, 'James Taylor Income')}
+                      placeholder="£"
+                    />
+                  </div>
+                  <div>
+                    <Label className="text-xs">Amount</Label>
+                    <Input placeholder="£" />
+                  </div>
+                  <div>
+                    <Label className="text-xs">Frequency</Label>
+                    <Select 
+                      value={formData.jamesAdditionalIncome1Frequency}
+                      onValueChange={(value) => handleInputChange('jamesAdditionalIncome1Frequency', value, 'James Taylor Income')}
+                    >
+                      <SelectTrigger>
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="Yearly">Yearly</SelectItem>
+                        <SelectItem value="Monthly">Monthly</SelectItem>
+                        <SelectItem value="Weekly">Weekly</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+                </div>
+                
+                <Button variant="outline" className="text-blue-600 border-blue-600">
+                  Add an Income source
+                </Button>
+              </div>
             </div>
-          </EditableField>
+          </div>
+
+          {/* James Taylor's commitments */}
+          <div className="bg-white border border-gray-200 p-6 rounded-lg">
+            <h3 className="text-[#165788] text-lg font-medium mb-6">James Taylor's commitments</h3>
+            <p className="text-sm text-gray-600 mb-6">
+              Please add all relevant commitments relating to this applicant, where it may will be included in affordability calculation, 
+              including but not limited to the following: hire purchase, finance, regular payments, loans, credit cards, store cards, overdrafts, child maintenance.
+            </p>
+            
+            <div className="space-y-4">
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <div>
+                  <Label className="text-xs">Commitment type</Label>
+                  <Select 
+                    value={formData.jamesCommitmentType1}
+                    onValueChange={(value) => handleInputChange('jamesCommitmentType1', value, 'James Taylor Commitments')}
+                  >
+                    <SelectTrigger>
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="Credit card">Credit card</SelectItem>
+                      <SelectItem value="Personal loan">Personal loan</SelectItem>
+                      <SelectItem value="Store card">Store card</SelectItem>
+                      <SelectItem value="Overdraft">Overdraft</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+                <div>
+                  <Label className="text-xs">Provider</Label>
+                  <Input 
+                    value={formData.jamesCommitmentProvider1}
+                    onChange={(e) => handleInputChange('jamesCommitmentProvider1', e.target.value, 'James Taylor Commitments')}
+                    placeholder="Tesco"
+                  />
+                </div>
+                <div>
+                  <Label className="text-xs">Remaining balance</Label>
+                  <Input 
+                    value={formData.jamesCommitmentBalance1}
+                    onChange={(e) => handleInputChange('jamesCommitmentBalance1', e.target.value, 'James Taylor Commitments')}
+                    placeholder="£300.00"
+                  />
+                </div>
+              </div>
+              
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <div>
+                  <Select 
+                    value={formData.jamesCommitmentType2}
+                    onValueChange={(value) => handleInputChange('jamesCommitmentType2', value, 'James Taylor Commitments')}
+                  >
+                    <SelectTrigger>
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="Credit card">Credit card</SelectItem>
+                      <SelectItem value="Personal loan">Personal loan</SelectItem>
+                      <SelectItem value="Store card">Store card</SelectItem>
+                      <SelectItem value="Overdraft">Overdraft</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+                <div>
+                  <Input 
+                    value={formData.jamesCommitmentProvider2}
+                    onChange={(e) => handleInputChange('jamesCommitmentProvider2', e.target.value, 'James Taylor Commitments')}
+                    placeholder="Santander Finance"
+                  />
+                </div>
+                <div>
+                  <Input 
+                    value={formData.jamesCommitmentBalance2}
+                    onChange={(e) => handleInputChange('jamesCommitmentBalance2', e.target.value, 'James Taylor Commitments')}
+                    placeholder="£500.00"
+                  />
+                </div>
+              </div>
+              
+              <div className="flex items-center space-x-2 mt-4">
+                <input type="checkbox" id="james-redemption" className="h-4 w-4" />
+                <Label htmlFor="james-redemption" className="text-sm">
+                  Fund on completion (with some form payment)
+                </Label>
+              </div>
+              
+              <Button variant="outline" className="text-blue-600 border-blue-600 mt-4">
+                Add a commitment
+              </Button>
+            </div>
+          </div>
         </div>
       );
     }
 
-    // Display view when not editing
+    // Display view when not editing - simple summary
     return (
-      <div className="space-y-6">
-        <h3 className="text-[#165788] text-lg font-medium">{applicantName}</h3>
+      <div className="space-y-4">
+        <h3 className="text-[#165788] text-lg font-medium">James Taylor</h3>
         
-        <div className="w-full">
-          <div className={`flex w-full gap-4 text-base flex-wrap p-1 bg-[#F7F8FA]`}>
-            <div className="text-[#505A5F] font-normal flex-1 shrink basis-[0%]">
-              Name change in last 6 years
-            </div>
-            <div 
-              className="text-black font-medium flex-1 shrink basis-[0%] flex items-center gap-2 cursor-pointer hover:text-blue-600"
-              onDoubleClick={() => handleFieldDoubleClick(`${prefix}NameChange`)}
-              title={isEditingEnabled && !isEditMode ? "Double-click to edit this field" : ""}
-            >
-              {formData[`${prefix}NameChange` as keyof typeof formData]}
-              {isFieldEdited(`${prefix}NameChange`) && (
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div 
+            className="cursor-pointer hover:bg-gray-50 p-2 rounded border"
+            onDoubleClick={() => handleFieldDoubleClick('jamesFirstName')}
+            title={isEditingEnabled ? "Double-click to edit" : ""}
+          >
+            <div className="text-sm text-gray-600">Name</div>
+            <div className="font-medium flex items-center gap-2">
+              {formData.jamesTitle} {formData.jamesFirstName} {formData.jamesLastName}
+              {isFieldEdited('jamesFirstName') && (
                 <TooltipProvider>
                   <Tooltip>
                     <TooltipTrigger asChild>
-                      <button 
-                        onClick={() => handleFieldComparisonClick(`${prefix}NameChange`)}
-                        className="text-blue-500 hover:text-blue-700"
-                      >
-                        <Clock className="w-3 h-3" />
+                      <button onClick={() => handleFieldComparisonClick('jamesFirstName')}>
+                        <Clock className="w-3 h-3 text-blue-500" />
                       </button>
                     </TooltipTrigger>
                     <TooltipContent>
-                      <p>This field has been edited. Click to view audit log.</p>
+                      <p>Field has been edited</p>
                     </TooltipContent>
                   </Tooltip>
                 </TooltipProvider>
@@ -601,303 +811,14 @@ export const EditablePersonalDetailsPage: React.FC = () => {
             </div>
           </div>
           
-          <div className={`flex w-full gap-4 text-base flex-wrap p-1`}>
-            <div className="text-[#505A5F] font-normal flex-1 shrink basis-[0%]">
-              D.O.B - Age
-            </div>
-            <div 
-              className="text-black font-medium flex-1 shrink basis-[0%] flex items-center gap-2 cursor-pointer hover:text-blue-600"
-              onDoubleClick={() => handleFieldDoubleClick(`${prefix}DateOfBirthDay`)}
-              title={isEditingEnabled && !isEditMode ? "Double-click to edit this field" : ""}
-            >
-              {formData[`${prefix}DateOfBirthDay` as keyof typeof formData]}/{formData[`${prefix}DateOfBirthMonth` as keyof typeof formData]}/{formData[`${prefix}DateOfBirthYear` as keyof typeof formData]}
-              {(isFieldEdited(`${prefix}DateOfBirthDay`) || isFieldEdited(`${prefix}DateOfBirthMonth`) || isFieldEdited(`${prefix}DateOfBirthYear`)) && (
-                <TooltipProvider>
-                  <Tooltip>
-                    <TooltipTrigger asChild>
-                      <button 
-                        onClick={() => handleFieldComparisonClick(`${prefix}DateOfBirthDay`)}
-                        className="text-blue-500 hover:text-blue-700"
-                      >
-                        <Clock className="w-3 h-3" />
-                      </button>
-                    </TooltipTrigger>
-                    <TooltipContent>
-                      <p>This field has been edited. Click to view audit log.</p>
-                    </TooltipContent>
-                  </Tooltip>
-                </TooltipProvider>
-              )}
-            </div>
-          </div>
-          
-          <div className={`flex w-full gap-4 text-base flex-wrap p-1 bg-[#F7F8FA]`}>
-            <div className="text-[#505A5F] font-normal flex-1 shrink basis-[0%]">
-              Current address
-            </div>
-            <div 
-              className="text-black font-medium flex-1 shrink basis-[0%] flex items-center gap-2 cursor-pointer hover:text-blue-600"
-              onDoubleClick={() => handleFieldDoubleClick(`${prefix}CurrentAddress`)}
-              title={isEditingEnabled && !isEditMode ? "Double-click to edit this field" : ""}
-            >
-              {formData[`${prefix}CurrentAddress` as keyof typeof formData]} {formData[`${prefix}AddressLine2` as keyof typeof formData]} {formData[`${prefix}AddressLine3` as keyof typeof formData]}
-              {(isFieldEdited(`${prefix}CurrentAddress`) || isFieldEdited(`${prefix}AddressLine2`) || isFieldEdited(`${prefix}AddressLine3`)) && (
-                <TooltipProvider>
-                  <Tooltip>
-                    <TooltipTrigger asChild>
-                      <button 
-                        onClick={() => handleFieldComparisonClick(`${prefix}CurrentAddress`)}
-                        className="text-blue-500 hover:text-blue-700"
-                      >
-                        <Clock className="w-3 h-3" />
-                      </button>
-                    </TooltipTrigger>
-                    <TooltipContent>
-                      <p>This field has been edited. Click to view audit log.</p>
-                    </TooltipContent>
-                  </Tooltip>
-                </TooltipProvider>
-              )}
-            </div>
-          </div>
-          
-          <div className={`flex w-full gap-4 text-base flex-wrap p-1`}>
-            <div className="text-[#505A5F] font-normal flex-1 shrink basis-[0%]">
-              Postcode
-            </div>
-            <div 
-              className="text-black font-medium flex-1 shrink basis-[0%] flex items-center gap-2 cursor-pointer hover:text-blue-600"
-              onDoubleClick={() => handleFieldDoubleClick(`${prefix}Postcode`)}
-              title={isEditingEnabled && !isEditMode ? "Double-click to edit this field" : ""}
-            >
-              {formData[`${prefix}Postcode` as keyof typeof formData]}
-              {isFieldEdited(`${prefix}Postcode`) && (
-                <TooltipProvider>
-                  <Tooltip>
-                    <TooltipTrigger asChild>
-                      <button 
-                        onClick={() => handleFieldComparisonClick(`${prefix}Postcode`)}
-                        className="text-blue-500 hover:text-blue-700"
-                      >
-                        <Clock className="w-3 h-3" />
-                      </button>
-                    </TooltipTrigger>
-                    <TooltipContent>
-                      <p>This field has been edited. Click to view audit log.</p>
-                    </TooltipContent>
-                  </Tooltip>
-                </TooltipProvider>
-              )}
-            </div>
-          </div>
-          
-          <div className={`flex w-full gap-4 text-base flex-wrap p-1 bg-[#F7F8FA]`}>
-            <div className="text-[#505A5F] font-normal flex-1 shrink basis-[0%]">
-              When did the applicant move into the property
-            </div>
-            <div 
-              className="text-black font-medium flex-1 shrink basis-[0%] flex items-center gap-2 cursor-pointer hover:text-blue-600"
-              onDoubleClick={() => handleFieldDoubleClick(`${prefix}MovedInMonths`)}
-              title={isEditingEnabled && !isEditMode ? "Double-click to edit this field" : ""}
-            >
-              {formData[`${prefix}MovedInMonths` as keyof typeof formData]}/{formData[`${prefix}MovedInYears` as keyof typeof formData]}
-              {(isFieldEdited(`${prefix}MovedInMonths`) || isFieldEdited(`${prefix}MovedInYears`)) && (
-                <TooltipProvider>
-                  <Tooltip>
-                    <TooltipTrigger asChild>
-                      <button 
-                        onClick={() => handleFieldComparisonClick(`${prefix}MovedInMonths`)}
-                        className="text-blue-500 hover:text-blue-700"
-                      >
-                        <Clock className="w-3 h-3" />
-                      </button>
-                    </TooltipTrigger>
-                    <TooltipContent>
-                      <p>This field has been edited. Click to view audit log.</p>
-                    </TooltipContent>
-                  </Tooltip>
-                </TooltipProvider>
-              )}
-            </div>
-          </div>
-          
-          <div className={`flex w-full gap-4 text-base flex-wrap p-1`}>
-            <div className="text-[#505A5F] font-normal flex-1 shrink basis-[0%]">
-              Sale price
-            </div>
-            <div 
-              className="text-black font-medium flex-1 shrink basis-[0%] flex items-center gap-2 cursor-pointer hover:text-blue-600"
-              onDoubleClick={() => handleFieldDoubleClick(`${prefix}SalePrice`)}
-              title={isEditingEnabled && !isEditMode ? "Double-click to edit this field" : ""}
-            >
-              {formData[`${prefix}SalePrice` as keyof typeof formData]}
-              {isFieldEdited(`${prefix}SalePrice`) && (
-                <TooltipProvider>
-                  <Tooltip>
-                    <TooltipTrigger asChild>
-                      <button 
-                        onClick={() => handleFieldComparisonClick(`${prefix}SalePrice`)}
-                        className="text-blue-500 hover:text-blue-700"
-                      >
-                        <Clock className="w-3 h-3" />
-                      </button>
-                    </TooltipTrigger>
-                    <TooltipContent>
-                      <p>This field has been edited. Click to view audit log.</p>
-                    </TooltipContent>
-                  </Tooltip>
-                </TooltipProvider>
-              )}
-            </div>
-          </div>
-          
-          <div className={`flex w-full gap-4 text-base flex-wrap p-1 bg-[#F7F8FA]`}>
-            <div className="text-[#505A5F] font-normal flex-1 shrink basis-[0%]">
-              Current residency status
-            </div>
-            <div 
-              className="text-black font-medium flex-1 shrink basis-[0%] flex items-center gap-2 cursor-pointer hover:text-blue-600"
-              onDoubleClick={() => handleFieldDoubleClick(`${prefix}ResidencyStatus`)}
-              title={isEditingEnabled && !isEditMode ? "Double-click to edit this field" : ""}
-            >
-              {formData[`${prefix}ResidencyStatus` as keyof typeof formData]}
-              {isFieldEdited(`${prefix}ResidencyStatus`) && (
-                <TooltipProvider>
-                  <Tooltip>
-                    <TooltipTrigger asChild>
-                      <button 
-                        onClick={() => handleFieldComparisonClick(`${prefix}ResidencyStatus`)}
-                        className="text-blue-500 hover:text-blue-700"
-                      >
-                        <Clock className="w-3 h-3" />
-                      </button>
-                    </TooltipTrigger>
-                    <TooltipContent>
-                      <p>This field has been edited. Click to view audit log.</p>
-                    </TooltipContent>
-                  </Tooltip>
-                </TooltipProvider>
-              )}
-            </div>
-          </div>
-          
-          <div className={`flex w-full gap-4 text-base flex-wrap p-1`}>
-            <div className="text-[#505A5F] font-normal flex-1 shrink basis-[0%]">
-              Current lender
-            </div>
-            <div 
-              className="text-black font-medium flex-1 shrink basis-[0%] flex items-center gap-2 cursor-pointer hover:text-blue-600"
-              onDoubleClick={() => handleFieldDoubleClick(`${prefix}CurrentLender`)}
-              title={isEditingEnabled && !isEditMode ? "Double-click to edit this field" : ""}
-            >
-              {formData[`${prefix}CurrentLender` as keyof typeof formData]}
-              {isFieldEdited(`${prefix}CurrentLender`) && (
-                <TooltipProvider>
-                  <Tooltip>
-                    <TooltipTrigger asChild>
-                      <button 
-                        onClick={() => handleFieldComparisonClick(`${prefix}CurrentLender`)}
-                        className="text-blue-500 hover:text-blue-700"
-                      >
-                        <Clock className="w-3 h-3" />
-                      </button>
-                    </TooltipTrigger>
-                    <TooltipContent>
-                      <p>This field has been edited. Click to view audit log.</p>
-                    </TooltipContent>
-                  </Tooltip>
-                </TooltipProvider>
-              )}
-            </div>
-          </div>
-          
-          <div className={`flex w-full gap-4 text-base flex-wrap p-1 bg-[#F7F8FA]`}>
-            <div className="text-[#505A5F] font-normal flex-1 shrink basis-[0%]">
-              Outstanding mortgage balance
-            </div>
-            <div 
-              className="text-black font-medium flex-1 shrink basis-[0%] flex items-center gap-2 cursor-pointer hover:text-blue-600"
-              onDoubleClick={() => handleFieldDoubleClick(`${prefix}OutstandingMortgage`)}
-              title={isEditingEnabled && !isEditMode ? "Double-click to edit this field" : ""}
-            >
-              {formData[`${prefix}OutstandingMortgage` as keyof typeof formData]}
-              {isFieldEdited(`${prefix}OutstandingMortgage`) && (
-                <TooltipProvider>
-                  <Tooltip>
-                    <TooltipTrigger asChild>
-                      <button 
-                        onClick={() => handleFieldComparisonClick(`${prefix}OutstandingMortgage`)}
-                        className="text-blue-500 hover:text-blue-700"
-                      >
-                        <Clock className="w-3 h-3" />
-                      </button>
-                    </TooltipTrigger>
-                    <TooltipContent>
-                      <p>This field has been edited. Click to view audit log.</p>
-                    </TooltipContent>
-                  </Tooltip>
-                </TooltipProvider>
-              )}
-            </div>
-          </div>
-          
-          <div className={`flex w-full gap-4 text-base flex-wrap p-1`}>
-            <div className="text-[#505A5F] font-normal flex-1 shrink basis-[0%]">
-              Plans for property
-            </div>
-            <div 
-              className="text-black font-medium flex-1 shrink basis-[0%] flex items-center gap-2 cursor-pointer hover:text-blue-600"
-              onDoubleClick={() => handleFieldDoubleClick(`${prefix}PlansForProperty`)}
-              title={isEditingEnabled && !isEditMode ? "Double-click to edit this field" : ""}
-            >
-              {formData[`${prefix}PlansForProperty` as keyof typeof formData]}
-              {isFieldEdited(`${prefix}PlansForProperty`) && (
-                <TooltipProvider>
-                  <Tooltip>
-                    <TooltipTrigger asChild>
-                      <button 
-                        onClick={() => handleFieldComparisonClick(`${prefix}PlansForProperty`)}
-                        className="text-blue-500 hover:text-blue-700"
-                      >
-                        <Clock className="w-3 h-3" />
-                      </button>
-                    </TooltipTrigger>
-                    <TooltipContent>
-                      <p>This field has been edited. Click to view audit log.</p>
-                    </TooltipContent>
-                  </Tooltip>
-                </TooltipProvider>
-              )}
-            </div>
-          </div>
-          
-          <div className={`flex w-full gap-4 text-base flex-wrap p-1 bg-[#F7F8FA]`}>
-            <div className="text-[#505A5F] font-normal flex-1 shrink basis-[0%]">
-              Expected remaining mortgage balance
-            </div>
-            <div 
-              className="text-black font-medium flex-1 shrink basis-[0%] flex items-center gap-2 cursor-pointer hover:text-blue-600"
-              onDoubleClick={() => handleFieldDoubleClick(`${prefix}ExpectedRemainingBalance`)}
-              title={isEditingEnabled && !isEditMode ? "Double-click to edit this field" : ""}
-            >
-              {formData[`${prefix}ExpectedRemainingBalance` as keyof typeof formData]}
-              {isFieldEdited(`${prefix}ExpectedRemainingBalance`) && (
-                <TooltipProvider>
-                  <Tooltip>
-                    <TooltipTrigger asChild>
-                      <button 
-                        onClick={() => handleFieldComparisonClick(`${prefix}ExpectedRemainingBalance`)}
-                        className="text-blue-500 hover:text-blue-700"
-                      >
-                        <Clock className="w-3 h-3" />
-                      </button>
-                    </TooltipTrigger>
-                    <TooltipContent>
-                      <p>This field has been edited. Click to view audit log.</p>
-                    </TooltipContent>
-                  </Tooltip>
-                </TooltipProvider>
-              )}
+          <div 
+            className="cursor-pointer hover:bg-gray-50 p-2 rounded border"
+            onDoubleClick={() => handleFieldDoubleClick('jamesDateOfBirthDay')}
+            title={isEditingEnabled ? "Double-click to edit" : ""}
+          >
+            <div className="text-sm text-gray-600">Date of Birth</div>
+            <div className="font-medium">
+              {formData.jamesDateOfBirthDay}/{formData.jamesDateOfBirthMonth}/{formData.jamesDateOfBirthYear}
             </div>
           </div>
         </div>
@@ -918,12 +839,7 @@ export const EditablePersonalDetailsPage: React.FC = () => {
           <div className="space-y-8">
             {/* James Taylor Section */}
             <section className="w-full">
-              {renderApplicantSection("James Taylor", "james", "Mr")}
-            </section>
-
-            {/* Jane Taylor Section */}
-            <section className="w-full">
-              {renderApplicantSection("Jane Taylor", "jane", "Mrs")}
+              {renderJamesTaylorForm()}
             </section>
           </div>
         </div>
