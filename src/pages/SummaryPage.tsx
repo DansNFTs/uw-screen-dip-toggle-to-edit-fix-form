@@ -107,6 +107,8 @@ export const SummaryPage: React.FC = () => {
   // Focus on specific field and section when entering edit mode
   useEffect(() => {
     if (isEditMode && focusedField) {
+      console.log('Focusing on field:', focusedField);
+      
       // Determine which section to scroll to based on field name
       let sectionToScroll = '';
       if (focusedField.includes('applicant1')) {
@@ -123,15 +125,21 @@ export const SummaryPage: React.FC = () => {
         sectionToScroll = 'affordability';
       }
 
+      console.log('Section to scroll:', sectionToScroll);
+      console.log('Section ref available:', !!sectionRefs.current[sectionToScroll]);
+      console.log('Field ref available:', !!fieldRefs.current[focusedField]);
+
       setTimeout(() => {
         // First scroll to the section
         if (sectionToScroll && sectionRefs.current[sectionToScroll]) {
+          console.log('Scrolling to section:', sectionToScroll);
           sectionRefs.current[sectionToScroll]?.scrollIntoView({ behavior: 'smooth', block: 'start' });
         }
         
         // Then focus on the specific field
         if (fieldRefs.current[focusedField]) {
           setTimeout(() => {
+            console.log('Focusing on field element');
             fieldRefs.current[focusedField]?.focus();
           }, 300);
         }
@@ -140,6 +148,7 @@ export const SummaryPage: React.FC = () => {
   }, [isEditMode, focusedField]);
 
   const handleFieldDoubleClick = (field: string) => {
+    console.log('Double clicked field:', field);
     if (!isEditMode) {
       setFocusedField(field);
       toggleEditMode();
