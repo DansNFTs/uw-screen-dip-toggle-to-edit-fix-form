@@ -18,6 +18,27 @@ export const EditableLoanDetailsPage: React.FC = () => {
   const navigate = useNavigate();
   
   const initialFormData = {
+    // Household details
+    grossHouseholdIncome: '£95,000',
+    netHouseholdIncome: '£6,000',
+    dependentChildren: '0',
+    adultDependents: '0',
+    
+    // Expenditure calculation
+    foodShopping: '£650',
+    utilityBills: '£400',
+    transport: '£350',
+    communicationsItRecreation: '£120',
+    clothing: '£100',
+    householdGoods: '£130',
+    personalCare: '£180',
+    otherEssential: '£290',
+    totalEssentialExpenditure: '£2,220',
+    discretionaryExpenditure: '£630',
+    totalExpenditure: '£2,850',
+    disposableIncome: '£3,150',
+    
+    // Application type details
     applicationPurpose: 'Residential',
     applicationType: 'Purchase',
     applicationSubtype: 'Standard',
@@ -196,6 +217,28 @@ export const EditableLoanDetailsPage: React.FC = () => {
     );
   };
 
+  const householdFields = [
+    { label: 'Gross household income', field: 'grossHouseholdIncome' },
+    { label: 'Net household income', field: 'netHouseholdIncome' },
+    { label: 'Number of dependent children under 18', field: 'dependentChildren' },
+    { label: 'Number of adult dependents', field: 'adultDependents' }
+  ];
+
+  const expenditureFields = [
+    { label: 'Food and housekeeping', field: 'foodShopping' },
+    { label: 'Utility bills and council tax', field: 'utilityBills' },
+    { label: 'Transport', field: 'transport' },
+    { label: 'Communications, IT and recreation', field: 'communicationsItRecreation' },
+    { label: 'Clothing', field: 'clothing' },
+    { label: 'Household goods', field: 'householdGoods' },
+    { label: 'Personal care', field: 'personalCare' },
+    { label: 'Other essential expenditure', field: 'otherEssential' },
+    { label: 'Total essential expenditure', field: 'totalEssentialExpenditure' },
+    { label: 'Discretionary expenditure', field: 'discretionaryExpenditure' },
+    { label: 'Total expenditure', field: 'totalExpenditure' },
+    { label: 'Disposable income', field: 'disposableIncome' }
+  ];
+
   const loanFields = [
     { label: 'Application purpose', field: 'applicationPurpose', type: 'select' as const, options: ['Residential', 'Commercial', 'Buy to Let'] },
     { label: 'Application type', field: 'applicationType', type: 'select' as const, options: ['Purchase', 'Remortgage', 'Additional Borrowing'] },
@@ -221,14 +264,47 @@ export const EditableLoanDetailsPage: React.FC = () => {
         <div className="shadow-[0px_0px_10px_rgba(0,0,0,0.05)] bg-white p-6 rounded">
           <div className="mb-8">
             <h1 className="text-[#165788] text-[22px] font-medium">
-              Loan Details
+              Mortgage Application Form
             </h1>
           </div>
         
-          <div className="space-y-6">
+          <div className="space-y-8">
+            {/* Household Details Section */}
+            <section className="w-full">
+              <h2 className="text-[#165788] text-lg font-medium mb-4">Household Details</h2>
+              <div className="w-full border border-gray-200 rounded">
+                {householdFields.map((field, index) => 
+                  renderField(
+                    field.label, 
+                    field.field, 
+                    formData[field.field as keyof typeof formData], 
+                    index % 2 === 0,
+                    'Household Details'
+                  )
+                )}
+              </div>
+            </section>
+
+            {/* Expenditure Calculation Section */}
+            <section className="w-full">
+              <h2 className="text-[#165788] text-lg font-medium mb-4">Expenditure Calculation</h2>
+              <div className="w-full border border-gray-200 rounded">
+                {expenditureFields.map((field, index) => 
+                  renderField(
+                    field.label, 
+                    field.field, 
+                    formData[field.field as keyof typeof formData], 
+                    index % 2 === 0,
+                    'Expenditure Calculation'
+                  )
+                )}
+              </div>
+            </section>
+
             {/* Loan Details Section */}
             <section className="w-full">
-              <div className="w-full">
+              <h2 className="text-[#165788] text-lg font-medium mb-4">Loan Details</h2>
+              <div className="w-full border border-gray-200 rounded">
                 {loanFields.map((field, index) => 
                   renderField(
                     field.label, 
