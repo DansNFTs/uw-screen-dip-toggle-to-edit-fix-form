@@ -780,47 +780,114 @@ export const EditablePersonalDetailsPage: React.FC = () => {
       );
     }
 
-    // Display view when not editing - simple summary
+    // Display view when not editing - restore original summary format
     return (
-      <div className="space-y-4">
+      <div className="space-y-6">
         <h3 className="text-[#165788] text-lg font-medium">James Taylor</h3>
         
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <div 
-            className="cursor-pointer hover:bg-gray-50 p-2 rounded border"
-            onDoubleClick={() => handleFieldDoubleClick('jamesFirstName')}
-            title={isEditingEnabled ? "Double-click to edit" : ""}
-          >
-            <div className="text-sm text-gray-600">Name</div>
-            <div className="font-medium flex items-center gap-2">
-              {formData.jamesTitle} {formData.jamesFirstName} {formData.jamesLastName}
-              {isFieldEdited('jamesFirstName') && (
-                <TooltipProvider>
-                  <Tooltip>
-                    <TooltipTrigger asChild>
-                      <button onClick={() => handleFieldComparisonClick('jamesFirstName')}>
-                        <Clock className="w-3 h-3 text-blue-500" />
-                      </button>
-                    </TooltipTrigger>
-                    <TooltipContent>
-                      <p>Field has been edited</p>
-                    </TooltipContent>
-                  </Tooltip>
-                </TooltipProvider>
-              )}
-            </div>
-          </div>
-          
-          <div 
-            className="cursor-pointer hover:bg-gray-50 p-2 rounded border"
-            onDoubleClick={() => handleFieldDoubleClick('jamesDateOfBirthDay')}
-            title={isEditingEnabled ? "Double-click to edit" : ""}
-          >
-            <div className="text-sm text-gray-600">Date of Birth</div>
-            <div className="font-medium">
-              {formData.jamesDateOfBirthDay}/{formData.jamesDateOfBirthMonth}/{formData.jamesDateOfBirthYear}
-            </div>
-          </div>
+        <div className="w-full">
+          {[
+            { label: 'Title', field: 'jamesTitle', value: formData.jamesTitle },
+            { label: 'First name', field: 'jamesFirstName', value: formData.jamesFirstName },
+            { label: 'Middle name', field: 'jamesMiddleName', value: formData.jamesMiddleName },
+            { label: 'Last name', field: 'jamesLastName', value: formData.jamesLastName },
+            { label: 'Name change in last 6 years', field: 'jamesNameChange', value: formData.jamesNameChange },
+            { label: 'Date of birth', field: 'jamesDateOfBirthDay', value: `${formData.jamesDateOfBirthDay}/${formData.jamesDateOfBirthMonth}/${formData.jamesDateOfBirthYear}` },
+            { label: 'Nationality', field: 'jamesNationality', value: formData.jamesNationality },
+            { label: 'Current address', field: 'jamesCurrentAddress', value: formData.jamesCurrentAddress },
+            { label: 'Postcode', field: 'jamesPostcode', value: formData.jamesPostcode },
+            { label: 'Employment status', field: 'jamesEmploymentStatus', value: formData.jamesEmploymentStatus },
+            { label: 'Job title', field: 'jamesJobTitle', value: formData.jamesJobTitle },
+            { label: 'Employer name', field: 'jamesEmployerName', value: formData.jamesEmployerName },
+            { label: 'Basic income', field: 'jamesBasicIncome', value: formData.jamesBasicIncome },
+            { label: 'Monthly net salary', field: 'jamesMonthlyNetSalary', value: formData.jamesMonthlyNetSalary }
+          ].map((item, index) => {
+            const edited = isFieldEdited(item.field);
+            const fieldClasses = isEditingEnabled 
+              ? `flex w-full gap-4 text-base flex-wrap p-1 cursor-pointer hover:bg-gray-50 ${index % 2 === 0 ? 'bg-[#F7F8FA]' : ''}`
+              : `flex w-full gap-4 text-base flex-wrap p-1 ${index % 2 === 0 ? 'bg-[#F7F8FA]' : ''}`;
+
+            return (
+              <div 
+                key={item.field} 
+                className={fieldClasses}
+                onDoubleClick={() => handleFieldDoubleClick(item.field)}
+                title={isEditingEnabled && !isEditMode ? "Double-click to edit this field" : ""}
+              >
+                <div className="text-[#505A5F] font-normal flex-1 shrink basis-[0%]">
+                  {item.label}
+                </div>
+                <div className="text-black font-medium flex-1 shrink basis-[0%] flex items-center gap-2">
+                  {item.value}
+                  {edited && (
+                    <TooltipProvider>
+                      <Tooltip>
+                        <TooltipTrigger asChild>
+                          <button 
+                            onClick={() => handleFieldComparisonClick(item.field)}
+                            className="text-blue-500 hover:text-blue-700"
+                          >
+                            <Clock className="w-3 h-3" />
+                          </button>
+                        </TooltipTrigger>
+                        <TooltipContent>
+                          <p>This field has been edited. Click to view audit log.</p>
+                        </TooltipContent>
+                      </Tooltip>
+                    </TooltipProvider>
+                  )}
+                </div>
+              </div>
+            );
+          })}
+        </div>
+        
+        <h3 className="text-[#165788] text-lg font-medium">Jane Taylor</h3>
+        
+        <div className="w-full">
+          {[
+            { label: 'Title', field: 'janeTitle', value: formData.janeTitle },
+            { label: 'First name', field: 'janeFirstName', value: formData.janeFirstName },
+            { label: 'Last name', field: 'janeLastName', value: formData.janeLastName }
+          ].map((item, index) => {
+            const edited = isFieldEdited(item.field);
+            const fieldClasses = isEditingEnabled 
+              ? `flex w-full gap-4 text-base flex-wrap p-1 cursor-pointer hover:bg-gray-50 ${index % 2 === 0 ? 'bg-[#F7F8FA]' : ''}`
+              : `flex w-full gap-4 text-base flex-wrap p-1 ${index % 2 === 0 ? 'bg-[#F7F8FA]' : ''}`;
+
+            return (
+              <div 
+                key={item.field} 
+                className={fieldClasses}
+                onDoubleClick={() => handleFieldDoubleClick(item.field)}
+                title={isEditingEnabled && !isEditMode ? "Double-click to edit this field" : ""}
+              >
+                <div className="text-[#505A5F] font-normal flex-1 shrink basis-[0%]">
+                  {item.label}
+                </div>
+                <div className="text-black font-medium flex-1 shrink basis-[0%] flex items-center gap-2">
+                  {item.value}
+                  {edited && (
+                    <TooltipProvider>
+                      <Tooltip>
+                        <TooltipTrigger asChild>
+                          <button 
+                            onClick={() => handleFieldComparisonClick(item.field)}
+                            className="text-blue-500 hover:text-blue-700"
+                          >
+                            <Clock className="w-3 h-3" />
+                          </button>
+                        </TooltipTrigger>
+                        <TooltipContent>
+                          <p>This field has been edited. Click to view audit log.</p>
+                        </TooltipContent>
+                      </Tooltip>
+                    </TooltipProvider>
+                  )}
+                </div>
+              </div>
+            );
+          })}
         </div>
       </div>
     );
