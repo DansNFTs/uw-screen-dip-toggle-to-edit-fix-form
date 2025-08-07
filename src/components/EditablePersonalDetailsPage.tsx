@@ -105,7 +105,7 @@ export const EditablePersonalDetailsPage: React.FC = () => {
     ...applicantData
   });
 
-  // Sync form data with applicant data context
+  // Sync form data with applicant data context whenever name fields change
   useEffect(() => {
     const applicantFields = {
       jamesTitle: formData.jamesTitle,
@@ -820,10 +820,6 @@ export const EditablePersonalDetailsPage: React.FC = () => {
         
         <div className="w-full">
           {[
-            { label: 'Title', field: 'jamesTitle', value: formData.jamesTitle },
-            { label: 'First name', field: 'jamesFirstName', value: formData.jamesFirstName },
-            { label: 'Middle name', field: 'jamesMiddleName', value: formData.jamesMiddleName },
-            { label: 'Last name', field: 'jamesLastName', value: formData.jamesLastName },
             { label: 'Name change in last 6 years', field: 'jamesNameChange', value: formData.jamesNameChange },
             { label: 'Date of birth', field: 'jamesDateOfBirthDay', value: `${formData.jamesDateOfBirthDay}/${formData.jamesDateOfBirthMonth}/${formData.jamesDateOfBirthYear}` },
             { label: 'Nationality', field: 'jamesNationality', value: formData.jamesNationality },
@@ -879,10 +875,6 @@ export const EditablePersonalDetailsPage: React.FC = () => {
         
         <div className="w-full">
           {[
-            { label: 'Title', field: 'janeTitle', value: formData.janeTitle },
-            { label: 'First name', field: 'janeFirstName', value: formData.janeFirstName },
-            { label: 'Middle name', field: 'janeMiddleName', value: formData.janeMiddleName },
-            { label: 'Last name', field: 'janeLastName', value: formData.janeLastName },
             { label: 'Date of birth', field: 'janeDateOfBirthDay', value: `${formData.janeDateOfBirthDay}/${formData.janeDateOfBirthMonth}/${formData.janeDateOfBirthYear}` },
             { label: 'Nationality', field: 'janeNationality', value: formData.janeNationality },
             { label: 'Employment status', field: 'janeEmploymentStatus', value: formData.janeEmploymentStatus },
