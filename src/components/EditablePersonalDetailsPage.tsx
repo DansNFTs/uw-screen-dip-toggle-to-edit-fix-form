@@ -102,10 +102,18 @@ export const EditablePersonalDetailsPage: React.FC = () => {
     janeMonthlyNetSalary: '£2400'
   };
 
-  const [formData, setFormData] = useState({
+  const [formData, setFormData] = useState(() => ({
     ...initialFormData,
-    ...applicantData
-  });
+    // Override with applicant data from context
+    jamesTitle: applicantData.jamesTitle,
+    jamesFirstName: applicantData.jamesFirstName,
+    jamesMiddleName: applicantData.jamesMiddleName,
+    jamesLastName: applicantData.jamesLastName,
+    janeTitle: applicantData.janeTitle,
+    janeFirstName: applicantData.janeFirstName,
+    janeMiddleName: applicantData.janeMiddleName,
+    janeLastName: applicantData.janeLastName,
+  }));
 
   // Sync form data with applicant data context whenever name fields change
   useEffect(() => {
