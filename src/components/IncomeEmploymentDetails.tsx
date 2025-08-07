@@ -2,8 +2,11 @@ import React from 'react';
 import { EmploymentSection } from './EmploymentSection';
 import { SecondJobSection } from './SecondJobSection';
 import { AdditionalIncomeSection } from './AdditionalIncomeSection';
+import { useApplicantData } from '@/contexts/ApplicantDataContext';
 
 export const IncomeEmploymentDetails: React.FC = () => {
+  const { getFormattedApplicantNames } = useApplicantData();
+  const [jamesName] = getFormattedApplicantNames();
   const employmentData = {
     employmentStatus: 'Employed',
     mostRecentYearNetProfit: '€150,000.00',
@@ -67,7 +70,7 @@ export const IncomeEmploymentDetails: React.FC = () => {
             
             <div className="w-full gap-4 mt-8 max-md:max-w-full">
               <EmploymentSection 
-                name="Mr James Taylor" 
+                name={jamesName} 
                 data={employmentData} 
               />
               
