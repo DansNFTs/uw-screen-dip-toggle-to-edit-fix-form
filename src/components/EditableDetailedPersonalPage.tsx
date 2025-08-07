@@ -28,12 +28,20 @@ interface PersonalData {
   nationality: string;
   // Addresses
   currentAddress: string;
+  postcode: string;
+  moveInDate: string;
   currentAddressYears: string;
   currentAddressMonths: string;
   currentResidencyStatus: string;
   previousAddress: string;
   previousAddressYears: string;
   previousAddressMonths: string;
+  // Property Details
+  salePrice: string;
+  currentLender: string;
+  outstandingMortgageBalance: string;
+  plansForProperty: string;
+  expectedRemainingBalance: string;
   // Income
   employmentStatus: string;
   grossBasicIncome: string;
@@ -78,13 +86,21 @@ export const EditableDetailedPersonalPage: React.FC<EditableDetailedPersonalPage
     birthYear: applicantNumber === 1 ? '1988' : '1990',
     nationality: 'UK Resident',
     // Addresses
-    currentAddress: '12 Longwood Close',
-    currentAddressYears: '1',
-    currentAddressMonths: '0',
-    currentResidencyStatus: 'Owner occupation with mortgage',
+    currentAddress: applicantNumber === 1 ? '12 Longwood Close' : '12 Longwood Close, NEWCASTLE UPON TYNE, Tyne and Wear',
+    postcode: applicantNumber === 1 ? '' : 'NE16 5QB',
+    moveInDate: applicantNumber === 1 ? '' : '01/04/2015',
+    currentAddressYears: applicantNumber === 1 ? '1' : '9',
+    currentAddressMonths: applicantNumber === 1 ? '0' : '0',
+    currentResidencyStatus: applicantNumber === 1 ? 'Owner occupation with mortgage' : 'Owner occupier with mortgage',
     previousAddress: '',
     previousAddressYears: '',
     previousAddressMonths: '',
+    // Property Details
+    salePrice: applicantNumber === 1 ? '' : '£200,000.00',
+    currentLender: applicantNumber === 1 ? '' : 'Barclays',
+    outstandingMortgageBalance: applicantNumber === 1 ? '' : '£56,000.00',
+    plansForProperty: applicantNumber === 1 ? '' : 'Selling current main residence',
+    expectedRemainingBalance: applicantNumber === 1 ? '' : '£56,000.00',
     // Income
     employmentStatus: 'Employed',
     grossBasicIncome: applicantNumber === 1 ? '£52000.00' : '£50000.00',
@@ -158,7 +174,7 @@ export const EditableDetailedPersonalPage: React.FC<EditableDetailedPersonalPage
     if (['title', 'firstName', 'middleName', 'lastName', 'nameChange', 'birthDay', 'birthMonth', 'birthYear', 'nationality'].includes(fieldName)) {
       return 'personalDetails';
     }
-    if (['currentAddress', 'currentAddressYears', 'currentAddressMonths', 'currentResidencyStatus', 'previousAddress', 'previousAddressYears', 'previousAddressMonths'].includes(fieldName)) {
+    if (['currentAddress', 'postcode', 'moveInDate', 'currentAddressYears', 'currentAddressMonths', 'currentResidencyStatus', 'previousAddress', 'previousAddressYears', 'previousAddressMonths', 'salePrice', 'currentLender', 'outstandingMortgageBalance', 'plansForProperty', 'expectedRemainingBalance'].includes(fieldName)) {
       return 'addresses';
     }
     if (['employmentStatus', 'grossBasicIncome', 'frequency', 'annualAmount', 'monthlyNetSalary', 'jobTitle', 'employerName', 'employmentType', 'startMonth', 'startYear', 'expectedRetirementAge'].includes(fieldName)) {
@@ -382,12 +398,15 @@ export const EditableDetailedPersonalPage: React.FC<EditableDetailedPersonalPage
           <div className="space-y-4">
             <h3 className="text-lg font-medium">Current address</h3>
             {renderField('currentAddress', 'Address')}
+            {renderField('postcode', 'Postcode')}
+            {renderField('moveInDate', 'When did the applicant move in')}
             <div className="grid grid-cols-2 gap-4">
               {renderField('currentAddressYears', 'Years')}
               {renderField('currentAddressMonths', 'Months')}
             </div>
             {renderField('currentResidencyStatus', 'Current residency status', 'select', [
               'Owner occupation with mortgage',
+              'Owner occupier with mortgage',
               'Owner occupation without mortgage',
               'Privately rented',
               'Living with parents',
@@ -395,6 +414,11 @@ export const EditableDetailedPersonalPage: React.FC<EditableDetailedPersonalPage
               'Housing association rented',
               'Other'
             ])}
+            {renderField('salePrice', 'Sale price')}
+            {renderField('currentLender', 'Current lender')}
+            {renderField('outstandingMortgageBalance', 'Outstanding mortgage balance')}
+            {renderField('plansForProperty', 'Plans for property')}
+            {renderField('expectedRemainingBalance', 'Expected remaining balance')}
           </div>
 
           <div className="space-y-4">
