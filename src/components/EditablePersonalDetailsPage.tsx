@@ -1,5 +1,6 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useEditMode } from '../contexts/EditModeContext';
+import { useApplicantData } from '../contexts/ApplicantDataContext';
 import { useAudit } from '../contexts/AuditContext';
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -16,6 +17,7 @@ import { FieldComparisonModal } from './FieldComparisonModal';
 export const EditablePersonalDetailsPage: React.FC = () => {
   const { isEditingEnabled, isEditMode, hasUnsavedChanges, hasSavedChanges, setIsEditMode, setHasUnsavedChanges, saveChanges, exitEditMode, storeOriginalState, restoreAllOriginalState } = useEditMode();
   const { addAuditEntry, auditLog, currentSessionId, startAuditSession, endAuditSession, cancelAuditSession } = useAudit();
+  const { applicantData, updateApplicantData } = useApplicantData();
   const { toast } = useToast();
   const navigate = useNavigate();
   
@@ -98,7 +100,26 @@ export const EditablePersonalDetailsPage: React.FC = () => {
     janeMonthlyNetSalary: '£2400'
   };
 
-  const [formData, setFormData] = useState(initialFormData);
+  const [formData, setFormData] = useState({
+    ...initialFormData,
+    ...applicantData
+  });
+
+  // Sync form data with applicant data context
+  useEffect(() => {
+    const applicantFields = {
+      jamesTitle: formData.jamesTitle,
+      jamesFirstName: formData.jamesFirstName,
+      jamesMiddleName: formData.jamesMiddleName,
+      jamesLastName: formData.jamesLastName,
+      janeTitle: formData.janeTitle,
+      janeFirstName: formData.janeFirstName,
+      janeMiddleName: formData.janeMiddleName,
+      janeLastName: formData.janeLastName,
+    };
+    updateApplicantData(applicantFields);
+  }, [formData.jamesTitle, formData.jamesFirstName, formData.jamesMiddleName, formData.jamesLastName, 
+      formData.janeTitle, formData.janeFirstName, formData.janeMiddleName, formData.janeLastName, updateApplicantData]);
   const [comparisonModal, setComparisonModal] = useState({ open: false, fieldName: '' });
 
   // Store original state when entering edit mode
