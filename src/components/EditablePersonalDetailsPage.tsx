@@ -89,11 +89,22 @@ export const EditablePersonalDetailsPage: React.FC = () => {
     janeFirstName: 'Jane',
     janeMiddleName: '',
     janeLastName: 'Taylor',
-    janeDateOfBirthDay: '15',
-    janeDateOfBirthMonth: '08',
+    janeDateOfBirthDay: '04',
+    janeDateOfBirthMonth: '04',
     janeDateOfBirthYear: '1990',
     janeNationality: 'UK Resident',
     
+    // Jane Taylor's addresses
+    janeCurrentAddress: '12 Longwood Close, NEWCASTLE UPON TYNE, Tyne and Wear',
+    janePostcode: 'NE16 5QB',
+    janeMoveInDate: '01/04/2015',
+    janeResidencyStatus: 'Owner occupier with mortgage',
+    janeSalePrice: '£200,000.00',
+    janeCurrentLender: 'Barclays',
+    janeOutstandingMortgage: '£56,000.00',
+    janePlansForProperty: 'Selling current main residence',
+    janeExpectedRemainingBalance: '£56,000.00',
+
     // Jane Taylor's employment
     janeEmploymentStatus: 'Employed',
     janeJobTitle: 'Teacher',
