@@ -896,7 +896,17 @@ export const EditablePersonalDetailsPage: React.FC = () => {
         
         <div className="w-full">
           {[
-            { label: 'Date of birth', field: 'janeDateOfBirthDay', value: `${formData.janeDateOfBirthDay}/${formData.janeDateOfBirthMonth}/${formData.janeDateOfBirthYear}` },
+            { label: 'Name change in last 6 years', field: 'janeNameChange', value: 'No' },
+            { label: 'D.O.B - Age', field: 'janeDateOfBirthDay', value: `${formData.janeDateOfBirthDay}/${formData.janeDateOfBirthMonth}/${formData.janeDateOfBirthYear} - 35yrs` },
+            { label: 'Current address', field: 'janeCurrentAddress', value: formData.janeCurrentAddress },
+            { label: 'Postcode', field: 'janePostcode', value: formData.janePostcode },
+            { label: 'When did the applicant move in', field: 'janeMoveInDate', value: formData.janeMoveInDate },
+            { label: 'Sale price', field: 'janeSalePrice', value: formData.janeSalePrice },
+            { label: 'Current residency status', field: 'janeResidencyStatus', value: formData.janeResidencyStatus },
+            { label: 'Current lender', field: 'janeCurrentLender', value: formData.janeCurrentLender },
+            { label: 'Outstanding mortgage balance', field: 'janeOutstandingMortgage', value: formData.janeOutstandingMortgage },
+            { label: 'Plans for property', field: 'janePlansForProperty', value: formData.janePlansForProperty },
+            { label: 'Expected remaining mortgage balance', field: 'janeExpectedRemainingBalance', value: formData.janeExpectedRemainingBalance },
             { label: 'Nationality', field: 'janeNationality', value: formData.janeNationality },
             { label: 'Employment status', field: 'janeEmploymentStatus', value: formData.janeEmploymentStatus },
             { label: 'Job title', field: 'janeJobTitle', value: formData.janeJobTitle },
