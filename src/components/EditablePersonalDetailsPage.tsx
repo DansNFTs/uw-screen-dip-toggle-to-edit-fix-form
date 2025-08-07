@@ -80,10 +80,22 @@ export const EditablePersonalDetailsPage: React.FC = () => {
     jamesCommitmentBalance2: '£500.00',
     jamesRedemptionPenalty: 'No',
     
-    // Jane Taylor - for existing functionality
+    // Jane Taylor - Personal Details
     janeTitle: 'Mrs',
     janeFirstName: 'Jane',
-    janeLastName: 'Taylor'
+    janeMiddleName: '',
+    janeLastName: 'Taylor',
+    janeDateOfBirthDay: '15',
+    janeDateOfBirthMonth: '08',
+    janeDateOfBirthYear: '1990',
+    janeNationality: 'UK Resident',
+    
+    // Jane Taylor's employment
+    janeEmploymentStatus: 'Employed',
+    janeJobTitle: 'Teacher',
+    janeEmployerName: 'Newcastle Primary School',
+    janeBasicIncome: '£35000.00',
+    janeMonthlyNetSalary: '£2400'
   };
 
   const [formData, setFormData] = useState(initialFormData);
@@ -848,7 +860,15 @@ export const EditablePersonalDetailsPage: React.FC = () => {
           {[
             { label: 'Title', field: 'janeTitle', value: formData.janeTitle },
             { label: 'First name', field: 'janeFirstName', value: formData.janeFirstName },
-            { label: 'Last name', field: 'janeLastName', value: formData.janeLastName }
+            { label: 'Middle name', field: 'janeMiddleName', value: formData.janeMiddleName },
+            { label: 'Last name', field: 'janeLastName', value: formData.janeLastName },
+            { label: 'Date of birth', field: 'janeDateOfBirthDay', value: `${formData.janeDateOfBirthDay}/${formData.janeDateOfBirthMonth}/${formData.janeDateOfBirthYear}` },
+            { label: 'Nationality', field: 'janeNationality', value: formData.janeNationality },
+            { label: 'Employment status', field: 'janeEmploymentStatus', value: formData.janeEmploymentStatus },
+            { label: 'Job title', field: 'janeJobTitle', value: formData.janeJobTitle },
+            { label: 'Employer name', field: 'janeEmployerName', value: formData.janeEmployerName },
+            { label: 'Basic income', field: 'janeBasicIncome', value: formData.janeBasicIncome },
+            { label: 'Monthly net salary', field: 'janeMonthlyNetSalary', value: formData.janeMonthlyNetSalary }
           ].map((item, index) => {
             const edited = isFieldEdited(item.field);
             const fieldClasses = isEditingEnabled 
