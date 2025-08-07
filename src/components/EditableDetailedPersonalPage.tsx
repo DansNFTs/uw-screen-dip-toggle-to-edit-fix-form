@@ -8,6 +8,7 @@ import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { useEditMode } from '@/contexts/EditModeContext';
 import { useAudit } from '@/contexts/AuditContext';
 import { useToast } from '@/hooks/use-toast';
+import { useApplicantData } from '@/contexts/ApplicantDataContext';
 import { Clock, Plus } from 'lucide-react';
 import { FieldComparisonModal } from '@/components/FieldComparisonModal';
 
@@ -61,15 +62,16 @@ export const EditableDetailedPersonalPage: React.FC<EditableDetailedPersonalPage
   applicantName,
   applicantNumber
 }) => {
+  const { applicantData, updateApplicantData, getFormattedApplicantNames } = useApplicantData();
   const [formData, setFormData] = useState<PersonalData>({
     // Eligibility
     courtDecree: 'No',
     debtManagement: 'No',
     // Personal Details
-    title: applicantNumber === 1 ? 'Mr' : 'Mrs',
-    firstName: applicantNumber === 1 ? 'James' : 'Jane',
-    middleName: '',
-    lastName: 'Taylor',
+    title: applicantNumber === 1 ? applicantData.jamesTitle : applicantData.janeTitle,
+    firstName: applicantNumber === 1 ? applicantData.jamesFirstName : applicantData.janeFirstName,
+    middleName: applicantNumber === 1 ? applicantData.jamesMiddleName : applicantData.janeMiddleName,
+    lastName: applicantNumber === 1 ? applicantData.jamesLastName : applicantData.janeLastName,
     nameChange: 'No',
     birthDay: applicantNumber === 1 ? '15' : '8',
     birthMonth: applicantNumber === 1 ? '3' : '4',
@@ -174,6 +176,14 @@ export const EditableDetailedPersonalPage: React.FC<EditableDetailedPersonalPage
       setFormData(prev => ({ ...prev, [field]: value }));
       addAuditEntry(field, oldValue, value, `${applicantName} Personal Details`);
       setHasUnsavedChanges(true);
+      
+      // Update ApplicantDataContext for name-related fields
+      if (['title', 'firstName', 'middleName', 'lastName'].includes(field)) {
+        const contextField = applicantNumber === 1 
+          ? `james${field.charAt(0).toUpperCase() + field.slice(1)}` 
+          : `jane${field.charAt(0).toUpperCase() + field.slice(1)}`;
+        updateApplicantData({ [contextField]: value });
+      }
     }
   };
 
