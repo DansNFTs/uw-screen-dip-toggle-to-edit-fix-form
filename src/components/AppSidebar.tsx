@@ -101,7 +101,7 @@ export const AppSidebar: React.FC = () => {
     );
   };
 
-  const renderEditModeItem = (item: EditModeItem, index: number) => {
+  const renderEditModeItem = (item: EditModeItem, index: number, sectionTitle: string) => {
     const getStatusIcon = () => {
       switch (item.status) {
         case 'warning':
@@ -121,11 +121,42 @@ export const AppSidebar: React.FC = () => {
       }
     };
 
+    // Map navigation items to routes based on section and item
+    const getNavigationPath = () => {
+      if (sectionTitle === "Mortgage") {
+        switch (item.label) {
+          case "Mortgage details": return "/loan-details";
+          case "Property details": return "/property-details";
+          case "Affordability": return "/affordability";
+          default: return "#";
+        }
+      }
+      if (sectionTitle === "James Taylor" || sectionTitle === "Jane Taylor") {
+        switch (item.label) {
+          case "Personal details": return "/personal-details";
+          case "Income & employment": return "/income-employment";
+          case "Credit information": return "/credit-information";
+          case "Commitments & expenses": return "/commitments-expenses";
+          default: return "#";
+        }
+      }
+      return "#";
+    };
+
+    const path = getNavigationPath();
+    const isActive = location.pathname === path;
+
     return (
-      <div key={index} className="flex items-center gap-2 py-1 px-2 text-sm text-gray-700 hover:bg-gray-50 cursor-pointer">
+      <Link
+        key={index}
+        to={path}
+        className={`flex items-center gap-2 py-1 px-2 text-sm text-gray-700 hover:bg-gray-50 cursor-pointer ${
+          isActive ? 'bg-blue-50 text-blue-700' : ''
+        }`}
+      >
         {getStatusIcon()}
         <span>{item.label}</span>
-      </div>
+      </Link>
     );
   };
 
@@ -139,7 +170,7 @@ export const AppSidebar: React.FC = () => {
                 {section.title}
               </h3>
               <div className="space-y-1">
-                {section.items.map((item, itemIndex) => renderEditModeItem(item, itemIndex))}
+                {section.items.map((item, itemIndex) => renderEditModeItem(item, itemIndex, section.title))}
               </div>
             </div>
           ))}
