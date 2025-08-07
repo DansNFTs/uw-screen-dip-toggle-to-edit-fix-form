@@ -842,15 +842,16 @@ export const EditablePersonalDetailsPage: React.FC = () => {
         <div className="w-full">
           {[
             { label: 'Name change in last 6 years', field: 'jamesNameChange', value: formData.jamesNameChange },
-            { label: 'Date of birth', field: 'jamesDateOfBirthDay', value: `${formData.jamesDateOfBirthDay}/${formData.jamesDateOfBirthMonth}/${formData.jamesDateOfBirthYear}` },
-            { label: 'Nationality', field: 'jamesNationality', value: formData.jamesNationality },
+            { label: 'D.O.B - Age', field: 'jamesDateOfBirthDay', value: `${formData.jamesDateOfBirthDay}/${formData.jamesDateOfBirthMonth}/${formData.jamesDateOfBirthYear}` },
             { label: 'Current address', field: 'jamesCurrentAddress', value: formData.jamesCurrentAddress },
             { label: 'Postcode', field: 'jamesPostcode', value: formData.jamesPostcode },
-            { label: 'Employment status', field: 'jamesEmploymentStatus', value: formData.jamesEmploymentStatus },
-            { label: 'Job title', field: 'jamesJobTitle', value: formData.jamesJobTitle },
-            { label: 'Employer name', field: 'jamesEmployerName', value: formData.jamesEmployerName },
-            { label: 'Basic income', field: 'jamesBasicIncome', value: formData.jamesBasicIncome },
-            { label: 'Monthly net salary', field: 'jamesMonthlyNetSalary', value: formData.jamesMonthlyNetSalary }
+            { label: 'When did the applicant move in', field: 'jamesMoveInDate', value: formData.janeMoveInDate },
+            { label: 'Sale price', field: 'jamesSalePrice', value: formData.jamesSalePrice },
+            { label: 'Current residency status', field: 'jamesResidencyStatus', value: formData.jamesResidencyStatus },
+            { label: 'Current lender', field: 'jamesCurrentLender', value: formData.jamesCurrentLender },
+            { label: 'Outstanding mortgage balance', field: 'jamesOutstandingMortgage', value: formData.jamesOutstandingMortgage },
+            { label: 'Plans for property', field: 'jamesPlansForProperty', value: formData.jamesPlansForProperty },
+            { label: 'Expected remaining mortgage balance', field: 'jamesExpectedRemainingBalance', value: formData.jamesExpectedRemainingBalance }
           ].map((item, index) => {
             const edited = isFieldEdited(item.field);
             const fieldClasses = isEditingEnabled 
@@ -907,12 +908,6 @@ export const EditablePersonalDetailsPage: React.FC = () => {
             { label: 'Outstanding mortgage balance', field: 'janeOutstandingMortgage', value: formData.janeOutstandingMortgage },
             { label: 'Plans for property', field: 'janePlansForProperty', value: formData.janePlansForProperty },
             { label: 'Expected remaining mortgage balance', field: 'janeExpectedRemainingBalance', value: formData.janeExpectedRemainingBalance },
-            { label: 'Nationality', field: 'janeNationality', value: formData.janeNationality },
-            { label: 'Employment status', field: 'janeEmploymentStatus', value: formData.janeEmploymentStatus },
-            { label: 'Job title', field: 'janeJobTitle', value: formData.janeJobTitle },
-            { label: 'Employer name', field: 'janeEmployerName', value: formData.janeEmployerName },
-            { label: 'Basic income', field: 'janeBasicIncome', value: formData.janeBasicIncome },
-            { label: 'Monthly net salary', field: 'janeMonthlyNetSalary', value: formData.janeMonthlyNetSalary }
           ].map((item, index) => {
             const edited = isFieldEdited(item.field);
             const fieldClasses = isEditingEnabled 
