@@ -17,9 +17,11 @@ import { FieldComparisonModal } from './FieldComparisonModal';
 export const EditablePersonalDetailsPage: React.FC = () => {
   const { isEditingEnabled, isEditMode, hasUnsavedChanges, hasSavedChanges, setIsEditMode, setHasUnsavedChanges, saveChanges, exitEditMode, storeOriginalState, restoreAllOriginalState } = useEditMode();
   const { addAuditEntry, auditLog, currentSessionId, startAuditSession, endAuditSession, cancelAuditSession } = useAudit();
-  const { applicantData, updateApplicantData } = useApplicantData();
+  const { applicantData, updateApplicantData, getFormattedApplicantNames } = useApplicantData();
   const { toast } = useToast();
   const navigate = useNavigate();
+  
+  const [applicantJamesName, applicantJaneName] = getFormattedApplicantNames();
   
   // Add anchor functionality
   const [focusedField, setFocusedField] = useState<string | null>(null);
@@ -229,7 +231,7 @@ export const EditablePersonalDetailsPage: React.FC = () => {
     if (isEditMode) {
       return (
         <div className="space-y-8" ref={(ref) => sectionRefs.current['james-section'] = ref}>
-          <h2 className="text-[#165788] text-xl font-medium border-b border-gray-200 pb-3">James Taylor</h2>
+          <h2 className="text-[#165788] text-xl font-medium border-b border-gray-200 pb-3">{applicantJamesName}</h2>
           
           {/* Eligibility Section */}
           <div className="bg-blue-50 p-6 rounded-lg">
@@ -414,7 +416,7 @@ export const EditablePersonalDetailsPage: React.FC = () => {
 
           {/* James Taylor's addresses */}
           <div className="bg-white border border-gray-200 p-6 rounded-lg">
-            <h3 className="text-[#165788] text-lg font-medium mb-6">James Taylor's addresses</h3>
+            <h3 className="text-[#165788] text-lg font-medium mb-6">{applicantJamesName}'s addresses</h3>
             <p className="text-sm text-gray-600 mb-6">
               Please enter the applicant's address history. Start with current address.
             </p>
@@ -555,7 +557,7 @@ export const EditablePersonalDetailsPage: React.FC = () => {
 
           {/* James Taylor's Income */}
           <div className="bg-white border border-gray-200 p-6 rounded-lg">
-            <h3 className="text-[#165788] text-lg font-medium mb-6">James Taylor's Income</h3>
+            <h3 className="text-[#165788] text-lg font-medium mb-6">{applicantJamesName}'s Income</h3>
             
             <div className="space-y-6">
               <div>
@@ -721,7 +723,7 @@ export const EditablePersonalDetailsPage: React.FC = () => {
 
           {/* James Taylor's commitments */}
           <div className="bg-white border border-gray-200 p-6 rounded-lg">
-            <h3 className="text-[#165788] text-lg font-medium mb-6">James Taylor's commitments</h3>
+            <h3 className="text-[#165788] text-lg font-medium mb-6">{applicantJamesName}'s commitments</h3>
             <p className="text-sm text-gray-600 mb-6">
               Please add all relevant commitments relating to this applicant, where it may will be included in affordability calculation, 
               including but not limited to the following: hire purchase, finance, regular payments, loans, credit cards, store cards, overdrafts, child maintenance.
@@ -816,7 +818,7 @@ export const EditablePersonalDetailsPage: React.FC = () => {
     // Display view when not editing - restore original summary format
     return (
       <div className="space-y-6">
-        <h3 className="text-[#165788] text-lg font-medium">James Taylor</h3>
+        <h3 className="text-[#165788] text-lg font-medium">{applicantJamesName}</h3>
         
         <div className="w-full">
           {[
@@ -871,7 +873,7 @@ export const EditablePersonalDetailsPage: React.FC = () => {
           })}
         </div>
         
-        <h3 className="text-[#165788] text-lg font-medium">Jane Taylor</h3>
+        <h3 className="text-[#165788] text-lg font-medium">{applicantJaneName}</h3>
         
         <div className="w-full">
           {[

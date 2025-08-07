@@ -1,6 +1,7 @@
 
 import React, { useState, useRef, useEffect } from 'react';
 import { useEditMode } from '../contexts/EditModeContext';
+import { useApplicantData } from '../contexts/ApplicantDataContext';
 import { useAudit } from '../contexts/AuditContext';
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -14,7 +15,10 @@ import { CheckCircle } from "lucide-react";
 export const SummaryPage: React.FC = () => {
   const { isEditMode, hasUnsavedChanges, hasSavedChanges, toggleEditMode, setHasUnsavedChanges, saveChanges, exitEditMode } = useEditMode();
   const { addAuditEntry } = useAudit();
+  const { getFormattedApplicantNames } = useApplicantData();
   const { toast } = useToast();
+  
+  const [applicantJamesName, applicantJaneName] = getFormattedApplicantNames();
 
   const [focusedField, setFocusedField] = useState<string | null>(null);
   const fieldRefs = useRef<{ [key: string]: HTMLInputElement | HTMLButtonElement | null }>({});
@@ -39,7 +43,7 @@ export const SummaryPage: React.FC = () => {
     postCode: '',
 
     // Applicant 1 details
-    applicant1Name: 'Mr James Taylor',
+    applicant1Name: 'Mr James Taylor', // Will be updated via useEffect
     applicant1ID: 'Check',
     applicant1Residency: 'Check',
     applicant1DOB: '11/11/1988 - 36yrs',
@@ -49,7 +53,7 @@ export const SummaryPage: React.FC = () => {
     applicant1BasicIncome: '£52,000',
 
     // Applicant 2 details
-    applicant2Name: 'Mrs Jane Taylor',
+    applicant2Name: 'Mrs Jane Taylor', // Will be updated via useEffect
     applicant2ID: 'Check',
     applicant2Residency: 'Check',
     applicant2DOB: '04/04/1990 - 35yrs',
@@ -72,6 +76,15 @@ export const SummaryPage: React.FC = () => {
     freeDisposableIncome: '£4,295.14',
     mortgageSubUnder: '£1,220.17'
   });
+
+  // Update applicant names when they change in the context
+  useEffect(() => {
+    setFormData(prev => ({
+      ...prev,
+      applicant1Name: applicantJamesName,
+      applicant2Name: applicantJaneName
+    }));
+  }, [applicantJamesName, applicantJaneName]);
 
   const handleInputChange = (field: string, value: string, section: string = 'Summary') => {
     const oldValue = formData[field as keyof typeof formData];
