@@ -51,39 +51,33 @@ export const AppSidebar: React.FC = () => {
 
   const editModeSections: EditModeSection[] = [
     {
-      title: "Decision in Principle",
-      items: [
-        { label: "Additional support", status: "warning" },
-        { label: "Eligibility", status: "warning" },
-        { label: "Personal details", status: "warning" },
-        { label: "Addresses", status: "warning" },
-        { label: "Income and commitments", status: "warning" },
-      ]
-    },
-    {
       title: "Mortgage",
       items: [
-        { label: "Mortgage details", status: "warning" },
-        { label: "Household details", status: "warning" },
+        { label: "Mortgage details", status: "complete" },
+        { label: "Property details", status: "complete" },
+        { label: "Affordability", status: "complete" },
       ]
     },
     {
-      title: "DiP Submission",
+      title: "James Taylor",
       items: [
-        { label: "Case notes", status: "warning" },
-        { label: "Declarations", status: "warning" },
+        { label: "Personal details", status: "complete" },
+        { label: "Income & employment", status: "complete" },
+        { label: "Credit information", status: "complete" },
+        { label: "Commitments & expenses", status: "complete" },
       ]
     },
     {
-      title: "Advice",
+      title: "Jane Taylor",
       items: [
-        { label: "Applicant 1", status: "warning" },
-        { label: "Applicant 2", status: "warning" },
-        { label: "Mortgage & product", status: "warning" },
+        { label: "Personal details", status: "complete" },
+        { label: "Income & employment", status: "complete" },
+        { label: "Credit information", status: "complete" },
+        { label: "Commitments & expenses", status: "complete" },
       ]
     },
     {
-      title: "Advised DiP Submission",
+      title: "Submission",
       items: [
         { label: "Declarations", status: "warning" },
       ]
