@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { useEditMode } from '../contexts/EditModeContext';
+import { useApplicantData } from '../contexts/ApplicantDataContext';
 import { useAudit } from '../contexts/AuditContext';
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -15,8 +16,11 @@ import { FieldComparisonModal } from './FieldComparisonModal';
 export const EditableIncomeEmploymentPage: React.FC = () => {
   const { isEditMode, hasUnsavedChanges, hasSavedChanges, toggleEditMode, setHasUnsavedChanges, saveChanges, exitEditMode, storeOriginalState, restoreAllOriginalState } = useEditMode();
   const { addAuditEntry, auditLog, currentSessionId, startAuditSession, endAuditSession, cancelAuditSession } = useAudit();
+  const { getFormattedApplicantNames } = useApplicantData();
   const { toast } = useToast();
   const navigate = useNavigate();
+  
+  const [applicantJamesName, applicantJaneName] = getFormattedApplicantNames();
   
   const initialFormData = {
     // James Taylor employment data
@@ -253,7 +257,7 @@ export const EditableIncomeEmploymentPage: React.FC = () => {
         <div className="space-y-8">
           {/* James Taylor Employment Section */}
           <section className="w-full">
-            <h3 className="text-[#165788] text-lg font-medium mb-4">James Taylor</h3>
+            <h3 className="text-[#165788] text-lg font-medium mb-4">{applicantJamesName}</h3>
             <div className="w-full">
               {jamesEmploymentFields.map((field, index) => 
                 renderField(
@@ -271,7 +275,7 @@ export const EditableIncomeEmploymentPage: React.FC = () => {
 
           {/* Jane Taylor Employment Section */}
           <section className="w-full">
-            <h3 className="text-[#165788] text-lg font-medium mb-4">Jane Taylor</h3>
+            <h3 className="text-[#165788] text-lg font-medium mb-4">{applicantJaneName}</h3>
             <div className="w-full">
               {janeEmploymentFields.map((field, index) => 
                 renderField(

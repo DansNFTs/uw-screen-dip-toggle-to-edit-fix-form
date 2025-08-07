@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { useEditMode } from '../contexts/EditModeContext';
+import { useApplicantData } from '../contexts/ApplicantDataContext';
 import { useAudit } from '../contexts/AuditContext';
 import { useCaseNotes } from '../contexts/CaseNotesContext';
 import { Button } from "@/components/ui/button";
@@ -18,9 +19,12 @@ import { AffordabilityWarningDialog } from './AffordabilityWarningDialog';
 export const EditableCommitmentsExpensesPage: React.FC = () => {
   const { isEditMode, hasUnsavedChanges, hasSavedChanges, toggleEditMode, setHasUnsavedChanges, saveChanges, saveAndResubmit, exitEditMode, storeOriginalState, restoreAllOriginalState } = useEditMode();
   const { addAuditEntry, auditLog, currentSessionId, startAuditSession, endAuditSession, cancelAuditSession } = useAudit();
+  const { getFormattedApplicantNames } = useApplicantData();
   const { addCaseNote } = useCaseNotes();
   const { toast } = useToast();
   const navigate = useNavigate();
+  
+  const [applicantJamesName, applicantJaneName] = getFormattedApplicantNames();
   
   const initialFormData = {
     // James Taylor - Revolving Credit Card
@@ -347,7 +351,7 @@ export const EditableCommitmentsExpensesPage: React.FC = () => {
           <div className="space-y-6">
             {/* James Taylor Section */}
             <section className="w-full">
-              <h2 className="text-[#165788] text-lg font-medium mb-4">James Taylor</h2>
+              <h2 className="text-[#165788] text-lg font-medium mb-4">{applicantJamesName}</h2>
               
               {/* Revolving Section */}
               <Collapsible open={jamesRevolvingOpen} onOpenChange={setJamesRevolvingOpen}>
@@ -418,7 +422,7 @@ export const EditableCommitmentsExpensesPage: React.FC = () => {
 
             {/* Jane Taylor Section */}
             <section className="w-full">
-              <h2 className="text-[#165788] text-lg font-medium mb-4">Jane Taylor</h2>
+              <h2 className="text-[#165788] text-lg font-medium mb-4">{applicantJaneName}</h2>
               
               {/* Non Revolving Section */}
               <Collapsible open={janeNonRevolvingOpen} onOpenChange={setJaneNonRevolvingOpen}>
