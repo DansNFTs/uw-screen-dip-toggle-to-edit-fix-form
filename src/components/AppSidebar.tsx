@@ -54,8 +54,7 @@ export const AppSidebar: React.FC = () => {
       title: "Mortgage",
       items: [
         { label: "Mortgage details", status: "complete" },
-        { label: "Property details", status: "complete" },
-        { label: "Affordability", status: "complete" },
+        { label: "Household details", status: "complete" },
       ]
     },
     {
@@ -126,8 +125,7 @@ export const AppSidebar: React.FC = () => {
       if (sectionTitle === "Mortgage") {
         switch (item.label) {
           case "Mortgage details": return "/loan-details";
-          case "Property details": return "/property-details";
-          case "Affordability": return "/affordability";
+          case "Household details": return "/loan-details"; // Same page, different section
           default: return "#";
         }
       }
