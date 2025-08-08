@@ -1,6 +1,6 @@
 import React from 'react';
-import { Navigate } from 'react-router-dom';
+import { EditablePersonalDetailsPage } from '@/components/EditablePersonalDetailsPage';
 
 export const PersonalDetailsPage: React.FC = () => {
-  return <Navigate to="/data-capture/applicants/1" replace />;
+  return <EditablePersonalDetailsPage />;
 };
