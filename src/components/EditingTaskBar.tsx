@@ -170,14 +170,11 @@ export const EditingTaskBar: React.FC = () => {
   };
 
   const handleEditToggle = () => {
-    // When enabling editing, remember the current read-only page and go to unified form
+    // Only toggle editing state, don't navigate automatically
     if (!isEditingEnabled) {
       try {
         sessionStorage.setItem('readOnlyOriginPath', location.pathname);
       } catch {}
-      toggleEditingEnabled();
-      navigate('/data-capture/applicants/1');
-      return;
     }
     toggleEditingEnabled();
   };
