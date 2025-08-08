@@ -10,6 +10,8 @@ import { CaseNotesProvider } from '../contexts/CaseNotesContext';
 import { ApplicantDataProvider, useApplicantData } from '../contexts/ApplicantDataContext';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { EditingTaskBar } from './EditingTaskBar';
+import { useEditMode } from '../contexts/EditModeContext';
+import { DataCaptureNavigation } from './DataCaptureNavigation';
 
 interface MainLayoutProps {
   children: React.ReactNode;
@@ -19,6 +21,7 @@ const MainLayoutContent: React.FC<MainLayoutProps> = ({ children }) => {
   const navigate = useNavigate();
   const location = useLocation();
   const { getFormattedApplicantNames } = useApplicantData();
+  const { isEditMode } = useEditMode();
   
   const caseInfo = {
     caseId: '[123456789]',
@@ -48,11 +51,14 @@ const MainLayoutContent: React.FC<MainLayoutProps> = ({ children }) => {
 
   // Hide task bar on summary, policy rules, and audit log pages
   const showTaskBar = !['/', '/policy-rules-notes', '/audit-log'].includes(location.pathname);
+  
+  // Show data capture navigation when in edit mode
+  const showDataCaptureNav = isEditMode && location.pathname.includes('/data-capture');
 
   return (
     <SidebarProvider>
       <div className="min-h-screen flex w-full bg-white">
-        <AppSidebar />
+        {showDataCaptureNav ? <DataCaptureNavigation /> : <AppSidebar />}
         <SidebarInset className="flex-1">
           <div className="flex h-screen">
             <main className="flex-1 bg-[#F7F8FA] overflow-hidden flex flex-col">

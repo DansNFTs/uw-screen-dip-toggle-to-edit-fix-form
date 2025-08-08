@@ -483,85 +483,21 @@ export const UnifiedDataCaptureForm: React.FC = () => {
   };
 
   return (
-    <SidebarProvider>
-      <div className="min-h-screen flex w-full bg-white">
-        {/* Custom Navigation Sidebar */}
-        <aside className="w-[280px] bg-white border-r border-gray-200 flex flex-col">
-          <div className="p-4 border-b border-gray-200">
-            <Button 
-              variant="outline" 
-              onClick={() => navigate(-1)}
-              className="w-full flex items-center gap-2"
-            >
-              <ArrowLeft className="h-4 w-4" />
-              Back to Summary
-            </Button>
-          </div>
-          
-          <ScrollArea className="flex-1">
-            <div className="p-4">
-              {navigationItems.map((section) => (
-                <div key={section.title} className="mb-6">
-                  <h3 className="font-semibold text-blue-700 mb-3 text-base">
-                    {section.title}
-                  </h3>
-                  <div className="space-y-1">
-                    {section.items.map((item) => {
-                      const isActive = 
-                        (item.key.startsWith('jane') && activeTab === 'applicants' && activeApplicant === 2) ||
-                        (item.key.startsWith('james') && activeTab === 'applicants' && activeApplicant === 1) ||
-                        (item.key.startsWith('mortgage') && activeTab === 'mortgage') ||
-                        (item.key.startsWith('household') && activeTab === 'mortgage') ||
-                        (item.key === 'declarations' && activeTab === 'submission');
-                      
-                      return (
-                        <button
-                          key={item.key}
-                          onClick={() => handleNavigationClick(item.key)}
-                          className={`w-full flex items-center gap-3 px-3 py-2 text-sm rounded-md transition-colors text-left ${
-                            isActive 
-                              ? 'bg-blue-50 text-blue-700 font-medium' 
-                              : 'text-gray-700 hover:bg-gray-50'
-                          }`}
-                        >
-                          {item.status === 'complete' && (
-                            <Check className="h-4 w-4 text-green-600" />
-                          )}
-                          {item.status === 'warning' && (
-                            <AlertTriangle className="h-4 w-4 text-orange-500" />
-                          )}
-                          <span className="flex-1">{item.label}</span>
-                        </button>
-                      );
-                    })}
-                  </div>
-                </div>
-              ))}
-            </div>
-          </ScrollArea>
-          
-          <div className="p-4 border-t border-gray-200">
-            <Button onClick={handleMainButtonClick} variant={getButtonVariant()} className="w-full">
-              {getButtonText()}
-            </Button>
-          </div>
-        </aside>
+    <div className="container mx-auto p-6 space-y-6">
+      <div className="flex justify-between items-center">
+        <h1 className="text-3xl font-bold">Data Capture Form</h1>
+        <Button onClick={handleMainButtonClick} variant={getButtonVariant()}>
+          {getButtonText()}
+        </Button>
+      </div>
 
-        <SidebarInset className="flex-1">
-          <main className="flex-1 bg-[#F7F8FA] overflow-hidden">
-            <ScrollArea className="h-screen">
-              <div className="container mx-auto p-6 space-y-6">
-                <div className="flex justify-between items-center">
-                  <h1 className="text-3xl font-bold">Data Capture Form</h1>
-                </div>
-
-                <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-                  {/* Hidden TabsList for programmatic control */}
-                  <TabsList className="hidden">
-                    <TabsTrigger value="mortgage">Mortgage Details</TabsTrigger>
-                    <TabsTrigger value="applicants">Applicant Information</TabsTrigger>
-                    <TabsTrigger value="submission">Review & Submit</TabsTrigger>
-                  </TabsList>
+      <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
+        {/* Hidden TabsList for programmatic control */}
+        <TabsList className="hidden">
+          <TabsTrigger value="mortgage">Mortgage Details</TabsTrigger>
+          <TabsTrigger value="applicants">Applicant Information</TabsTrigger>
+          <TabsTrigger value="submission">Review & Submit</TabsTrigger>
+        </TabsList>
 
                   <TabsContent value="mortgage" className="space-y-6">
                     <Card>
@@ -865,22 +801,17 @@ export const UnifiedDataCaptureForm: React.FC = () => {
                         </div>
                       </CardContent>
                     </Card>
-                  </TabsContent>
-                </Tabs>
+        </TabsContent>
+      </Tabs>
 
-                {comparisonField && (
-                  <FieldComparisonModal
-                    open={!!comparisonField}
-                    onOpenChange={(open) => !open && setComparisonField(null)}
-                    fieldName={comparisonField}
-                    auditEntries={auditLog}
-                  />
-                )}
-              </div>
-            </ScrollArea>
-          </main>
-        </SidebarInset>
-      </div>
-    </SidebarProvider>
+      {comparisonField && (
+        <FieldComparisonModal
+          open={!!comparisonField}
+          onOpenChange={(open) => !open && setComparisonField(null)}
+          fieldName={comparisonField}
+          auditEntries={auditLog}
+        />
+      )}
+    </div>
   );
 };
