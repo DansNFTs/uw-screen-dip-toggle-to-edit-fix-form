@@ -236,7 +236,7 @@ export const UnifiedDataCaptureForm: React.FC = () => {
     jamesFutureChanges: 'No',
     jamesMonthlyPreTaxSalary: '£0.00',
 
-    // Jane Taylor defaults
+    // Jane Taylor defaults (updated to match screenshots)
     janeCourtDecree: 'No',
     janeDebtManagement: 'No',
     janeTitle: applicantData.janeTitle || 'Mrs',
@@ -247,12 +247,12 @@ export const UnifiedDataCaptureForm: React.FC = () => {
     janeBirthDay: '04',
     janeBirthMonth: '04',
     janeBirthYear: '1990',
-    janeNationality: 'UK Resident',
-    janeCurrentAddress: '12 Longwood Close, NEWCASTLE UPON TYNE, Tyne and Wear',
+    janeNationality: 'UK National',
+    janeCurrentAddress: '12 Longwood Close, Sunniside, NEWCASTLE UPON TYNE, Tyne and Wear',
     janePostcode: 'NE16 5QB',
-    janeMoveInDate: '01/04/2015',
+    janeMoveInDate: 'April 2015',
     janeCurrentAddressYears: '9',
-    janeCurrentAddressMonths: '1',
+    janeCurrentAddressMonths: '4',
     janeCurrentResidencyStatus: 'Owner occupier with mortgage',
     janePreviousAddress: '',
     janePreviousAddressYears: '',
@@ -263,29 +263,29 @@ export const UnifiedDataCaptureForm: React.FC = () => {
     janePlansForProperty: 'Selling current main residence',
     janeExpectedRemainingBalance: '£56,000.00',
     janeEmploymentStatus: 'Employed',
-    janeGrossBasicIncome: '£35,000.00',
+    janeGrossBasicIncome: '£50,000.00',
     janeFrequency: 'Yearly',
-    janeAnnualAmount: '£35,000.00',
-    janeMonthlyNetSalary: '£2,400.00',
-    janeJobTitle: 'Teacher',
-    janeEmployerName: 'Newcastle Primary School',
+    janeAnnualAmount: '£50,000.00',
+    janeMonthlyNetSalary: '£3,200.00',
+    janeJobTitle: 'Manager',
+    janeEmployerName: 'NHS',
     janeEmploymentType: 'Permanent',
     janeStartMonth: '09',
     janeStartYear: '2019',
     janeExpectedRetirementAge: '70',
-    janeCommitmentType: 'Personal loan',
-    janeProvider: 'Bank',
-    janeMonthlyPayment: '£100.00',
-    janeRemainingBalance: '£5,000.00',
+    janeCommitmentType: 'Hire purchase',
+    janeProvider: 'Nissan',
+    janeMonthlyPayment: '£200.00',
+    janeRemainingBalance: '£4,500.00',
     janeBasicIncome: '£50,000',
     janeEmploymentTenure: 'Permanent',
     janeEmploymentStartDate: '01/09/2019',
-    janeTimeInEmployment: '5 years and 10 months',
-    janeAgeAtEndOfTerm: '60 years',
+    janeTimeInEmployment: '5 years and 3 months',
+    janeAgeAtEndOfTerm: '65 years',
     janeProbationaryPeriod: 'No',
     janeRedundancyPeriod: 'No',
     janeFutureChanges: 'No',
-    janeMonthlyPreTaxSalary: '£60.00'
+    janeMonthlyPreTaxSalary: '£0.00'
   };
 
   const [formData, setFormData] = useState(initialFormData);
@@ -1027,9 +1027,22 @@ export const UnifiedDataCaptureForm: React.FC = () => {
                       <div className="space-y-2">
                         <div className="text-sm font-medium">Current address</div>
                         <div className="text-sm text-muted-foreground">
-                          123 Example Street<br />
-                          Example Town<br />
-                          EX1 2MP
+                          {currentApplicant === 1 ? (
+                            <>
+                              12 Longwood Close<br />
+                              NEWCASTLE UPON TYNE<br />
+                              Tyne and Wear<br />
+                              NE16 5QB
+                            </>
+                          ) : (
+                            <>
+                              12 Longwood Close<br />
+                              Sunniside<br />
+                              NEWCASTLE UPON TYNE<br />
+                              Tyne and Wear<br />
+                              NE16 5QB
+                            </>
+                          )}
                         </div>
                         <div className="text-xs text-blue-600 cursor-pointer hover:underline">Delete address</div>
                       </div>
@@ -1059,9 +1072,13 @@ export const UnifiedDataCaptureForm: React.FC = () => {
 
               <div className="border-t pt-8">
                 <div className="space-y-4">
-                  <h3 className="text-lg font-semibold">{getApplicantName(currentApplicant)}'s employment</h3>
+                  <h3 className="text-lg font-semibold">{getApplicantName(currentApplicant)}'s employment & income</h3>
                   
-                  <div className="space-y-4">
+                  <div className="space-y-6">
+                    {/* Employment Status */}
+                    {renderField(`${getFieldPrefix(currentApplicant)}EmploymentStatus`, 'Employment status', formData[`${getFieldPrefix(currentApplicant)}EmploymentStatus` as keyof UnifiedFormData], (value) => handleInputChange(`${getFieldPrefix(currentApplicant)}EmploymentStatus`, value), 'select', ['Employed', 'Self-employed', 'Unemployed', 'Retired'])}
+                    
+                    {/* Job Details */}
                     {renderField(`${getFieldPrefix(currentApplicant)}JobTitle`, 'Job title', formData[`${getFieldPrefix(currentApplicant)}JobTitle` as keyof UnifiedFormData], (value) => handleInputChange(`${getFieldPrefix(currentApplicant)}JobTitle`, value))}
                     {renderField(`${getFieldPrefix(currentApplicant)}EmployerName`, 'Employer name', formData[`${getFieldPrefix(currentApplicant)}EmployerName` as keyof UnifiedFormData], (value) => handleInputChange(`${getFieldPrefix(currentApplicant)}EmployerName`, value))}
                     {renderField(`${getFieldPrefix(currentApplicant)}EmploymentTenure`, 'Employment tenure', formData[`${getFieldPrefix(currentApplicant)}EmploymentTenure` as keyof UnifiedFormData], (value) => handleInputChange(`${getFieldPrefix(currentApplicant)}EmploymentTenure`, value), 'radio', ['Permanent', 'Contract'])}
@@ -1076,8 +1093,28 @@ export const UnifiedDataCaptureForm: React.FC = () => {
                     
                     {renderField(`${getFieldPrefix(currentApplicant)}ExpectedRetirementAge`, 'Expected retirement age', formData[`${getFieldPrefix(currentApplicant)}ExpectedRetirementAge` as keyof UnifiedFormData], (value) => handleInputChange(`${getFieldPrefix(currentApplicant)}ExpectedRetirementAge`, value))}
                     
-                    <div className="space-y-4">
-                      <p className="text-sm text-muted-foreground">
+                    {/* Income Details */}
+                    <div className="border-t pt-6">
+                      <h4 className="text-base font-medium mb-4">Income details</h4>
+                      <div className="space-y-4">
+                        {renderField(`${getFieldPrefix(currentApplicant)}GrossBasicIncome`, 'Gross basic income', formData[`${getFieldPrefix(currentApplicant)}GrossBasicIncome` as keyof UnifiedFormData], (value) => handleInputChange(`${getFieldPrefix(currentApplicant)}GrossBasicIncome`, value))}
+                        {renderField(`${getFieldPrefix(currentApplicant)}Frequency`, 'Payment frequency of gross basic income', formData[`${getFieldPrefix(currentApplicant)}Frequency` as keyof UnifiedFormData], (value) => handleInputChange(`${getFieldPrefix(currentApplicant)}Frequency`, value), 'select', ['Weekly', 'Monthly', 'Yearly'])}
+                        {renderField(`${getFieldPrefix(currentApplicant)}AnnualAmount`, 'Annual amount', formData[`${getFieldPrefix(currentApplicant)}AnnualAmount` as keyof UnifiedFormData], (value) => handleInputChange(`${getFieldPrefix(currentApplicant)}AnnualAmount`, value))}
+                        
+                        <div>
+                          <label className="text-sm font-medium block mb-2">Monthly pre-tax salary sacrifices</label>
+                          <p className="text-xs text-muted-foreground mb-2">
+                            E.g. pension contributions, cycle to work scheme, health insurance, childcare vouchers
+                          </p>
+                          {renderField(`${getFieldPrefix(currentApplicant)}MonthlyPreTaxSalary`, '', formData[`${getFieldPrefix(currentApplicant)}MonthlyPreTaxSalary` as keyof UnifiedFormData], (value) => handleInputChange(`${getFieldPrefix(currentApplicant)}MonthlyPreTaxSalary`, value))}
+                        </div>
+                      </div>
+                    </div>
+                    
+                    {/* Additional Income Sources */}
+                    <div className="border-t pt-6">
+                      <h4 className="text-base font-medium mb-4">Additional income sources</h4>
+                      <p className="text-sm text-muted-foreground mb-4">
                         Please add all additional income sources related to this applicant
                       </p>
                       
@@ -1108,24 +1145,34 @@ export const UnifiedDataCaptureForm: React.FC = () => {
                   </p>
                   
                   <div className="border rounded-lg">
-                    <div className="grid grid-cols-4 gap-4 p-4 border-b bg-muted/30">
+                    <div className="grid grid-cols-5 gap-4 p-4 border-b bg-muted/30">
                       <div className="text-sm font-medium">Commitment type</div>
                       <div className="text-sm font-medium">Provider</div>
+                      <div className="text-sm font-medium">Monthly payment</div>
                       <div className="text-sm font-medium">Remaining balance</div>
                       <div className="text-sm font-medium">Actions</div>
                     </div>
-                    <div className="grid grid-cols-4 gap-4 p-4 items-center">
-                      {renderField(`${getFieldPrefix(currentApplicant)}CommitmentType`, '', formData[`${getFieldPrefix(currentApplicant)}CommitmentType` as keyof UnifiedFormData], (value) => handleInputChange(`${getFieldPrefix(currentApplicant)}CommitmentType`, value), 'select', ['Credit card', 'Personal loan', 'Car loan', 'Store card', 'Other'])}
+                    <div className="grid grid-cols-5 gap-4 p-4 items-center">
+                      {renderField(`${getFieldPrefix(currentApplicant)}CommitmentType`, '', formData[`${getFieldPrefix(currentApplicant)}CommitmentType` as keyof UnifiedFormData], (value) => handleInputChange(`${getFieldPrefix(currentApplicant)}CommitmentType`, value), 'select', ['Credit card', 'Personal loan', 'Car loan', 'Store card', 'Hire purchase', 'Other'])}
                       {renderField(`${getFieldPrefix(currentApplicant)}Provider`, '', formData[`${getFieldPrefix(currentApplicant)}Provider` as keyof UnifiedFormData], (value) => handleInputChange(`${getFieldPrefix(currentApplicant)}Provider`, value))}
+                      {renderField(`${getFieldPrefix(currentApplicant)}MonthlyPayment`, '', formData[`${getFieldPrefix(currentApplicant)}MonthlyPayment` as keyof UnifiedFormData], (value) => handleInputChange(`${getFieldPrefix(currentApplicant)}MonthlyPayment`, value))}
                       {renderField(`${getFieldPrefix(currentApplicant)}RemainingBalance`, '', formData[`${getFieldPrefix(currentApplicant)}RemainingBalance` as keyof UnifiedFormData], (value) => handleInputChange(`${getFieldPrefix(currentApplicant)}RemainingBalance`, value))}
                       <div className="text-xs text-blue-600 cursor-pointer hover:underline">Delete</div>
                     </div>
                     <div className="p-4 border-t">
-                      <div className="flex items-center space-x-2 mb-4">
-                        <input type="checkbox" id={`${getFieldPrefix(currentApplicant)}PaidByCompletion`} className="rounded border-border" />
-                        <label htmlFor={`${getFieldPrefix(currentApplicant)}PaidByCompletion`} className="text-sm">
-                          Paid by completion (with extra payments)
-                        </label>
+                      <div className="space-y-2 mb-4">
+                        <div className="flex items-center space-x-2">
+                          <input type="checkbox" id={`${getFieldPrefix(currentApplicant)}LessThan6Months`} className="rounded border-border" />
+                          <label htmlFor={`${getFieldPrefix(currentApplicant)}LessThan6Months`} className="text-sm">
+                            Less than 6 months remaining (no extra payments)
+                          </label>
+                        </div>
+                        <div className="flex items-center space-x-2">
+                          <input type="checkbox" id={`${getFieldPrefix(currentApplicant)}PaidByCompletion`} className="rounded border-border" />
+                          <label htmlFor={`${getFieldPrefix(currentApplicant)}PaidByCompletion`} className="text-sm">
+                            Paid by completion (with extra payments)
+                          </label>
+                        </div>
                       </div>
                       <Button variant="outline" size="sm">Add a commitment</Button>
                     </div>
