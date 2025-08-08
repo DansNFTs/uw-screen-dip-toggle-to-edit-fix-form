@@ -144,10 +144,11 @@ export const EditingTaskBar: React.FC = () => {
       title: "Changes saved",
       description: "Your changes have been saved and edit mode has been exited.",
     });
+    navigate(location.pathname);
   };
 
   const performSaveAndResubmit = () => {
-    const affordabilityChanged = checkAffordabilityFieldsChanged();
+    const originPath = location.pathname;
     saveAndResubmit();
     exitEditMode();
     if (isEditingEnabled) {
@@ -157,12 +158,8 @@ export const EditingTaskBar: React.FC = () => {
       title: "Changes saved and resubmitted",
       description: "Your changes have been saved and the case has been resubmitted for review.",
     });
-    // Navigate to affordability page if affordability calculations were affected
-    if (affordabilityChanged) {
-      navigate('/affordability');
-    } else {
-      navigate('/');
-    }
+    // Return to the read-only view of the same page
+    navigate(originPath);
   };
 
   const handleReturnToSummary = () => {
@@ -188,6 +185,7 @@ export const EditingTaskBar: React.FC = () => {
       title: "Changes cancelled",
       description: "All unsaved changes have been discarded.",
     });
+    navigate(location.pathname);
     setShowCancelDialog(false);
   };
 
