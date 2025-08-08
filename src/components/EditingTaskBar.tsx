@@ -181,7 +181,9 @@ export const EditingTaskBar: React.FC = () => {
     setShowCancelDialog(false);
   };
 
-  // Always show task bar for all case states
+  // Only show task bar in read-only views (never in edit mode or data capture routes)
+  const isDataCaptureRoute = location.pathname.includes('/data-capture');
+  if (isEditMode || isDataCaptureRoute) return null;
 
   // Draft mode (not currently editing)
   const isDraftMode = hasSavedChanges && !hasUnsavedChanges && !isEditMode;
