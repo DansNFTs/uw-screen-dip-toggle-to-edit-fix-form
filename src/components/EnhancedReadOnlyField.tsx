@@ -61,76 +61,23 @@ export const EnhancedReadOnlyField: React.FC<EnhancedReadOnlyFieldProps> = ({
 
   return (
     <TooltipProvider>
-      <div className={cn("space-y-1", className)}>
-        <div className="flex items-center justify-between">
-          <label className="text-sm font-medium text-gray-700">{label}</label>
-          {(isEdited || isModified) && showAuditIcon && (
-            <div className="flex items-center gap-1">
-              {lastModified && (
-                <Tooltip>
-                  <TooltipTrigger asChild>
-                    <div className="flex items-center gap-1 text-xs text-gray-500">
-                      <Clock className="w-3 h-3" />
-                      <span>Modified</span>
-                    </div>
-                  </TooltipTrigger>
-                  <TooltipContent>
-                    <p>Last modified: {formatTimestamp(lastModified)}</p>
-                  </TooltipContent>
-                </Tooltip>
-              )}
-              {onAuditClick && (
-                <Tooltip>
-                  <TooltipTrigger asChild>
-                    <button
-                      onClick={handleAuditClick}
-                      className="p-1 hover:bg-gray-100 rounded transition-colors"
-                      aria-label="View change history"
-                    >
-                      <Clock className="w-3 h-3 text-blue-500" />
-                    </button>
-                  </TooltipTrigger>
-                  <TooltipContent>
-                    <p>Click to view change history</p>
-                  </TooltipContent>
-                </Tooltip>
-              )}
-            </div>
-          )}
-          {isProtected && (
-            <Tooltip>
-              <TooltipTrigger asChild>
-                <div className="flex items-center gap-1 text-xs text-orange-600">
-                  <AlertCircle className="w-3 h-3" />
-                  <span>Calculated</span>
-                </div>
-              </TooltipTrigger>
-              <TooltipContent>
-                <p>This value is calculated automatically and cannot be edited</p>
-              </TooltipContent>
-            </Tooltip>
-          )}
-        </div>
-        
-        <EditableField 
-          isEdited={isEdited || isModified}
-          className={cn(
-            isProtected && "bg-muted/50 border border-muted"
-          )}
-        >
-          <div
-            className={cn(
-              "p-3 border border-gray-200 rounded-md bg-gray-50 text-sm",
-              !isProtected && "cursor-pointer hover:bg-gray-100 transition-colors",
-              isProtected && "bg-muted cursor-not-allowed opacity-75",
-              (isEdited || isModified) && "bg-blue-50 border-blue-200"
-            )}
-            onDoubleClick={handleDoubleClick}
-            title={isProtected ? "This field is calculated automatically" : "Double-click to edit"}
-          >
-            {displayValue || '-'}
-          </div>
-        </EditableField>
+      <div
+        className={cn(
+          "text-sm text-gray-900 cursor-pointer hover:bg-gray-100 transition-colors",
+          !isProtected && "cursor-pointer",
+          isProtected && "cursor-not-allowed opacity-75",
+          (isEdited || isModified) && "text-blue-600 font-medium",
+          className
+        )}
+        onDoubleClick={handleDoubleClick}
+        title={isProtected ? "This field is calculated automatically" : "Double-click to edit"}
+      >
+        {displayValue || '-'}
+        {(isEdited || isModified) && showAuditIcon && (
+          <span className="ml-2 inline-flex items-center">
+            <Clock className="w-3 h-3 text-blue-500" />
+          </span>
+        )}
       </div>
     </TooltipProvider>
   );

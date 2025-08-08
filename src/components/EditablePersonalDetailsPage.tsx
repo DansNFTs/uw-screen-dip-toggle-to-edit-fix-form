@@ -842,7 +842,7 @@ export const EditablePersonalDetailsPage: React.FC = () => {
       );
     }
 
-    // Simple read-only view matching original styling
+    // Simple read-only view matching original styling with double-click functionality
     return (
       <div className="space-y-8">
         <div>
@@ -850,39 +850,147 @@ export const EditablePersonalDetailsPage: React.FC = () => {
           
           <div className="grid grid-cols-2 gap-x-8 gap-y-3">
             <div className="text-sm text-gray-600">Name change in last 6 years</div>
-            <div className="text-sm text-gray-900">{unifiedData.jamesNameChange || formData.jamesNameChange || 'No'}</div>
+            <div className="text-sm text-gray-900">
+              <EnhancedReadOnlyField
+                field="jamesNameChange"
+                value=""
+                label=""
+                onDoubleClick={handleFieldDoubleClick}
+                onAuditClick={handleFieldComparisonClick}
+                showAuditIcon={false}
+                className=""
+              />
+            </div>
             
             <div className="text-sm text-gray-600">D.O.B - Age</div>
             <div className="text-sm text-gray-900">
-              {`${unifiedData.jamesDateOfBirthDay || formData.jamesDateOfBirthDay}/${unifiedData.jamesDateOfBirthMonth || formData.jamesDateOfBirthMonth}/${unifiedData.jamesDateOfBirthYear || formData.jamesDateOfBirthYear}`}
+              <EnhancedReadOnlyField
+                field="jamesDateOfBirthDay"
+                value=""
+                label=""
+                onDoubleClick={handleFieldDoubleClick}
+                onAuditClick={handleFieldComparisonClick}
+                showAuditIcon={false}
+                className=""
+              />
             </div>
             
             <div className="text-sm text-gray-600">Current address</div>
-            <div className="text-sm text-gray-900">{unifiedData.jamesCurrentAddress || formData.jamesCurrentAddress}</div>
+            <div className="text-sm text-gray-900">
+              <EnhancedReadOnlyField
+                field="jamesCurrentAddress"
+                value=""
+                label=""
+                onDoubleClick={handleFieldDoubleClick}
+                onAuditClick={handleFieldComparisonClick}
+                showAuditIcon={false}
+                className=""
+              />
+            </div>
             
             <div className="text-sm text-gray-600">Postcode</div>
-            <div className="text-sm text-gray-900">{unifiedData.jamesPostcode || formData.jamesPostcode}</div>
+            <div className="text-sm text-gray-900">
+              <EnhancedReadOnlyField
+                field="jamesPostcode"
+                value=""
+                label=""
+                onDoubleClick={handleFieldDoubleClick}
+                onAuditClick={handleFieldComparisonClick}
+                showAuditIcon={false}
+                className=""
+              />
+            </div>
             
             <div className="text-sm text-gray-600">When did the applicant move in</div>
-            <div className="text-sm text-gray-900">{unifiedData.jamesMoveInDate || formData.jamesMoveInDate}</div>
+            <div className="text-sm text-gray-900">
+              <EnhancedReadOnlyField
+                field="jamesMoveInDate"
+                value=""
+                label=""
+                onDoubleClick={handleFieldDoubleClick}
+                onAuditClick={handleFieldComparisonClick}
+                showAuditIcon={false}
+                className=""
+              />
+            </div>
             
             <div className="text-sm text-gray-600">Sale price</div>
-            <div className="text-sm text-gray-900">{unifiedData.jamesSalePrice || formData.jamesSalePrice}</div>
+            <div className="text-sm text-gray-900">
+              <EnhancedReadOnlyField
+                field="jamesSalePrice"
+                value=""
+                label=""
+                onDoubleClick={handleFieldDoubleClick}
+                onAuditClick={handleFieldComparisonClick}
+                showAuditIcon={false}
+                className=""
+              />
+            </div>
             
             <div className="text-sm text-gray-600">Current residency status</div>
-            <div className="text-sm text-gray-900">{unifiedData.jamesResidencyStatus || formData.jamesResidencyStatus}</div>
+            <div className="text-sm text-gray-900">
+              <EnhancedReadOnlyField
+                field="jamesResidencyStatus"
+                value=""
+                label=""
+                onDoubleClick={handleFieldDoubleClick}
+                onAuditClick={handleFieldComparisonClick}
+                showAuditIcon={false}
+                className=""
+              />
+            </div>
             
             <div className="text-sm text-gray-600">Current lender</div>
-            <div className="text-sm text-gray-900">{unifiedData.jamesCurrentLender || formData.jamesCurrentLender}</div>
+            <div className="text-sm text-gray-900">
+              <EnhancedReadOnlyField
+                field="jamesCurrentLender"
+                value=""
+                label=""
+                onDoubleClick={handleFieldDoubleClick}
+                onAuditClick={handleFieldComparisonClick}
+                showAuditIcon={false}
+                className=""
+              />
+            </div>
             
             <div className="text-sm text-gray-600">Outstanding mortgage balance</div>
-            <div className="text-sm text-gray-900">{unifiedData.jamesOutstandingMortgage || formData.jamesOutstandingMortgage}</div>
+            <div className="text-sm text-gray-900">
+              <EnhancedReadOnlyField
+                field="jamesOutstandingMortgage"
+                value=""
+                label=""
+                onDoubleClick={handleFieldDoubleClick}
+                onAuditClick={handleFieldComparisonClick}
+                showAuditIcon={false}
+                className=""
+              />
+            </div>
             
             <div className="text-sm text-gray-600">Plans for property</div>
-            <div className="text-sm text-gray-900">{unifiedData.jamesPlansForProperty || formData.jamesPlansForProperty}</div>
+            <div className="text-sm text-gray-900">
+              <EnhancedReadOnlyField
+                field="jamesPlansForProperty"
+                value=""
+                label=""
+                onDoubleClick={handleFieldDoubleClick}
+                onAuditClick={handleFieldComparisonClick}
+                showAuditIcon={false}
+                className=""
+              />
+            </div>
             
             <div className="text-sm text-gray-600">Expected remaining mortgage balance</div>
-            <div className="text-sm text-gray-900">{unifiedData.jamesExpectedRemainingBalance || formData.jamesExpectedRemainingBalance}</div>
+            <div className="text-sm text-gray-900">
+              <EnhancedReadOnlyField
+                field="jamesExpectedRemainingBalance"
+                value=""
+                label=""
+                onDoubleClick={handleFieldDoubleClick}
+                onAuditClick={handleFieldComparisonClick}
+                showAuditIcon={false}
+                className=""
+              />
+            </div>
           </div>
         </div>
         
@@ -891,39 +999,147 @@ export const EditablePersonalDetailsPage: React.FC = () => {
           
           <div className="grid grid-cols-2 gap-x-8 gap-y-3">
             <div className="text-sm text-gray-600">Name change in last 6 years</div>
-            <div className="text-sm text-gray-900">No</div>
+            <div className="text-sm text-gray-900">
+              <EnhancedReadOnlyField
+                field="janeNameChange"
+                value=""
+                label=""
+                onDoubleClick={handleFieldDoubleClick}
+                onAuditClick={handleFieldComparisonClick}
+                showAuditIcon={false}
+                className=""
+              />
+            </div>
             
             <div className="text-sm text-gray-600">D.O.B - Age</div>
             <div className="text-sm text-gray-900">
-              {`${unifiedData.janeDateOfBirthDay || formData.janeDateOfBirthDay}/${unifiedData.janeDateOfBirthMonth || formData.janeDateOfBirthMonth}/${unifiedData.janeDateOfBirthYear || formData.janeDateOfBirthYear}`}
+              <EnhancedReadOnlyField
+                field="janeDateOfBirthDay"
+                value=""
+                label=""
+                onDoubleClick={handleFieldDoubleClick}
+                onAuditClick={handleFieldComparisonClick}
+                showAuditIcon={false}
+                className=""
+              />
             </div>
             
             <div className="text-sm text-gray-600">Current address</div>
-            <div className="text-sm text-gray-900">{unifiedData.janeCurrentAddress || formData.janeCurrentAddress}</div>
+            <div className="text-sm text-gray-900">
+              <EnhancedReadOnlyField
+                field="janeCurrentAddress"
+                value=""
+                label=""
+                onDoubleClick={handleFieldDoubleClick}
+                onAuditClick={handleFieldComparisonClick}
+                showAuditIcon={false}
+                className=""
+              />
+            </div>
             
             <div className="text-sm text-gray-600">Postcode</div>
-            <div className="text-sm text-gray-900">{unifiedData.janePostcode || formData.janePostcode}</div>
+            <div className="text-sm text-gray-900">
+              <EnhancedReadOnlyField
+                field="janePostcode"
+                value=""
+                label=""
+                onDoubleClick={handleFieldDoubleClick}
+                onAuditClick={handleFieldComparisonClick}
+                showAuditIcon={false}
+                className=""
+              />
+            </div>
             
             <div className="text-sm text-gray-600">When did the applicant move in</div>
-            <div className="text-sm text-gray-900">{unifiedData.janeMoveInDate || formData.janeMoveInDate}</div>
+            <div className="text-sm text-gray-900">
+              <EnhancedReadOnlyField
+                field="janeMoveInDate"
+                value=""
+                label=""
+                onDoubleClick={handleFieldDoubleClick}
+                onAuditClick={handleFieldComparisonClick}
+                showAuditIcon={false}
+                className=""
+              />
+            </div>
             
             <div className="text-sm text-gray-600">Sale price</div>
-            <div className="text-sm text-gray-900">{unifiedData.janeSalePrice || formData.janeSalePrice}</div>
+            <div className="text-sm text-gray-900">
+              <EnhancedReadOnlyField
+                field="janeSalePrice"
+                value=""
+                label=""
+                onDoubleClick={handleFieldDoubleClick}
+                onAuditClick={handleFieldComparisonClick}
+                showAuditIcon={false}
+                className=""
+              />
+            </div>
             
             <div className="text-sm text-gray-600">Current residency status</div>
-            <div className="text-sm text-gray-900">{unifiedData.janeResidencyStatus || formData.janeResidencyStatus}</div>
+            <div className="text-sm text-gray-900">
+              <EnhancedReadOnlyField
+                field="janeResidencyStatus"
+                value=""
+                label=""
+                onDoubleClick={handleFieldDoubleClick}
+                onAuditClick={handleFieldComparisonClick}
+                showAuditIcon={false}
+                className=""
+              />
+            </div>
             
             <div className="text-sm text-gray-600">Current lender</div>
-            <div className="text-sm text-gray-900">{unifiedData.janeCurrentLender || formData.janeCurrentLender}</div>
+            <div className="text-sm text-gray-900">
+              <EnhancedReadOnlyField
+                field="janeCurrentLender"
+                value=""
+                label=""
+                onDoubleClick={handleFieldDoubleClick}
+                onAuditClick={handleFieldComparisonClick}
+                showAuditIcon={false}
+                className=""
+              />
+            </div>
             
             <div className="text-sm text-gray-600">Outstanding mortgage balance</div>
-            <div className="text-sm text-gray-900">{unifiedData.janeOutstandingMortgage || formData.janeOutstandingMortgage}</div>
+            <div className="text-sm text-gray-900">
+              <EnhancedReadOnlyField
+                field="janeOutstandingMortgage"
+                value=""
+                label=""
+                onDoubleClick={handleFieldDoubleClick}
+                onAuditClick={handleFieldComparisonClick}
+                showAuditIcon={false}
+                className=""
+              />
+            </div>
             
             <div className="text-sm text-gray-600">Plans for property</div>
-            <div className="text-sm text-gray-900">{unifiedData.janePlansForProperty || formData.janePlansForProperty}</div>
+            <div className="text-sm text-gray-900">
+              <EnhancedReadOnlyField
+                field="janePlansForProperty"
+                value=""
+                label=""
+                onDoubleClick={handleFieldDoubleClick}
+                onAuditClick={handleFieldComparisonClick}
+                showAuditIcon={false}
+                className=""
+              />
+            </div>
             
             <div className="text-sm text-gray-600">Expected remaining mortgage balance</div>
-            <div className="text-sm text-gray-900">{unifiedData.janeExpectedRemainingBalance || formData.janeExpectedRemainingBalance}</div>
+            <div className="text-sm text-gray-900">
+              <EnhancedReadOnlyField
+                field="janeExpectedRemainingBalance"
+                value=""
+                label=""
+                onDoubleClick={handleFieldDoubleClick}
+                onAuditClick={handleFieldComparisonClick}
+                showAuditIcon={false}
+                className=""
+              />
+            </div>
           </div>
         </div>
       </div>
