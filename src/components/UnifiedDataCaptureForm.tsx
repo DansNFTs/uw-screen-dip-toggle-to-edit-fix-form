@@ -1053,105 +1053,192 @@ export const UnifiedDataCaptureForm: React.FC = () => {
 
         {/* Applicant Information Section */}
         {currentSection === 'applicants' && (
-          <div className="space-y-6">
-            <div className="flex items-center justify-between mb-6">
-              <h2 className="text-xl font-semibold">
-                {getApplicantName(currentApplicant)} Information
-              </h2>
-            </div>
+          <Card>
+            <CardHeader>
+              <CardTitle>{getApplicantName(currentApplicant)} Information</CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-8">
+              
+              {/* Eligibility Section */}
+              <div className="space-y-4">
+                <h3 className="text-lg font-semibold">{getApplicantName(currentApplicant)}'s eligibility</h3>
+                
+                <div className="space-y-4">
+                  <div>
+                    <label className="text-sm text-muted-foreground block mb-3">
+                      In the last 3 years has this applicant had or satisfied any of the following:
+                    </label>
+                    <div className="space-y-1 mb-4">
+                      <div className="text-sm">• CCJs (Court of Decree in Scotland)</div>
+                      <div className="text-sm">• Defaults</div>
+                    </div>
+                    {renderField(`${getFieldPrefix(currentApplicant)}CCJsOrDefaults`, '', formData[`${getFieldPrefix(currentApplicant)}CCJsOrDefaults` as keyof UnifiedFormData], (value) => handleInputChange(`${getFieldPrefix(currentApplicant)}CCJsOrDefaults`, value), 'radio', ['Yes', 'No'])}
+                  </div>
+                  
+                  <div>
+                    <label className="text-sm text-muted-foreground block mb-3">
+                      In the last 12 months has this applicant:
+                    </label>
+                    <div className="space-y-1 mb-4">
+                      <div className="text-sm">• Had an active or settled debt management plan</div>
+                      <div className="text-sm">• Had any secured or unsecured arrears</div>
+                    </div>
+                    {renderField(`${getFieldPrefix(currentApplicant)}DebtManagementOrArrears`, '', formData[`${getFieldPrefix(currentApplicant)}DebtManagementOrArrears` as keyof UnifiedFormData], (value) => handleInputChange(`${getFieldPrefix(currentApplicant)}DebtManagementOrArrears`, value), 'radio', ['Yes', 'No'])}
+                  </div>
+                </div>
+              </div>
 
-            {/* Eligibility Section */}
-            <Card>
-              <CardHeader>
-                <CardTitle>Eligibility - {getApplicantName(currentApplicant)}</CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  {renderField(`${getFieldPrefix(currentApplicant)}CourtDecree`, 'Court Decree', formData[`${getFieldPrefix(currentApplicant)}CourtDecree` as keyof UnifiedFormData], (value) => handleInputChange(`${getFieldPrefix(currentApplicant)}CourtDecree`, value), 'radio', ['Yes', 'No'])}
-                  {renderField(`${getFieldPrefix(currentApplicant)}DebtManagement`, 'Debt Management Plan', formData[`${getFieldPrefix(currentApplicant)}DebtManagement` as keyof UnifiedFormData], (value) => handleInputChange(`${getFieldPrefix(currentApplicant)}DebtManagement`, value), 'radio', ['Yes', 'No'])}
+              <div className="border-t pt-8">
+                <div className="space-y-4">
+                  <h3 className="text-lg font-semibold">{getApplicantName(currentApplicant)}'s personal details</h3>
+                  <p className="text-sm text-muted-foreground">
+                    Please enter these details as they appear on a form of official identification, such as a passport or driving licence
+                  </p>
+                  
+                  <div className="space-y-4">
+                    {renderField(`${getFieldPrefix(currentApplicant)}Title`, 'Title', formData[`${getFieldPrefix(currentApplicant)}Title` as keyof UnifiedFormData], (value) => handleInputChange(`${getFieldPrefix(currentApplicant)}Title`, value), 'select', ['Mr', 'Mrs', 'Miss', 'Ms', 'Dr'])}
+                    {renderField(`${getFieldPrefix(currentApplicant)}FirstName`, 'First name', formData[`${getFieldPrefix(currentApplicant)}FirstName` as keyof UnifiedFormData], (value) => handleInputChange(`${getFieldPrefix(currentApplicant)}FirstName`, value))}
+                    {renderField(`${getFieldPrefix(currentApplicant)}MiddleName`, 'Middle name(s)', formData[`${getFieldPrefix(currentApplicant)}MiddleName` as keyof UnifiedFormData], (value) => handleInputChange(`${getFieldPrefix(currentApplicant)}MiddleName`, value))}
+                    {renderField(`${getFieldPrefix(currentApplicant)}LastName`, 'Last name', formData[`${getFieldPrefix(currentApplicant)}LastName` as keyof UnifiedFormData], (value) => handleInputChange(`${getFieldPrefix(currentApplicant)}LastName`, value))}
+                    {renderField(`${getFieldPrefix(currentApplicant)}NameChange`, 'Has this applicant changed name in the last 6 years?', formData[`${getFieldPrefix(currentApplicant)}NameChange` as keyof UnifiedFormData], (value) => handleInputChange(`${getFieldPrefix(currentApplicant)}NameChange`, value), 'radio', ['Yes', 'No'])}
+                    
+                    <div>
+                      <label className="text-sm font-medium block mb-2">Date of birth</label>
+                      <div className="grid grid-cols-3 gap-4">
+                        {renderField(`${getFieldPrefix(currentApplicant)}BirthDay`, 'Day', formData[`${getFieldPrefix(currentApplicant)}BirthDay` as keyof UnifiedFormData], (value) => handleInputChange(`${getFieldPrefix(currentApplicant)}BirthDay`, value))}
+                        {renderField(`${getFieldPrefix(currentApplicant)}BirthMonth`, 'Month', formData[`${getFieldPrefix(currentApplicant)}BirthMonth` as keyof UnifiedFormData], (value) => handleInputChange(`${getFieldPrefix(currentApplicant)}BirthMonth`, value))}
+                        {renderField(`${getFieldPrefix(currentApplicant)}BirthYear`, 'Year', formData[`${getFieldPrefix(currentApplicant)}BirthYear` as keyof UnifiedFormData], (value) => handleInputChange(`${getFieldPrefix(currentApplicant)}BirthYear`, value))}
+                      </div>
+                    </div>
+                    
+                    {renderField(`${getFieldPrefix(currentApplicant)}Nationality`, 'Nationality', formData[`${getFieldPrefix(currentApplicant)}Nationality` as keyof UnifiedFormData], (value) => handleInputChange(`${getFieldPrefix(currentApplicant)}Nationality`, value), 'radio', ['UK National', 'EEA or Swiss National', 'Non EEA'])}
+                  </div>
                 </div>
-              </CardContent>
-            </Card>
+              </div>
 
-            {/* Personal Details Section */}
-            <Card>
-              <CardHeader>
-                <CardTitle>Personal Details - {getApplicantName(currentApplicant)}</CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                  {renderField(`${getFieldPrefix(currentApplicant)}Title`, 'Title', formData[`${getFieldPrefix(currentApplicant)}Title` as keyof UnifiedFormData], (value) => handleInputChange(`${getFieldPrefix(currentApplicant)}Title`, value), 'select', ['Mr', 'Mrs', 'Miss', 'Ms', 'Dr'])}
-                  {renderField(`${getFieldPrefix(currentApplicant)}FirstName`, 'First Name', formData[`${getFieldPrefix(currentApplicant)}FirstName` as keyof UnifiedFormData], (value) => handleInputChange(`${getFieldPrefix(currentApplicant)}FirstName`, value))}
-                  {renderField(`${getFieldPrefix(currentApplicant)}MiddleName`, 'Middle Name', formData[`${getFieldPrefix(currentApplicant)}MiddleName` as keyof UnifiedFormData], (value) => handleInputChange(`${getFieldPrefix(currentApplicant)}MiddleName`, value))}
+              <div className="border-t pt-8">
+                <div className="space-y-4">
+                  <h3 className="text-lg font-semibold">{getApplicantName(currentApplicant)}'s addresses</h3>
+                  <p className="text-sm text-muted-foreground">
+                    Please provide the applicant's addresses over the last 3 years
+                  </p>
+                  
+                  <div className="space-y-4">
+                    <div className="border rounded-lg p-4 bg-muted/30">
+                      <div className="space-y-2">
+                        <div className="text-sm font-medium">Current address</div>
+                        <div className="text-sm text-muted-foreground">
+                          123 Example Street<br />
+                          Example Town<br />
+                          EX1 2MP
+                        </div>
+                        <div className="text-xs text-blue-600 cursor-pointer hover:underline">Delete address</div>
+                      </div>
+                    </div>
+                    
+                    <div className="grid grid-cols-2 gap-4">
+                      {renderField(`${getFieldPrefix(currentApplicant)}MoveInMonth`, 'Move in month', formData[`${getFieldPrefix(currentApplicant)}MoveInMonth` as keyof UnifiedFormData], (value) => handleInputChange(`${getFieldPrefix(currentApplicant)}MoveInMonth`, value), 'select', ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'])}
+                      {renderField(`${getFieldPrefix(currentApplicant)}MoveInYear`, 'Move in year', formData[`${getFieldPrefix(currentApplicant)}MoveInYear` as keyof UnifiedFormData], (value) => handleInputChange(`${getFieldPrefix(currentApplicant)}MoveInYear`, value))}
+                    </div>
+                    
+                    {renderField(`${getFieldPrefix(currentApplicant)}CurrentResidencyStatus`, 'Current residency status', formData[`${getFieldPrefix(currentApplicant)}CurrentResidencyStatus` as keyof UnifiedFormData], (value) => handleInputChange(`${getFieldPrefix(currentApplicant)}CurrentResidencyStatus`, value), 'select', ['Owner occupier with mortgage', 'Owner occupier without mortgage', 'Renting', 'Living with family'])}
+                    
+                    {renderField(`${getFieldPrefix(currentApplicant)}PlansForCurrentResidence`, 'Plans for current residence', formData[`${getFieldPrefix(currentApplicant)}PlansForCurrentResidence` as keyof UnifiedFormData], (value) => handleInputChange(`${getFieldPrefix(currentApplicant)}PlansForCurrentResidence`, value), 'select', ['Retain', 'Sell', 'Let'])}
+                    
+                    <div className="space-y-4">
+                      <h4 className="text-sm font-medium">Property sale details</h4>
+                      <div className="grid grid-cols-4 gap-4">
+                        {renderField(`${getFieldPrefix(currentApplicant)}CurrentLender`, 'Current lender', formData[`${getFieldPrefix(currentApplicant)}CurrentLender` as keyof UnifiedFormData], (value) => handleInputChange(`${getFieldPrefix(currentApplicant)}CurrentLender`, value))}
+                        {renderField(`${getFieldPrefix(currentApplicant)}CurrentMonthlyPayment`, 'Current monthly payment', formData[`${getFieldPrefix(currentApplicant)}CurrentMonthlyPayment` as keyof UnifiedFormData], (value) => handleInputChange(`${getFieldPrefix(currentApplicant)}CurrentMonthlyPayment`, value))}
+                        {renderField(`${getFieldPrefix(currentApplicant)}RemainingMortgageBalance`, 'Remaining mortgage balance', formData[`${getFieldPrefix(currentApplicant)}RemainingMortgageBalance` as keyof UnifiedFormData], (value) => handleInputChange(`${getFieldPrefix(currentApplicant)}RemainingMortgageBalance`, value))}
+                        {renderField(`${getFieldPrefix(currentApplicant)}SalePrice`, 'Sale price', formData[`${getFieldPrefix(currentApplicant)}SalePrice` as keyof UnifiedFormData], (value) => handleInputChange(`${getFieldPrefix(currentApplicant)}SalePrice`, value))}
+                      </div>
+                    </div>
+                  </div>
                 </div>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  {renderField(`${getFieldPrefix(currentApplicant)}LastName`, 'Last Name', formData[`${getFieldPrefix(currentApplicant)}LastName` as keyof UnifiedFormData], (value) => handleInputChange(`${getFieldPrefix(currentApplicant)}LastName`, value))}
-                  {renderField(`${getFieldPrefix(currentApplicant)}NameChange`, 'Name Change in Last 6 Years', formData[`${getFieldPrefix(currentApplicant)}NameChange` as keyof UnifiedFormData], (value) => handleInputChange(`${getFieldPrefix(currentApplicant)}NameChange`, value), 'radio', ['Yes', 'No'])}
-                </div>
-                <div className="grid grid-cols-3 gap-4">
-                  {renderField(`${getFieldPrefix(currentApplicant)}BirthDay`, 'Day', formData[`${getFieldPrefix(currentApplicant)}BirthDay` as keyof UnifiedFormData], (value) => handleInputChange(`${getFieldPrefix(currentApplicant)}BirthDay`, value))}
-                  {renderField(`${getFieldPrefix(currentApplicant)}BirthMonth`, 'Month', formData[`${getFieldPrefix(currentApplicant)}BirthMonth` as keyof UnifiedFormData], (value) => handleInputChange(`${getFieldPrefix(currentApplicant)}BirthMonth`, value))}
-                  {renderField(`${getFieldPrefix(currentApplicant)}BirthYear`, 'Year', formData[`${getFieldPrefix(currentApplicant)}BirthYear` as keyof UnifiedFormData], (value) => handleInputChange(`${getFieldPrefix(currentApplicant)}BirthYear`, value))}
-                </div>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  {renderField(`${getFieldPrefix(currentApplicant)}Nationality`, 'Nationality', formData[`${getFieldPrefix(currentApplicant)}Nationality` as keyof UnifiedFormData], (value) => handleInputChange(`${getFieldPrefix(currentApplicant)}Nationality`, value), 'select', ['UK Resident', 'EU Citizen', 'Other'])}
-                </div>
-              </CardContent>
-            </Card>
+              </div>
 
-            {/* Address Section */}
-            <Card>
-              <CardHeader>
-                <CardTitle>Addresses - {getApplicantName(currentApplicant)}</CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                <div className="grid grid-cols-1 gap-4">
-                  {renderField(`${getFieldPrefix(currentApplicant)}CurrentAddress`, 'Current Address', formData[`${getFieldPrefix(currentApplicant)}CurrentAddress` as keyof UnifiedFormData], (value) => handleInputChange(`${getFieldPrefix(currentApplicant)}CurrentAddress`, value))}
-                  {renderField(`${getFieldPrefix(currentApplicant)}Postcode`, 'Postcode', formData[`${getFieldPrefix(currentApplicant)}Postcode` as keyof UnifiedFormData], (value) => handleInputChange(`${getFieldPrefix(currentApplicant)}Postcode`, value))}
+              <div className="border-t pt-8">
+                <div className="space-y-4">
+                  <h3 className="text-lg font-semibold">{getApplicantName(currentApplicant)}'s employment</h3>
+                  
+                  <div className="space-y-4">
+                    {renderField(`${getFieldPrefix(currentApplicant)}JobTitle`, 'Job title', formData[`${getFieldPrefix(currentApplicant)}JobTitle` as keyof UnifiedFormData], (value) => handleInputChange(`${getFieldPrefix(currentApplicant)}JobTitle`, value))}
+                    {renderField(`${getFieldPrefix(currentApplicant)}EmployerName`, 'Employer name', formData[`${getFieldPrefix(currentApplicant)}EmployerName` as keyof UnifiedFormData], (value) => handleInputChange(`${getFieldPrefix(currentApplicant)}EmployerName`, value))}
+                    {renderField(`${getFieldPrefix(currentApplicant)}EmploymentTenure`, 'Employment tenure', formData[`${getFieldPrefix(currentApplicant)}EmploymentTenure` as keyof UnifiedFormData], (value) => handleInputChange(`${getFieldPrefix(currentApplicant)}EmploymentTenure`, value), 'radio', ['Permanent', 'Contract'])}
+                    
+                    <div>
+                      <label className="text-sm font-medium block mb-2">Start date of permanent employment</label>
+                      <div className="grid grid-cols-2 gap-4">
+                        {renderField(`${getFieldPrefix(currentApplicant)}EmploymentStartMonth`, 'Month', formData[`${getFieldPrefix(currentApplicant)}EmploymentStartMonth` as keyof UnifiedFormData], (value) => handleInputChange(`${getFieldPrefix(currentApplicant)}EmploymentStartMonth`, value), 'select', ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'])}
+                        {renderField(`${getFieldPrefix(currentApplicant)}EmploymentStartYear`, 'Year', formData[`${getFieldPrefix(currentApplicant)}EmploymentStartYear` as keyof UnifiedFormData], (value) => handleInputChange(`${getFieldPrefix(currentApplicant)}EmploymentStartYear`, value))}
+                      </div>
+                    </div>
+                    
+                    {renderField(`${getFieldPrefix(currentApplicant)}ExpectedRetirementAge`, 'Expected retirement age', formData[`${getFieldPrefix(currentApplicant)}ExpectedRetirementAge` as keyof UnifiedFormData], (value) => handleInputChange(`${getFieldPrefix(currentApplicant)}ExpectedRetirementAge`, value))}
+                    
+                    <div className="space-y-4">
+                      <p className="text-sm text-muted-foreground">
+                        Please add all additional income sources related to this applicant
+                      </p>
+                      
+                      <div className="border rounded-lg">
+                        <div className="grid grid-cols-4 gap-4 p-4 border-b bg-muted/30">
+                          <div className="text-sm font-medium">Income source</div>
+                          <div className="text-sm font-medium">Amount (£)</div>
+                          <div className="text-sm font-medium">Frequency</div>
+                          <div className="text-sm font-medium">Annual amount (£)</div>
+                        </div>
+                        <div className="grid grid-cols-4 gap-4 p-4">
+                          {renderField(`${getFieldPrefix(currentApplicant)}IncomeSource`, '', formData[`${getFieldPrefix(currentApplicant)}IncomeSource` as keyof UnifiedFormData], (value) => handleInputChange(`${getFieldPrefix(currentApplicant)}IncomeSource`, value), 'select', ['Basic salary', 'Overtime', 'Bonus', 'Commission', 'Other'])}
+                          {renderField(`${getFieldPrefix(currentApplicant)}IncomeAmount`, '', formData[`${getFieldPrefix(currentApplicant)}IncomeAmount` as keyof UnifiedFormData], (value) => handleInputChange(`${getFieldPrefix(currentApplicant)}IncomeAmount`, value))}
+                          {renderField(`${getFieldPrefix(currentApplicant)}IncomeFrequency`, '', formData[`${getFieldPrefix(currentApplicant)}IncomeFrequency` as keyof UnifiedFormData], (value) => handleInputChange(`${getFieldPrefix(currentApplicant)}IncomeFrequency`, value), 'select', ['Monthly', 'Weekly', 'Annually'])}
+                          {renderField(`${getFieldPrefix(currentApplicant)}AnnualAmount`, '', formData[`${getFieldPrefix(currentApplicant)}AnnualAmount` as keyof UnifiedFormData], (value) => handleInputChange(`${getFieldPrefix(currentApplicant)}AnnualAmount`, value))}
+                        </div>
+                      </div>
+                    </div>
+                  </div>
                 </div>
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                  {renderField(`${getFieldPrefix(currentApplicant)}MoveInDate`, 'Move In Date', formData[`${getFieldPrefix(currentApplicant)}MoveInDate` as keyof UnifiedFormData], (value) => handleInputChange(`${getFieldPrefix(currentApplicant)}MoveInDate`, value))}
-                  {renderField(`${getFieldPrefix(currentApplicant)}CurrentAddressYears`, 'Years at Address', formData[`${getFieldPrefix(currentApplicant)}CurrentAddressYears` as keyof UnifiedFormData], (value) => handleInputChange(`${getFieldPrefix(currentApplicant)}CurrentAddressYears`, value))}
-                  {renderField(`${getFieldPrefix(currentApplicant)}CurrentAddressMonths`, 'Months at Address', formData[`${getFieldPrefix(currentApplicant)}CurrentAddressMonths` as keyof UnifiedFormData], (value) => handleInputChange(`${getFieldPrefix(currentApplicant)}CurrentAddressMonths`, value))}
-                </div>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  {renderField(`${getFieldPrefix(currentApplicant)}CurrentResidencyStatus`, 'Current Residency Status', formData[`${getFieldPrefix(currentApplicant)}CurrentResidencyStatus` as keyof UnifiedFormData], (value) => handleInputChange(`${getFieldPrefix(currentApplicant)}CurrentResidencyStatus`, value), 'select', ['Owner occupier with mortgage', 'Owner occupier without mortgage', 'Renting', 'Living with family'])}
-                </div>
-              </CardContent>
-            </Card>
+              </div>
 
-            {/* Income Section */}
-            <Card>
-              <CardHeader>
-                <CardTitle>Employment & Income - {getApplicantName(currentApplicant)}</CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  {renderField(`${getFieldPrefix(currentApplicant)}EmploymentStatus`, 'Employment Status', formData[`${getFieldPrefix(currentApplicant)}EmploymentStatus` as keyof UnifiedFormData], (value) => handleInputChange(`${getFieldPrefix(currentApplicant)}EmploymentStatus`, value), 'select', ['Employed', 'Self-employed', 'Retired', 'Student', 'Unemployed'])}
-                  {renderField(`${getFieldPrefix(currentApplicant)}GrossBasicIncome`, 'Gross Basic Income', formData[`${getFieldPrefix(currentApplicant)}GrossBasicIncome` as keyof UnifiedFormData], (value) => handleInputChange(`${getFieldPrefix(currentApplicant)}GrossBasicIncome`, value))}
-                  {renderField(`${getFieldPrefix(currentApplicant)}JobTitle`, 'Job Title', formData[`${getFieldPrefix(currentApplicant)}JobTitle` as keyof UnifiedFormData], (value) => handleInputChange(`${getFieldPrefix(currentApplicant)}JobTitle`, value))}
-                  {renderField(`${getFieldPrefix(currentApplicant)}EmployerName`, 'Employer Name', formData[`${getFieldPrefix(currentApplicant)}EmployerName` as keyof UnifiedFormData], (value) => handleInputChange(`${getFieldPrefix(currentApplicant)}EmployerName`, value))}
-                  {renderField(`${getFieldPrefix(currentApplicant)}EmploymentType`, 'Employment Type', formData[`${getFieldPrefix(currentApplicant)}EmploymentType` as keyof UnifiedFormData], (value) => handleInputChange(`${getFieldPrefix(currentApplicant)}EmploymentType`, value), 'select', ['Permanent', 'Fixed Term', 'Temporary', 'Probationary'])}
-                  {renderField(`${getFieldPrefix(currentApplicant)}ExpectedRetirementAge`, 'Expected Retirement Age', formData[`${getFieldPrefix(currentApplicant)}ExpectedRetirementAge` as keyof UnifiedFormData], (value) => handleInputChange(`${getFieldPrefix(currentApplicant)}ExpectedRetirementAge`, value))}
+              <div className="border-t pt-8">
+                <div className="space-y-4">
+                  <h3 className="text-lg font-semibold">{getApplicantName(currentApplicant)}'s commitments</h3>
+                  <p className="text-sm text-muted-foreground">
+                    Please add all current commitments related to this applicant, even if they will be redeemed or consolidated upon completion. These may include, but are not limited to, credit cards, hire purchases, other mortgages, unsecured loans, and student loan repayments.
+                  </p>
+                  
+                  <div className="border rounded-lg">
+                    <div className="grid grid-cols-4 gap-4 p-4 border-b bg-muted/30">
+                      <div className="text-sm font-medium">Commitment type</div>
+                      <div className="text-sm font-medium">Provider</div>
+                      <div className="text-sm font-medium">Remaining balance</div>
+                      <div className="text-sm font-medium">Actions</div>
+                    </div>
+                    <div className="grid grid-cols-4 gap-4 p-4 items-center">
+                      {renderField(`${getFieldPrefix(currentApplicant)}CommitmentType`, '', formData[`${getFieldPrefix(currentApplicant)}CommitmentType` as keyof UnifiedFormData], (value) => handleInputChange(`${getFieldPrefix(currentApplicant)}CommitmentType`, value), 'select', ['Credit card', 'Personal loan', 'Car loan', 'Store card', 'Other'])}
+                      {renderField(`${getFieldPrefix(currentApplicant)}Provider`, '', formData[`${getFieldPrefix(currentApplicant)}Provider` as keyof UnifiedFormData], (value) => handleInputChange(`${getFieldPrefix(currentApplicant)}Provider`, value))}
+                      {renderField(`${getFieldPrefix(currentApplicant)}RemainingBalance`, '', formData[`${getFieldPrefix(currentApplicant)}RemainingBalance` as keyof UnifiedFormData], (value) => handleInputChange(`${getFieldPrefix(currentApplicant)}RemainingBalance`, value))}
+                      <div className="text-xs text-blue-600 cursor-pointer hover:underline">Delete</div>
+                    </div>
+                    <div className="p-4 border-t">
+                      <div className="flex items-center space-x-2 mb-4">
+                        <input type="checkbox" id={`${getFieldPrefix(currentApplicant)}PaidByCompletion`} className="rounded border-border" />
+                        <label htmlFor={`${getFieldPrefix(currentApplicant)}PaidByCompletion`} className="text-sm">
+                          Paid by completion (with extra payments)
+                        </label>
+                      </div>
+                      <Button variant="outline" size="sm">Add a commitment</Button>
+                    </div>
+                  </div>
+                  
+                  <div className="flex justify-end mt-6">
+                    <Button>Continue</Button>
+                  </div>
                 </div>
-              </CardContent>
-            </Card>
-
-            {/* Commitments Section */}
-            <Card>
-              <CardHeader>
-                <CardTitle>Commitments - {getApplicantName(currentApplicant)}</CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  {renderField(`${getFieldPrefix(currentApplicant)}CommitmentType`, 'Commitment Type', formData[`${getFieldPrefix(currentApplicant)}CommitmentType` as keyof UnifiedFormData], (value) => handleInputChange(`${getFieldPrefix(currentApplicant)}CommitmentType`, value), 'select', ['Credit card', 'Personal loan', 'Car loan', 'Store card', 'Other'])}
-                  {renderField(`${getFieldPrefix(currentApplicant)}Provider`, 'Provider', formData[`${getFieldPrefix(currentApplicant)}Provider` as keyof UnifiedFormData], (value) => handleInputChange(`${getFieldPrefix(currentApplicant)}Provider`, value))}
-                  {renderField(`${getFieldPrefix(currentApplicant)}MonthlyPayment`, 'Monthly Payment', formData[`${getFieldPrefix(currentApplicant)}MonthlyPayment` as keyof UnifiedFormData], (value) => handleInputChange(`${getFieldPrefix(currentApplicant)}MonthlyPayment`, value))}
-                  {renderField(`${getFieldPrefix(currentApplicant)}RemainingBalance`, 'Remaining Balance', formData[`${getFieldPrefix(currentApplicant)}RemainingBalance` as keyof UnifiedFormData], (value) => handleInputChange(`${getFieldPrefix(currentApplicant)}RemainingBalance`, value))}
-                </div>
-              </CardContent>
-            </Card>
-          </div>
+              </div>
+            </CardContent>
+          </Card>
         )}
 
         {/* Review & Submit Section */}
