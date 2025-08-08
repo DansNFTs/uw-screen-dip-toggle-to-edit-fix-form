@@ -268,6 +268,11 @@ export const EditableCommitmentsExpensesPage: React.FC = () => {
     );
   };
 
+  const handleFieldDoubleClick = (field: string) => {
+    console.log('Double clicked field:', field);
+    navigate('/commitments-expenses');
+  };
+
   const renderField = (label: string, field: string, value: string, isEven: boolean, section: string = 'Commitments & Expenses', type: 'input' | 'select' = 'input', options?: string[]) => {
     const edited = field ? isFieldEdited(field) : false;
 
@@ -301,8 +306,15 @@ export const EditableCommitmentsExpensesPage: React.FC = () => {
       );
     }
 
+    const fieldClasses = `flex w-full gap-4 text-base flex-wrap p-1 cursor-pointer hover:bg-gray-50 ${isEven ? 'bg-[#F7F8FA]' : ''}`;
+
     return (
-      <div key={field} className={`flex w-full gap-4 text-base flex-wrap p-1 ${isEven ? 'bg-[#F7F8FA]' : ''}`}>
+      <div 
+        key={field} 
+        className={fieldClasses}
+        onDoubleClick={() => handleFieldDoubleClick(field)}
+        title="Double-click to edit this field"
+      >
         <div className="text-[#505A5F] font-normal flex-1 shrink basis-[0%]">
           {label}
         </div>
