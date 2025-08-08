@@ -269,7 +269,7 @@ export const EditableCommitmentsExpensesPage: React.FC = () => {
   };
 
   const handleFieldDoubleClick = (field: string) => {
-    if (!isEditMode) {
+    if (!isEditingEnabled) {
       toast({
         title: "Enable editing first",
         description: "Please enable editing mode to modify fields.",

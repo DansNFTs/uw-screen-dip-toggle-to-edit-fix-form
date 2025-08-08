@@ -153,7 +153,7 @@ export const EditableIncomeEmploymentPage: React.FC = () => {
   const handleFieldDoubleClick = (field: string) => {
     console.log('Double clicked field:', field);
     // Check if editing is enabled
-    if (!isEditMode) {
+    if (!isEditingEnabled) {
       toast({
         title: "Enable editing first",
         description: "Please enable editing mode to modify fields.",
