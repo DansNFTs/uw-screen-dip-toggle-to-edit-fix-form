@@ -19,6 +19,7 @@ interface UnifiedFormData {
   bankruptcySubject: string;
   ivaSubject: string;
   propertyRepossessed: string;
+  applicantSubjectTo: string;
   applicationPurpose: string;
   applicationType: string;
   residentialSubType: string;
@@ -164,9 +165,10 @@ export const UnifiedDataCaptureForm: React.FC = () => {
     bankruptcySubject: 'No',
     ivaSubject: 'No', 
     propertyRepossessed: 'No',
-    applicationPurpose: 'Purchase',
-    applicationType: 'Standard Residential',
-    residentialSubType: 'Home Mover',
+    applicantSubjectTo: 'No',
+    applicationPurpose: 'Residential',
+    applicationType: 'Purchase',
+    residentialSubType: 'Standard',
     propertyRegion: 'England',
     totalPurchasePrice: '£280,000.00',
     depositAmount: '£70,000.00',
@@ -519,99 +521,39 @@ export const UnifiedDataCaptureForm: React.FC = () => {
             <div className="mb-8">
               <h2 className="text-xl font-semibold mb-6">Mortgage details</h2>
               
-              {/* Bankruptcy/IVA Questions */}
+              {/* Combined Bankruptcy/IVA Question */}
               <div className="mb-8">
                 <h3 className="text-base font-medium mb-4 text-gray-900">Have any applicants been subject to:</h3>
-                <div className="space-y-4 ml-4">
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">• Bankruptcy</label>
-                    <div className="flex space-x-6">
-                      <label className="flex items-center">
-                        <input
-                          type="radio"
-                          name="bankruptcySubject"
-                          value="Yes"
-                          checked={formData.bankruptcySubject === 'Yes'}
-                          onChange={(e) => handleInputChange('bankruptcySubject', e.target.value)}
-                          className="mr-2 h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300"
-                          disabled={!isEditMode}
-                        />
-                        <span className="text-sm text-gray-700">Yes</span>
-                      </label>
-                      <label className="flex items-center">
-                        <input
-                          type="radio"
-                          name="bankruptcySubject"
-                          value="No"
-                          checked={formData.bankruptcySubject === 'No'}
-                          onChange={(e) => handleInputChange('bankruptcySubject', e.target.value)}
-                          className="mr-2 h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300"
-                          disabled={!isEditMode}
-                        />
-                        <span className="text-sm text-gray-700">No</span>
-                      </label>
-                    </div>
-                  </div>
-                  
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">• Individual Voluntary Arrangement (IVA)</label>
-                    <div className="flex space-x-6">
-                      <label className="flex items-center">
-                        <input
-                          type="radio"
-                          name="ivaSubject"
-                          value="Yes"
-                          checked={formData.ivaSubject === 'Yes'}
-                          onChange={(e) => handleInputChange('ivaSubject', e.target.value)}
-                          className="mr-2 h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300"
-                          disabled={!isEditMode}
-                        />
-                        <span className="text-sm text-gray-700">Yes</span>
-                      </label>
-                      <label className="flex items-center">
-                        <input
-                          type="radio"
-                          name="ivaSubject"
-                          value="No"
-                          checked={formData.ivaSubject === 'No'}
-                          onChange={(e) => handleInputChange('ivaSubject', e.target.value)}
-                          className="mr-2 h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300"
-                          disabled={!isEditMode}
-                        />
-                        <span className="text-sm text-gray-700">No</span>
-                      </label>
-                    </div>
-                  </div>
-                  
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">• Property being repossessed</label>
-                    <div className="flex space-x-6">
-                      <label className="flex items-center">
-                        <input
-                          type="radio"
-                          name="propertyRepossessed"
-                          value="Yes"
-                          checked={formData.propertyRepossessed === 'Yes'}
-                          onChange={(e) => handleInputChange('propertyRepossessed', e.target.value)}
-                          className="mr-2 h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300"
-                          disabled={!isEditMode}
-                        />
-                        <span className="text-sm text-gray-700">Yes</span>
-                      </label>
-                      <label className="flex items-center">
-                        <input
-                          type="radio"
-                          name="propertyRepossessed"
-                          value="No"
-                          checked={formData.propertyRepossessed === 'No'}
-                          onChange={(e) => handleInputChange('propertyRepossessed', e.target.value)}
-                          className="mr-2 h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300"
-                          disabled={!isEditMode}
-                        />
-                        <span className="text-sm text-gray-700">No</span>
-                      </label>
-                    </div>
-                  </div>
+                <div className="ml-4 space-y-2 mb-4">
+                  <div className="text-sm text-gray-700">• bankruptcy which has not been satisfied for at least 3 years?</div>
+                  <div className="text-sm text-gray-700">• an individual voluntary arrangement (IVA) or debt relief order (DRO) that has not been satisfied for at least 3 years?</div>
+                  <div className="text-sm text-gray-700">• property repossession at any time?</div>
+                </div>
+                <div className="flex space-x-6">
+                  <label className="flex items-center">
+                    <input
+                      type="radio"
+                      name="applicantSubjectTo"
+                      value="Yes"
+                      checked={formData.applicantSubjectTo === 'Yes'}
+                      onChange={(e) => handleInputChange('applicantSubjectTo', e.target.value)}
+                      className="mr-2 h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300"
+                      disabled={!isEditMode}
+                    />
+                    <span className="text-sm text-gray-700">Yes</span>
+                  </label>
+                  <label className="flex items-center">
+                    <input
+                      type="radio"
+                      name="applicantSubjectTo"
+                      value="No"
+                      checked={formData.applicantSubjectTo === 'No'}
+                      onChange={(e) => handleInputChange('applicantSubjectTo', e.target.value)}
+                      className="mr-2 h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300"
+                      disabled={!isEditMode}
+                    />
+                    <span className="text-sm text-gray-700">No</span>
+                  </label>
                 </div>
               </div>
 
@@ -619,45 +561,79 @@ export const UnifiedDataCaptureForm: React.FC = () => {
               <div className="grid grid-cols-1 gap-6">
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">Application purpose</label>
-                  <select
-                    value={formData.applicationPurpose}
-                    onChange={(e) => handleInputChange('applicationPurpose', e.target.value)}
-                    disabled={!isEditMode}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white"
-                  >
-                    <option value="Purchase">Purchase</option>
-                    <option value="Remortgage">Remortgage</option>
-                    <option value="Transfer of Equity">Transfer of Equity</option>
-                  </select>
+                  <div className="flex space-x-6">
+                    <label className="flex items-center">
+                      <input
+                        type="radio"
+                        name="applicationPurpose"
+                        value="Residential"
+                        checked={formData.applicationPurpose === 'Residential'}
+                        onChange={(e) => handleInputChange('applicationPurpose', e.target.value)}
+                        className="mr-2 h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300"
+                        disabled={!isEditMode}
+                      />
+                      <span className="text-sm text-gray-700">Residential</span>
+                    </label>
+                    <label className="flex items-center">
+                      <input
+                        type="radio"
+                        name="applicationPurpose"
+                        value="Buy to Let"
+                        checked={formData.applicationPurpose === 'Buy to Let'}
+                        onChange={(e) => handleInputChange('applicationPurpose', e.target.value)}
+                        className="mr-2 h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300"
+                        disabled={!isEditMode}
+                      />
+                      <span className="text-sm text-gray-700">Buy to Let</span>
+                    </label>
+                  </div>
                 </div>
 
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">Application type</label>
-                  <select
-                    value={formData.applicationType}
-                    onChange={(e) => handleInputChange('applicationType', e.target.value)}
-                    disabled={!isEditMode}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white"
-                  >
-                    <option value="Standard Residential">Standard Residential</option>
-                    <option value="Buy to Let">Buy to Let</option>
-                    <option value="Right to Buy">Right to Buy</option>
-                  </select>
+                  <div className="flex space-x-6">
+                    <label className="flex items-center">
+                      <input
+                        type="radio"
+                        name="applicationType"
+                        value="Purchase"
+                        checked={formData.applicationType === 'Purchase'}
+                        onChange={(e) => handleInputChange('applicationType', e.target.value)}
+                        className="mr-2 h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300"
+                        disabled={!isEditMode}
+                      />
+                      <span className="text-sm text-gray-700">Purchase</span>
+                    </label>
+                    <label className="flex items-center">
+                      <input
+                        type="radio"
+                        name="applicationType"
+                        value="Remortgage"
+                        checked={formData.applicationType === 'Remortgage'}
+                        onChange={(e) => handleInputChange('applicationType', e.target.value)}
+                        className="mr-2 h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300"
+                        disabled={!isEditMode}
+                      />
+                      <span className="text-sm text-gray-700">Remortgage</span>
+                    </label>
+                  </div>
                 </div>
 
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">Residential sub-type</label>
-                  <select
-                    value={formData.residentialSubType}
-                    onChange={(e) => handleInputChange('residentialSubType', e.target.value)}
-                    disabled={!isEditMode}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white"
-                  >
-                    <option value="First Time Buyer">First Time Buyer</option>
-                    <option value="Home Mover">Home Mover</option>
-                    <option value="Remortgage">Remortgage</option>
-                  </select>
-                </div>
+                {formData.applicationType === 'Purchase' && (
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">Residential purchase sub-type</label>
+                    <select
+                      value={formData.residentialSubType}
+                      onChange={(e) => handleInputChange('residentialSubType', e.target.value)}
+                      disabled={!isEditMode}
+                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white"
+                    >
+                      <option value="Standard">Standard</option>
+                      <option value="First Time Buyer">First Time Buyer</option>
+                      <option value="Home Mover">Home Mover</option>
+                    </select>
+                  </div>
+                )}
 
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">Property region</label>
