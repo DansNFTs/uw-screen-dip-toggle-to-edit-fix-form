@@ -17,7 +17,7 @@ import { FieldComparisonModal } from './FieldComparisonModal';
 import { AffordabilityWarningDialog } from './AffordabilityWarningDialog';
 
 export const EditableCommitmentsExpensesPage: React.FC = () => {
-  const { isEditMode, hasUnsavedChanges, hasSavedChanges, toggleEditMode, setHasUnsavedChanges, saveChanges, saveAndResubmit, exitEditMode, storeOriginalState, restoreAllOriginalState } = useEditMode();
+  const { isEditingEnabled, isEditMode, hasUnsavedChanges, hasSavedChanges, toggleEditMode, setHasUnsavedChanges, saveChanges, saveAndResubmit, exitEditMode, storeOriginalState, restoreAllOriginalState } = useEditMode();
   const { addAuditEntry, auditLog, currentSessionId, startAuditSession, endAuditSession, cancelAuditSession } = useAudit();
   const { getFormattedApplicantNames } = useApplicantData();
   const { addCaseNote } = useCaseNotes();
@@ -269,10 +269,19 @@ export const EditableCommitmentsExpensesPage: React.FC = () => {
   };
 
   const handleFieldDoubleClick = (field: string) => {
+    if (!isEditMode) {
+      toast({
+        title: "Enable editing first",
+        description: "Please enable editing mode to modify fields.",
+      });
+      return;
+    }
+    
     console.log('Double clicked field:', field);
     // Navigate to unified data capture form - determine applicant number based on field prefix
     const applicantNumber = field.startsWith('james') ? 1 : 2;
-    navigate(`/data-capture/applicants/${applicantNumber}`);
+    const currentPath = window.location.pathname;
+    navigate(`/data-capture/applicants/${applicantNumber}?field=${field}&from=${encodeURIComponent(currentPath)}`);
   };
 
   const renderField = (label: string, field: string, value: string, isEven: boolean, section: string = 'Commitments & Expenses', type: 'input' | 'select' = 'input', options?: string[]) => {
@@ -308,14 +317,14 @@ export const EditableCommitmentsExpensesPage: React.FC = () => {
       );
     }
 
-    const fieldClasses = `flex w-full gap-4 text-base flex-wrap p-1 cursor-pointer hover:bg-gray-50 ${isEven ? 'bg-[#F7F8FA]' : ''}`;
+    const fieldClasses = `flex w-full gap-4 text-base flex-wrap p-1 ${isEditingEnabled ? 'cursor-pointer hover:bg-gray-50' : 'cursor-not-allowed opacity-60'} ${isEven ? 'bg-[#F7F8FA]' : ''}`;
 
     return (
       <div 
         key={field} 
         className={fieldClasses}
-        onDoubleClick={() => handleFieldDoubleClick(field)}
-        title="Double-click to edit this field"
+        onDoubleClick={() => isEditingEnabled && handleFieldDoubleClick(field)}
+        title={isEditingEnabled ? "Double-click to edit this field" : "Enable editing to modify this field"}
       >
         <div className="text-[#505A5F] font-normal flex-1 shrink basis-[0%]">
           {label}

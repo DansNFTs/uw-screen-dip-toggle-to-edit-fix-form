@@ -226,11 +226,20 @@ export const EditablePersonalDetailsPage: React.FC = () => {
   };
 
   const handleFieldDoubleClick = (field: string) => {
+    if (!isEditingEnabled) {
+      toast({
+        title: "Enable editing first",
+        description: "Please enable editing mode to modify fields.",
+      });
+      return;
+    }
+    
     console.log('Double clicked field:', field);
     // Enter edit mode and navigate to unified data capture form for the correct applicant
     setIsEditMode(true);
     const applicantNumber = field.startsWith('james') ? 1 : 2;
-    navigate(`/data-capture/applicants/${applicantNumber}`);
+    const currentPath = window.location.pathname;
+    navigate(`/data-capture/applicants/${applicantNumber}?field=${field}&from=${encodeURIComponent(currentPath)}`);
   };
 
   const handleFieldComparisonClick = (fieldName: string) => {

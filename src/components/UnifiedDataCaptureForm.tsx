@@ -1,20 +1,19 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { Button } from '@/components/ui/button';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { useEditMode } from '@/contexts/EditModeContext';
-import { useAudit } from '@/contexts/AuditContext';
-import { useToast } from '@/hooks/use-toast';
-import { useApplicantData } from '@/contexts/ApplicantDataContext';
-import { Clock, Plus, ArrowLeft, Check, AlertTriangle } from 'lucide-react';
-import { FieldComparisonModal } from '@/components/FieldComparisonModal';
-import { SidebarProvider, SidebarInset } from "@/components/ui/sidebar";
-import { ScrollArea } from "@/components/ui/scroll-area";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
+import { Clock } from 'lucide-react';
+import { useEditMode } from '../contexts/EditModeContext';
+import { useAudit } from '../contexts/AuditContext';
+import { useApplicantData } from '../contexts/ApplicantDataContext';
+import { useToast } from "@/hooks/use-toast";
+import { useParams, useSearchParams, useNavigate } from 'react-router-dom';
+import { FieldComparisonModal } from './FieldComparisonModal';
 
 interface UnifiedFormData {
   // Mortgage Details
@@ -81,6 +80,15 @@ interface UnifiedFormData {
   jamesProvider: string;
   jamesMonthlyPayment: string;
   jamesRemainingBalance: string;
+  jamesBasicIncome: string;
+  jamesEmploymentTenure: string;
+  jamesEmploymentStartDate: string;
+  jamesTimeInEmployment: string;
+  jamesAgeAtEndOfTerm: string;
+  jamesProbationaryPeriod: string;
+  jamesRedundancyPeriod: string;
+  jamesFutureChanges: string;
+  jamesMonthlyPreTaxSalary: string;
   
   // Jane Taylor (Applicant 2)
   janeCourtDecree: string;
@@ -123,89 +131,108 @@ interface UnifiedFormData {
   janeProvider: string;
   janeMonthlyPayment: string;
   janeRemainingBalance: string;
+  janeBasicIncome: string;
+  janeEmploymentTenure: string;
+  janeEmploymentStartDate: string;
+  janeTimeInEmployment: string;
+  janeAgeAtEndOfTerm: string;
+  janeProbationaryPeriod: string;
+  janeRedundancyPeriod: string;
+  janeFutureChanges: string;
+  janeMonthlyPreTaxSalary: string;
 }
 
 export const UnifiedDataCaptureForm: React.FC = () => {
-  const { section, applicantNumber } = useParams<{ section?: string; applicantNumber?: string }>();
+  const { isEditingEnabled, isEditMode, hasUnsavedChanges, setIsEditMode, setHasUnsavedChanges, saveChanges, exitEditMode, storeOriginalState, restoreAllOriginalState } = useEditMode();
+  const { addAuditEntry, auditLog, currentSessionId, startAuditSession, endAuditSession, cancelAuditSession } = useAudit();
+  const { applicantData, updateApplicantData, getFormattedApplicantNames } = useApplicantData();
+  const { toast } = useToast();
+  const params = useParams();
+  const [searchParams] = useSearchParams();
   const navigate = useNavigate();
-  const { applicantData, updateApplicantData } = useApplicantData();
-  
-  const [activeTab, setActiveTab] = useState(section || 'mortgage');
-  const [activeApplicant, setActiveApplicant] = useState(applicantNumber ? parseInt(applicantNumber) : 1);
-  
-  const [formData, setFormData] = useState<UnifiedFormData>({
+
+  const initialFormData: UnifiedFormData = {
     // Mortgage Details
     bankruptcySubject: 'No',
-    ivaSubject: 'No',
+    ivaSubject: 'No', 
     propertyRepossessed: 'No',
-    applicationPurpose: 'Residential',
-    applicationType: 'Purchase',
-    residentialSubType: 'Standard',
-    propertyRegion: 'North',
-    totalPurchasePrice: '£590,000',
-    depositAmount: '£75,000',
-    requiredLoanAmount: '£515,000',
-    loanToValue: '70%',
+    applicationPurpose: 'Purchase',
+    applicationType: 'Standard Residential',
+    residentialSubType: 'Home Mover',
+    propertyRegion: 'England',
+    totalPurchasePrice: '£280,000.00',
+    depositAmount: '£70,000.00',
+    requiredLoanAmount: '£210,000.00',
+    loanToValue: '75.00%',
     termYears: '25',
     repaymentType: 'Repayment',
-    monthlyGroundRent: '£0',
-    initialFixedTerm: 'No',
-    numberOfApplicants: 'Two',
+    monthlyGroundRent: '£0.00',
+    initialFixedTerm: '2 years',
+    numberOfApplicants: '2',
     sameAddress: 'Yes',
     dependentsUnder13: '2',
     childBenefit: 'No',
     dependents14Plus: '0',
-    expenditureCalculation: 'ONS',
-    
-    // James Taylor data
+    expenditureCalculation: 'Auto',
+
+    // James Taylor defaults
     jamesCourtDecree: 'No',
     jamesDebtManagement: 'No',
-    jamesTitle: applicantData.jamesTitle,
-    jamesFirstName: applicantData.jamesFirstName,
-    jamesMiddleName: applicantData.jamesMiddleName,
-    jamesLastName: applicantData.jamesLastName,
+    jamesTitle: applicantData.jamesTitle || 'Mr',
+    jamesFirstName: applicantData.jamesFirstName || 'James',
+    jamesMiddleName: applicantData.jamesMiddleName || '',
+    jamesLastName: applicantData.jamesLastName || 'Taylor',
     jamesNameChange: 'No',
     jamesBirthDay: '11',
     jamesBirthMonth: '11',
     jamesBirthYear: '1988',
     jamesNationality: 'UK Resident',
-    jamesCurrentAddress: '12 Longwood Close',
-    jamesPostcode: '',
-    jamesMoveInDate: '',
-    jamesCurrentAddressYears: '1',
-    jamesCurrentAddressMonths: '0',
-    jamesCurrentResidencyStatus: 'Owner occupation with mortgage',
+    jamesCurrentAddress: '12 Longwood Close, NEWCASTLE UPON TYNE, Tyne and Wear',
+    jamesPostcode: 'NE16 5QB',
+    jamesMoveInDate: '01/01/2015',
+    jamesCurrentAddressYears: '9',
+    jamesCurrentAddressMonths: '3',
+    jamesCurrentResidencyStatus: 'Owner occupier with mortgage',
     jamesPreviousAddress: '',
     jamesPreviousAddressYears: '',
     jamesPreviousAddressMonths: '',
-    jamesSalePrice: '',
-    jamesCurrentLender: '',
-    jamesOutstandingMortgageBalance: '',
-    jamesPlansForProperty: '',
-    jamesExpectedRemainingBalance: '',
+    jamesSalePrice: '£200,000.00',
+    jamesCurrentLender: 'Barclays',
+    jamesOutstandingMortgageBalance: '£56,000.00',
+    jamesPlansForProperty: 'Selling current main residence',
+    jamesExpectedRemainingBalance: '£56,000.00',
     jamesEmploymentStatus: 'Employed',
-    jamesGrossBasicIncome: '£52000.00',
+    jamesGrossBasicIncome: '£50,000.00',
     jamesFrequency: 'Yearly',
-    jamesAnnualAmount: '£52,000.00',
-    jamesMonthlyNetSalary: '£4333',
-    jamesJobTitle: 'Software Engineer',
-    jamesEmployerName: 'NBS',
+    jamesAnnualAmount: '£50,000.00',
+    jamesMonthlyNetSalary: '£3,200.00',
+    jamesJobTitle: 'Accountant',
+    jamesEmployerName: 'ABC Accountant',
     jamesEmploymentType: 'Permanent',
-    jamesStartMonth: '9',
-    jamesStartYear: '2008',
+    jamesStartMonth: '04',
+    jamesStartYear: '2016',
     jamesExpectedRetirementAge: '70',
     jamesCommitmentType: 'Credit card',
-    jamesProvider: 'Bank',
-    jamesMonthlyPayment: '£100.00',
-    jamesRemainingBalance: '£5,000.00',
-    
-    // Jane Taylor data
+    jamesProvider: 'Tesco',
+    jamesMonthlyPayment: '£0.00',
+    jamesRemainingBalance: '£300.00',
+    jamesBasicIncome: '£52,000',
+    jamesEmploymentTenure: 'Permanent',
+    jamesEmploymentStartDate: '01/04/2016',
+    jamesTimeInEmployment: '9 years and 3 months',
+    jamesAgeAtEndOfTerm: '61 years',
+    jamesProbationaryPeriod: 'No',
+    jamesRedundancyPeriod: 'No',
+    jamesFutureChanges: 'No',
+    jamesMonthlyPreTaxSalary: '£0.00',
+
+    // Jane Taylor defaults
     janeCourtDecree: 'No',
     janeDebtManagement: 'No',
-    janeTitle: applicantData.janeTitle,
-    janeFirstName: applicantData.janeFirstName,
-    janeMiddleName: applicantData.janeMiddleName,
-    janeLastName: applicantData.janeLastName,
+    janeTitle: applicantData.janeTitle || 'Mrs',
+    janeFirstName: applicantData.janeFirstName || 'Jane',
+    janeMiddleName: applicantData.janeMiddleName || '',
+    janeLastName: applicantData.janeLastName || 'Taylor',
     janeNameChange: 'No',
     janeBirthDay: '04',
     janeBirthMonth: '04',
@@ -215,7 +242,7 @@ export const UnifiedDataCaptureForm: React.FC = () => {
     janePostcode: 'NE16 5QB',
     janeMoveInDate: '01/04/2015',
     janeCurrentAddressYears: '9',
-    janeCurrentAddressMonths: '0',
+    janeCurrentAddressMonths: '1',
     janeCurrentResidencyStatus: 'Owner occupier with mortgage',
     janePreviousAddress: '',
     janePreviousAddressYears: '',
@@ -226,72 +253,179 @@ export const UnifiedDataCaptureForm: React.FC = () => {
     janePlansForProperty: 'Selling current main residence',
     janeExpectedRemainingBalance: '£56,000.00',
     janeEmploymentStatus: 'Employed',
-    janeGrossBasicIncome: '£50000.00',
+    janeGrossBasicIncome: '£35,000.00',
     janeFrequency: 'Yearly',
-    janeAnnualAmount: '£50,000.00',
-    janeMonthlyNetSalary: '£4167',
-    janeJobTitle: 'Manager',
-    janeEmployerName: 'NHS',
+    janeAnnualAmount: '£35,000.00',
+    janeMonthlyNetSalary: '£2,400.00',
+    janeJobTitle: 'Teacher',
+    janeEmployerName: 'Newcastle Primary School',
     janeEmploymentType: 'Permanent',
-    janeStartMonth: '9',
+    janeStartMonth: '09',
     janeStartYear: '2019',
     janeExpectedRetirementAge: '70',
-    janeCommitmentType: 'Credit card',
+    janeCommitmentType: 'Personal loan',
     janeProvider: 'Bank',
     janeMonthlyPayment: '£100.00',
-    janeRemainingBalance: '£5,000.00'
-  });
+    janeRemainingBalance: '£5,000.00',
+    janeBasicIncome: '£50,000',
+    janeEmploymentTenure: 'Permanent',
+    janeEmploymentStartDate: '01/09/2019',
+    janeTimeInEmployment: '5 years and 10 months',
+    janeAgeAtEndOfTerm: '60 years',
+    janeProbationaryPeriod: 'No',
+    janeRedundancyPeriod: 'No',
+    janeFutureChanges: 'No',
+    janeMonthlyPreTaxSalary: '£60.00'
+  };
 
+  const [formData, setFormData] = useState(initialFormData);
   const [originalFormData, setOriginalFormData] = useState(formData);
+  const [activeTab, setActiveTab] = useState("mortgage-details");
+  const [activeApplicant, setActiveApplicant] = useState(1);
   const [comparisonField, setComparisonField] = useState<string | null>(null);
-  const fieldRefs = useRef<Record<string, HTMLElement | null>>({});
+  const sectionRefs = useRef<{ [key: string]: HTMLDivElement | null }>({});
+  const fieldRefs = useRef<{ [key: string]: HTMLInputElement | HTMLButtonElement | null }>({});
 
-  const { isEditingEnabled, isEditMode, setIsEditMode, hasUnsavedChanges, setHasUnsavedChanges } = useEditMode();
-  const { startAuditSession, endAuditSession, addAuditEntry, auditLog } = useAudit();
-  const { toast } = useToast();
+  // Field targeting from URL parameters
+  const targetField = searchParams.get('field');
+  const targetApplicant = params.applicantNumber ? parseInt(params.applicantNumber) : null;
 
+  // Handle field targeting and auto-focus
   useEffect(() => {
-    if (isEditMode) {
-      setOriginalFormData(formData);
-      startAuditSession();
+    if (targetField && targetApplicant && isEditMode) {
+      console.log('Targeting field:', targetField, 'for applicant:', targetApplicant);
+      
+      // Set the active applicant
+      setActiveApplicant(targetApplicant);
+      
+      // Determine section and set active tab
+      const section = getSectionFromField(targetField);
+      if (section) {
+        setActiveTab(section);
+      }
+      
+      // Focus on the field after a delay to ensure the DOM is ready
+      setTimeout(() => {
+        const fieldRef = fieldRefs.current[targetField];
+        if (fieldRef) {
+          fieldRef.focus();
+          fieldRef.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }
+      }, 500);
     }
-  }, [isEditMode]);
+  }, [targetField, targetApplicant, isEditMode]);
+
+  // Handle initialization and cleanup
+  useEffect(() => {
+    if (isEditMode && !currentSessionId) {
+      startAuditSession();
+      Object.entries(formData).forEach(([key, value]) => {
+        storeOriginalState(`formData.${key}`, value);
+      });
+    }
+  }, [isEditMode, currentSessionId, storeOriginalState, startAuditSession]);
 
   useEffect(() => {
     const handleEditModeCancel = () => {
-      setFormData(originalFormData);
-      endAuditSession();
+      const originalState = restoreAllOriginalState();
+      const restoredFormData: any = {};
+      
+      Object.keys(initialFormData).forEach(key => {
+        const originalValue = originalState[`formData.${key}`];
+        if (originalValue !== undefined) {
+          restoredFormData[key] = originalValue;
+        } else {
+          restoredFormData[key] = initialFormData[key as keyof UnifiedFormData];
+        }
+      });
+      
+      setFormData(restoredFormData);
+      cancelAuditSession();
     };
 
     window.addEventListener('editModeCancel', handleEditModeCancel);
     return () => window.removeEventListener('editModeCancel', handleEditModeCancel);
-  }, [originalFormData, endAuditSession]);
+  }, [restoreAllOriginalState, cancelAuditSession, initialFormData]);
 
   const handleInputChange = (field: string, value: string) => {
-    if (!isEditMode) return; // block changes unless in edit mode
     const oldValue = formData[field as keyof UnifiedFormData];
-    if (oldValue !== value) {
-      setFormData(prev => ({ ...prev, [field]: value }));
-      addAuditEntry(field, oldValue, value, 'Unified Data Capture');
-      setHasUnsavedChanges(true);
+    
+    setFormData(prev => ({
+      ...prev,
+      [field]: value
+    }));
+    
+    addAuditEntry(field, oldValue, value, 'Unified Data Capture');
+    setHasUnsavedChanges(true);
+    
+    // Update ApplicantDataContext for name fields
+    if (field.includes('Title') || field.includes('FirstName') || field.includes('MiddleName') || field.includes('LastName')) {
+      updateApplicantData({ [field]: value });
+    }
+  };
+
+  const handleMainButtonClick = () => {
+    if (hasUnsavedChanges) {
+      setIsEditMode(false);
+      setHasUnsavedChanges(false);
       
-      // Update ApplicantDataContext for name-related fields
-      if (field.includes('Title') || field.includes('FirstName') || field.includes('MiddleName') || field.includes('LastName')) {
-        const contextField = field.replace('james', '').replace('jane', '');
-        const prefix = field.startsWith('james') ? 'james' : 'jane';
-        const finalField = `${prefix}${contextField}`;
-        updateApplicantData({ [finalField]: value });
-      }
+      // Restore original state
+      const originalState = restoreAllOriginalState();
+      const restoredFormData: any = {};
+      
+      Object.keys(initialFormData).forEach(key => {
+        const originalValue = originalState[`formData.${key}`];
+        if (originalValue !== undefined) {
+          restoredFormData[key] = originalValue;
+        } else {
+          restoredFormData[key] = initialFormData[key as keyof UnifiedFormData];
+        }
+      });
+      
+      setFormData(restoredFormData);
+      cancelAuditSession();
+      
+      // Navigate back to the originating page
+      navigateBackToOriginalPage();
+      
+      toast({
+        title: "Changes discarded",
+        description: "Your changes have been discarded and original values restored.",
+      });
+    } else {
+      setIsEditMode(true);
+    }
+  };
+
+  // Helper function to determine section from field name
+  const getSectionFromField = (fieldName: string): string => {
+    if (fieldName.includes('mortgage') || fieldName.includes('loan') || fieldName.includes('household')) {
+      return 'mortgage-details';
+    }
+    return 'applicant-information';
+  };
+
+  // Helper function to navigate back to original page
+  const navigateBackToOriginalPage = () => {
+    const referrer = searchParams.get('from');
+    if (referrer) {
+      navigate(decodeURIComponent(referrer));
+    } else {
+      // Default navigation based on field type or current context
+      navigate('/');
     }
   };
 
   const handleSave = () => {
+    saveChanges();
     endAuditSession();
-    setHasUnsavedChanges(false);
-    setIsEditMode(false);
+    
+    // Navigate back to the originating page
+    navigateBackToOriginalPage();
+    
     toast({
-      title: "Changes saved successfully",
-      description: "All data has been updated.",
+      title: "Changes saved",
+      description: "Your data has been successfully saved.",
     });
   };
 
@@ -303,538 +437,406 @@ export const UnifiedDataCaptureForm: React.FC = () => {
     setComparisonField(fieldName);
   };
 
-  const getButtonText = () => {
-    return hasUnsavedChanges ? "Save" : "Exit Edit Mode";
-  };
-
-  const getButtonVariant = () => {
-    return hasUnsavedChanges ? "default" : "outline";
-  };
-
-  const handleMainButtonClick = () => {
-    if (hasUnsavedChanges) {
-      handleSave();
-    } else {
-      setIsEditMode(false);
-    }
-  };
-
   const renderField = (
-    field: keyof UnifiedFormData,
-    label: string,
+    fieldName: string, 
+    label: string, 
+    value: string, 
+    onChange: (value: string) => void,
     type: 'input' | 'select' | 'radio' = 'input',
-    options?: { value: string; label: string }[] | string[]
+    options?: string[]
   ) => {
-    const value = formData[field];
-    const fieldName = field as string;
-
-    if (type === 'select') {
+    const edited = isFieldEdited(fieldName);
+    
+    // Show inactive state if editing is not enabled and not in edit mode
+    if (!isEditingEnabled && !isEditMode) {
       return (
-        <div
-          onDoubleClick={() => {
-            if (!isEditingEnabled) {
-              toast({ title: 'Enable editing to make changes' });
-              return;
-            }
-            if (!isEditMode) {
-              setIsEditMode(true);
-              setTimeout(() => {
-                const el = fieldRefs.current[fieldName] as HTMLElement | null;
-                el?.focus?.();
-              }, 0);
-            }
-          }}
-          className="select-none"
-        >
-          <div className="space-y-2">
-            <Label htmlFor={fieldName}>{label}</Label>
-            <Select
+        <div className="space-y-2">
+          <Label className="text-sm font-medium opacity-50">{label}</Label>
+          <div className="p-2 bg-gray-50 border border-gray-200 rounded-md opacity-50">
+            <span className="text-gray-600">{value || 'Not set'}</span>
+          </div>
+        </div>
+      );
+    }
+
+    // Show toast and return inactive if editing is not enabled but user tries to interact
+    if (!isEditingEnabled) {
+      const handleClick = () => {
+        toast({
+          title: "Enable editing first",
+          description: "Please enable editing mode to modify fields.",
+        });
+      };
+
+      return (
+        <div className="space-y-2" onClick={handleClick}>
+          <Label className="text-sm font-medium">{label}</Label>
+          <div className="p-2 bg-gray-50 border border-gray-200 rounded-md cursor-pointer hover:bg-gray-100">
+            <span className="text-gray-700">{value || 'Not set'}</span>
+          </div>
+        </div>
+      );
+    }
+
+    // Show edit mode version
+    if (isEditMode) {
+      return (
+        <div className="space-y-2">
+          <Label htmlFor={fieldName} className="text-sm font-medium">
+            {label}
+            {edited && (
+              <TooltipProvider>
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <button 
+                      onClick={() => handleFieldComparisonClick(fieldName)}
+                      className="ml-2 text-blue-500 hover:text-blue-700"
+                    >
+                      <Clock className="w-3 h-3" />
+                    </button>
+                  </TooltipTrigger>
+                  <TooltipContent>
+                    <p>This field has been edited. Click to view audit log.</p>
+                  </TooltipContent>
+                </Tooltip>
+              </TooltipProvider>
+            )}
+          </Label>
+          
+          {type === 'input' && (
+            <Input
+              id={fieldName}
+              ref={(ref) => fieldRefs.current[fieldName] = ref}
               value={value}
-              onValueChange={(newValue) => handleInputChange(fieldName, newValue)}
-            >
-              <SelectTrigger
-                ref={(el) => { fieldRefs.current[fieldName] = el; }}
-                className={`w-full ${!isEditMode ? 'opacity-60 pointer-events-none' : ''}`}
-              >
+              onChange={(e) => onChange(e.target.value)}
+            />
+          )}
+          
+          {type === 'select' && options && (
+            <Select value={value} onValueChange={onChange}>
+              <SelectTrigger ref={(ref) => fieldRefs.current[fieldName] = ref}>
                 <SelectValue />
               </SelectTrigger>
               <SelectContent>
-                {options?.map((option) => {
-                  const optionValue = typeof option === 'string' ? option : option.value;
-                  const optionLabel = typeof option === 'string' ? option : option.label;
-                  return (
-                    <SelectItem key={optionValue} value={optionValue}>
-                      {optionLabel}
-                    </SelectItem>
-                  );
-                })}
+                {options.map((option) => (
+                  <SelectItem key={option} value={option}>
+                    {option}
+                  </SelectItem>
+                ))}
               </SelectContent>
             </Select>
-            {isFieldEdited(fieldName) && (
-              <Clock
-                className="h-4 w-4 text-muted-foreground cursor-pointer inline-block ml-2"
-                onClick={() => handleFieldComparisonClick(fieldName)}
-              />
-            )}
-          </div>
-        </div>
-      );
-    }
-
-    if (type === 'radio' && options) {
-      return (
-        <div
-          onDoubleClick={() => {
-            if (!isEditingEnabled) {
-              toast({ title: 'Enable editing to make changes' });
-              return;
-            }
-            if (!isEditMode) {
-              setIsEditMode(true);
-            }
-          }}
-          className="select-none"
-        >
-          <div className="space-y-2">
-            <Label>{label}</Label>
-            <RadioGroup
-              value={value}
-              onValueChange={(newValue) => handleInputChange(fieldName, newValue)}
-              className={`flex gap-4 ${!isEditMode ? 'opacity-60 pointer-events-none' : ''}`}
-            >
-              {options.map((option) => {
-                const optionValue = typeof option === 'string' ? option : option.value;
-                const optionLabel = typeof option === 'string' ? option : option.label;
-                return (
-                  <div key={optionValue} className="flex items-center space-x-2">
-                    <RadioGroupItem value={optionValue} id={`${fieldName}-${optionValue}`} />
-                    <Label htmlFor={`${fieldName}-${optionValue}`}>{optionLabel}</Label>
-                  </div>
-                );
-              })}
+          )}
+          
+          {type === 'radio' && options && (
+            <RadioGroup value={value} onValueChange={onChange}>
+              {options.map((option) => (
+                <div key={option} className="flex items-center space-x-2">
+                  <RadioGroupItem value={option} id={`${fieldName}-${option}`} />
+                  <Label htmlFor={`${fieldName}-${option}`}>{option}</Label>
+                </div>
+              ))}
             </RadioGroup>
-            {isFieldEdited(fieldName) && (
-              <Clock
-                className="h-4 w-4 text-muted-foreground cursor-pointer inline-block ml-2"
-                onClick={() => handleFieldComparisonClick(fieldName)}
-              />
-            )}
-          </div>
+          )}
         </div>
       );
     }
 
+    // Show read-only version with double-click to edit
     return (
-      <div
+      <div 
+        className="space-y-2 cursor-pointer group hover:bg-gray-50 p-2 rounded-md transition-colors"
         onDoubleClick={() => {
-          if (!isEditingEnabled) {
-            toast({ title: 'Enable editing to make changes' });
-            return;
-          }
-          if (!isEditMode) {
-            setIsEditMode(true);
-            setTimeout(() => {
-              const el = fieldRefs.current[fieldName] as HTMLElement | null;
-              el?.focus?.();
-            }, 0);
-          }
+          setIsEditMode(true);
+          setTimeout(() => {
+            const fieldRef = fieldRefs.current[fieldName];
+            if (fieldRef) {
+              fieldRef.focus();
+            }
+          }, 100);
         }}
-        className="select-none"
+        title="Double-click to edit this field"
       >
-        <div className="space-y-2">
-          <Label htmlFor={fieldName}>{label}</Label>
-          <div className="flex items-center gap-2">
-            <Input
-              ref={(el) => { fieldRefs.current[fieldName] = el; }}
-              id={fieldName}
-              value={value}
-              onChange={(e) => handleInputChange(fieldName, e.target.value)}
-              className={`w-full ${!isEditMode ? 'opacity-60 pointer-events-none' : ''}`}
-            />
-            {isFieldEdited(fieldName) && (
-              <Clock
-                className="h-4 w-4 text-muted-foreground cursor-pointer"
-                onClick={() => handleFieldComparisonClick(fieldName)}
-              />
-            )}
-          </div>
+        <Label className="text-sm font-medium">
+          {label}
+          {edited && (
+            <TooltipProvider>
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <button 
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      handleFieldComparisonClick(fieldName);
+                    }}
+                    className="ml-2 text-blue-500 hover:text-blue-700"
+                  >
+                    <Clock className="w-3 h-3" />
+                  </button>
+                </TooltipTrigger>
+                <TooltipContent>
+                  <p>This field has been edited. Click to view audit log.</p>
+                </TooltipContent>
+              </Tooltip>
+            </TooltipProvider>
+          )}
+        </Label>
+        <div className="p-2 border border-gray-200 rounded-md group-hover:border-blue-300">
+          <span className="text-gray-900">{value || 'Not set'}</span>
         </div>
       </div>
     );
   };
 
-  const getApplicantName = (applicantNum: number) => {
-    return applicantNum === 1 ? 
-      `${formData.jamesTitle} ${formData.jamesFirstName} ${formData.jamesLastName}` :
-      `${formData.janeTitle} ${formData.janeFirstName} ${formData.janeLastName}`;
-  };
-
-  const getFieldPrefix = (applicantNum: number) => {
-    return applicantNum === 1 ? 'james' : 'jane';
-  };
-
+  // Get applicant names for display
+  const [applicantJamesName, applicantJaneName] = getFormattedApplicantNames();
+  
+  // Navigation items
   const navigationItems = [
-    {
-      title: 'Mortgage',
-      items: [
-        { label: 'Mortgage details', key: 'mortgage-details', status: 'complete' as const },
-        { label: 'Household details', key: 'household-details', status: 'complete' as const }
-      ]
-    },
-    {
-      title: 'James Taylor',
-      items: [
-        { label: 'Personal details', key: 'james-personal', status: 'complete' as const },
-        { label: 'Income & employment', key: 'james-employment', status: 'complete' as const },
-        { label: 'Credit information', key: 'james-credit', status: 'complete' as const },
-        { label: 'Commitments & expenses', key: 'james-commitments', status: 'complete' as const }
-      ]
-    },
-    {
-      title: 'Jane Taylor',
-      items: [
-        { label: 'Personal details', key: 'jane-personal', status: 'complete' as const },
-        { label: 'Income & employment', key: 'jane-employment', status: 'complete' as const },
-        { label: 'Credit information', key: 'jane-credit', status: 'complete' as const },
-        { label: 'Commitments & expenses', key: 'jane-commitments', status: 'complete' as const }
-      ]
-    },
-    {
-      title: 'Submission',
-      items: [
-        { label: 'Declarations', key: 'declarations', status: 'warning' as const }
-      ]
-    }
+    { key: "mortgage-details", label: "Mortgage Details" },
+    { key: "applicant-information", label: "Applicant Information" },
+    { key: "review-submit", label: "Review & Submit" }
   ];
 
+  const getApplicantName = (applicantNumber: number) => {
+    return applicantNumber === 1 ? applicantJamesName : applicantJaneName;
+  };
+
+  const getFieldPrefix = (applicantNumber: number) => {
+    return applicantNumber === 1 ? 'james' : 'jane';
+  };
+
+  // Current section from key
   const getCurrentSectionFromKey = (key: string) => {
-    if (key.startsWith('mortgage') || key.startsWith('household')) return 'mortgage';
-    if (key.startsWith('james')) return 'applicants';
-    if (key.startsWith('jane')) return 'applicants';
-    if (key === 'declarations') return 'submission';
-    return 'mortgage';
+    if (key === "mortgage-details") return "mortgage";
+    if (key === "applicant-information") return "applicants";
+    return "review";
   };
 
   const handleNavigationClick = (key: string) => {
-    const section = getCurrentSectionFromKey(key);
-    setActiveTab(section);
+    setActiveTab(key);
     
-    if (key.startsWith('james')) {
+    // Auto-switch to applicant 1 when going to applicant information
+    if (key === "applicant-information" && !targetApplicant) {
       setActiveApplicant(1);
-    } else if (key.startsWith('jane')) {
-      setActiveApplicant(2);
     }
   };
 
   return (
-    <div className="container mx-auto p-6 space-y-6">
-      <div className="flex justify-between items-center">
-        <h1 className="text-3xl font-bold">Data Capture Form</h1>
+    <div className="flex flex-col h-full">
+      <div className="flex items-center justify-between p-4 border-b">
+        <h1 className="text-xl font-semibold">Data Capture Form</h1>
+        
+        <div className="flex gap-2">
+          {isEditMode && hasUnsavedChanges && (
+            <Button onClick={handleSave} variant="default">
+              Save Changes
+            </Button>
+          )}
+          <Button 
+            onClick={handleMainButtonClick}
+            variant={hasUnsavedChanges ? "destructive" : "outline"}
+          >
+            {hasUnsavedChanges ? "Cancel" : (isEditMode ? "Exit Edit Mode" : "Enter Edit Mode")}
+          </Button>
+        </div>
       </div>
 
-      <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-        {/* Hidden TabsList for programmatic control */}
-        <TabsList className="hidden">
-          <TabsTrigger value="mortgage">Mortgage Details</TabsTrigger>
-          <TabsTrigger value="applicants">Applicant Information</TabsTrigger>
-          <TabsTrigger value="submission">Review & Submit</TabsTrigger>
-        </TabsList>
+      <div className="flex-1 p-4">
+        <Tabs value={activeTab} onValueChange={handleNavigationClick} className="w-full">
+          <TabsList className="grid w-full grid-cols-3">
+            {navigationItems.map((item) => (
+              <TabsTrigger key={item.key} value={item.key}>
+                {item.label}
+              </TabsTrigger>
+            ))}
+          </TabsList>
 
-                  <TabsContent value="mortgage" className="space-y-6">
-                    <Card>
-                      <CardHeader>
-                        <CardTitle>Mortgage details</CardTitle>
-                      </CardHeader>
-                      <CardContent className="space-y-6">
-                        <div className="space-y-4">
-                          <h3 className="text-lg font-medium">Have any applicants been subject to:</h3>
-                          {renderField('bankruptcySubject', 'A bankruptcy which has not been satisfied for at least 3 years?', 'radio', ['Yes', 'No'])}
-                          {renderField('ivaSubject', 'An Individual Voluntary arrangement (IVA) or debt relief order (DRO) that has not been satisfied for at least 3 years?', 'radio', ['Yes', 'No'])}
-                          {renderField('propertyRepossessed', 'Property repossession at any time?', 'radio', ['Yes', 'No'])}
-                        </div>
+          {/* Mortgage Details Tab */}
+          <TabsContent value="mortgage-details" className="space-y-6">
+            <Card>
+              <CardHeader>
+                <CardTitle>Mortgage Information</CardTitle>
+                <CardDescription>Basic loan and property details</CardDescription>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  {renderField('applicationPurpose', 'Application Purpose', formData.applicationPurpose, (value) => handleInputChange('applicationPurpose', value), 'select', ['Purchase', 'Remortgage', 'Transfer of Equity'])}
+                  {renderField('applicationType', 'Application Type', formData.applicationType, (value) => handleInputChange('applicationType', value), 'select', ['Standard Residential', 'Buy to Let', 'Right to Buy'])}
+                  {renderField('totalPurchasePrice', 'Total Purchase Price', formData.totalPurchasePrice, (value) => handleInputChange('totalPurchasePrice', value))}
+                  {renderField('depositAmount', 'Deposit Amount', formData.depositAmount, (value) => handleInputChange('depositAmount', value))}
+                  {renderField('requiredLoanAmount', 'Required Loan Amount', formData.requiredLoanAmount, (value) => handleInputChange('requiredLoanAmount', value))}
+                  {renderField('loanToValue', 'Loan to Value', formData.loanToValue, (value) => handleInputChange('loanToValue', value))}
+                  {renderField('termYears', 'Term (Years)', formData.termYears, (value) => handleInputChange('termYears', value))}
+                  {renderField('repaymentType', 'Repayment Type', formData.repaymentType, (value) => handleInputChange('repaymentType', value), 'select', ['Repayment', 'Interest Only', 'Part and Part'])}
+                </div>
+              </CardContent>
+            </Card>
 
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                          {renderField('applicationPurpose', 'Application purpose', 'radio', ['Residential', 'Buy to Let'])}
-                          {renderField('applicationType', 'Application type', 'radio', ['Purchase', 'Remortgage'])}
-                          {renderField('residentialSubType', 'Residential purchase sub-type', 'select', ['Standard', 'Help to Buy', 'Shared Ownership'])}
-                          {renderField('propertyRegion', 'Region of the property to be mortgaged', 'select', ['North', 'South', 'East', 'West', 'Central'])}
-                          {renderField('totalPurchasePrice', 'Total purchase price')}
-                          {renderField('depositAmount', 'Deposit amount')}
-                          {renderField('requiredLoanAmount', 'Required loan amount')}
-                          {renderField('loanToValue', 'Loan to value')}
-                          {renderField('termYears', 'Term (years)')}
-                          {renderField('repaymentType', 'Repayment type', 'radio', ['Repayment', 'Interest Only', 'Part And Part'])}
-                          {renderField('monthlyGroundRent', 'Monthly ground rent/service charge of the property to be purchased')}
-                          {renderField('initialFixedTerm', 'Will the initial fixed term be 60 months or more?', 'radio', ['Yes', 'No'])}
-                        </div>
-                      </CardContent>
-                    </Card>
+            <Card>
+              <CardHeader>
+                <CardTitle>Household Information</CardTitle>
+                <CardDescription>Applicant and dependency details</CardDescription>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  {renderField('numberOfApplicants', 'Number of Applicants', formData.numberOfApplicants, (value) => handleInputChange('numberOfApplicants', value), 'select', ['1', '2', '3', '4'])}
+                  {renderField('sameAddress', 'Same Address', formData.sameAddress, (value) => handleInputChange('sameAddress', value), 'radio', ['Yes', 'No'])}
+                  {renderField('dependentsUnder13', 'Dependents Under 13', formData.dependentsUnder13, (value) => handleInputChange('dependentsUnder13', value))}
+                  {renderField('dependents14Plus', 'Dependents 14+', formData.dependents14Plus, (value) => handleInputChange('dependents14Plus', value))}
+                  {renderField('childBenefit', 'Child Benefit', formData.childBenefit, (value) => handleInputChange('childBenefit', value), 'radio', ['Yes', 'No'])}
+                </div>
+              </CardContent>
+            </Card>
+          </TabsContent>
 
-                    <Card>
-                      <CardHeader>
-                        <CardTitle>Household details</CardTitle>
-                      </CardHeader>
-                      <CardContent className="space-y-6">
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                          {renderField('numberOfApplicants', 'Number of applicants', 'radio', ['One', 'Two'])}
-                          {renderField('sameAddress', 'Will all applicants live at the same address once the mortgage completes?', 'radio', ['Yes', 'No'])}
-                          {renderField('dependentsUnder13', 'Number of household dependents aged 0-13')}
-                          {renderField('childBenefit', 'Does the applicant receive child benefit?', 'radio', ['Yes', 'No'])}
-                          {renderField('dependents14Plus', 'Number of household dependents aged 14 and over')}
-                        </div>
-                      </CardContent>
-                    </Card>
+          {/* Applicant Information Tab */}
+          <TabsContent value="applicant-information" className="space-y-6">
+            <div className="flex items-center gap-4 mb-6">
+              <span className="font-medium">Viewing:</span>
+              <div className="flex gap-2">
+                <Button
+                  variant={activeApplicant === 1 ? "default" : "outline"}
+                  size="sm"
+                  onClick={() => setActiveApplicant(1)}
+                >
+                  {getApplicantName(1)}
+                </Button>
+                <Button
+                  variant={activeApplicant === 2 ? "default" : "outline"}
+                  size="sm"
+                  onClick={() => setActiveApplicant(2)}
+                >
+                  {getApplicantName(2)}
+                </Button>
+              </div>
+            </div>
 
-                    <Card>
-                      <CardHeader>
-                        <CardTitle>Household expenditure</CardTitle>
-                      </CardHeader>
-                      <CardContent>
-                        <p className="text-sm text-muted-foreground mb-4">
-                          Newcastle Building Society uses Office of National Statistics (ONS) data to calculate affordability, which considers 
-                          typical household expenditure for the region. Alternatively, we can calculate affordability using the applicant's 
-                          expected total monthly expenditure.
-                        </p>
-                        <p className="text-sm text-muted-foreground mb-4">
-                          Please select how you would like us to calculate the applicant's affordability:
-                        </p>
-                        {renderField('expenditureCalculation', 'Calculation method', 'radio', ['ONS', 'Enter expenditure'])}
-                      </CardContent>
-                    </Card>
-                  </TabsContent>
+            {[1, 2].map((applicantNumber) => (
+              <div 
+                key={applicantNumber}
+                className={applicantNumber === activeApplicant ? 'block' : 'hidden'}
+              >
+                <div className="space-y-6">
+                  {/* Eligibility Section */}
+                  <Card>
+                    <CardHeader>
+                      <CardTitle>Eligibility - {getApplicantName(applicantNumber)}</CardTitle>
+                    </CardHeader>
+                    <CardContent className="space-y-4">
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        {renderField(`${getFieldPrefix(applicantNumber)}CourtDecree`, 'Court Decree', formData[`${getFieldPrefix(applicantNumber)}CourtDecree` as keyof UnifiedFormData], (value) => handleInputChange(`${getFieldPrefix(applicantNumber)}CourtDecree`, value), 'radio', ['Yes', 'No'])}
+                        {renderField(`${getFieldPrefix(applicantNumber)}DebtManagement`, 'Debt Management Plan', formData[`${getFieldPrefix(applicantNumber)}DebtManagement` as keyof UnifiedFormData], (value) => handleInputChange(`${getFieldPrefix(applicantNumber)}DebtManagement`, value), 'radio', ['Yes', 'No'])}
+                      </div>
+                    </CardContent>
+                  </Card>
 
-                  <TabsContent value="applicants" className="space-y-6">
-                    {/* Render all applicants without tabs */}
-                    {[1, 2].map(applicantNum => {
-                      const prefix = getFieldPrefix(applicantNum);
-                      
-                      return (
-                        <div key={applicantNum} className="space-y-6">
-                          <Card>
-                            <CardHeader>
-                              <CardTitle>Eligibility - {getApplicantName(applicantNum)}</CardTitle>
-                            </CardHeader>
-                            <CardContent className="space-y-4">
-                              <p className="text-sm text-muted-foreground">
-                                In the last 3 years has this applicant had or satisfied any of the following:
-                              </p>
-                              {renderField(`${prefix}CourtDecree` as keyof UnifiedFormData, 'CCJ (court of decree in Scotland)', 'radio', ['Yes', 'No'])}
-                              {renderField(`${prefix}DebtManagement` as keyof UnifiedFormData, 'Had an active or settled debt management plan', 'radio', ['Yes', 'No'])}
-                            </CardContent>
-                          </Card>
+                  {/* Personal Details Section */}
+                  <Card>
+                    <CardHeader>
+                      <CardTitle>Personal Details - {getApplicantName(applicantNumber)}</CardTitle>
+                    </CardHeader>
+                    <CardContent className="space-y-4">
+                      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                        {renderField(`${getFieldPrefix(applicantNumber)}Title`, 'Title', formData[`${getFieldPrefix(applicantNumber)}Title` as keyof UnifiedFormData], (value) => handleInputChange(`${getFieldPrefix(applicantNumber)}Title`, value), 'select', ['Mr', 'Mrs', 'Miss', 'Ms', 'Dr'])}
+                        {renderField(`${getFieldPrefix(applicantNumber)}FirstName`, 'First Name', formData[`${getFieldPrefix(applicantNumber)}FirstName` as keyof UnifiedFormData], (value) => handleInputChange(`${getFieldPrefix(applicantNumber)}FirstName`, value))}
+                        {renderField(`${getFieldPrefix(applicantNumber)}MiddleName`, 'Middle Name', formData[`${getFieldPrefix(applicantNumber)}MiddleName` as keyof UnifiedFormData], (value) => handleInputChange(`${getFieldPrefix(applicantNumber)}MiddleName`, value))}
+                      </div>
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        {renderField(`${getFieldPrefix(applicantNumber)}LastName`, 'Last Name', formData[`${getFieldPrefix(applicantNumber)}LastName` as keyof UnifiedFormData], (value) => handleInputChange(`${getFieldPrefix(applicantNumber)}LastName`, value))}
+                        {renderField(`${getFieldPrefix(applicantNumber)}NameChange`, 'Name Change in Last 6 Years', formData[`${getFieldPrefix(applicantNumber)}NameChange` as keyof UnifiedFormData], (value) => handleInputChange(`${getFieldPrefix(applicantNumber)}NameChange`, value), 'radio', ['Yes', 'No'])}
+                      </div>
+                      <div className="grid grid-cols-3 gap-4">
+                        {renderField(`${getFieldPrefix(applicantNumber)}BirthDay`, 'Day', formData[`${getFieldPrefix(applicantNumber)}BirthDay` as keyof UnifiedFormData], (value) => handleInputChange(`${getFieldPrefix(applicantNumber)}BirthDay`, value))}
+                        {renderField(`${getFieldPrefix(applicantNumber)}BirthMonth`, 'Month', formData[`${getFieldPrefix(applicantNumber)}BirthMonth` as keyof UnifiedFormData], (value) => handleInputChange(`${getFieldPrefix(applicantNumber)}BirthMonth`, value))}
+                        {renderField(`${getFieldPrefix(applicantNumber)}BirthYear`, 'Year', formData[`${getFieldPrefix(applicantNumber)}BirthYear` as keyof UnifiedFormData], (value) => handleInputChange(`${getFieldPrefix(applicantNumber)}BirthYear`, value))}
+                      </div>
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        {renderField(`${getFieldPrefix(applicantNumber)}Nationality`, 'Nationality', formData[`${getFieldPrefix(applicantNumber)}Nationality` as keyof UnifiedFormData], (value) => handleInputChange(`${getFieldPrefix(applicantNumber)}Nationality`, value), 'select', ['UK Resident', 'EU Citizen', 'Other'])}
+                      </div>
+                    </CardContent>
+                  </Card>
 
-                          <Card>
-                            <CardHeader>
-                              <CardTitle>Personal details - {getApplicantName(applicantNum)}</CardTitle>
-                            </CardHeader>
-                            <CardContent className="space-y-6">
-                              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                                {renderField(`${prefix}Title` as keyof UnifiedFormData, 'Title', 'select', ['Mr', 'Mrs', 'Miss', 'Ms', 'Dr'])}
-                                {renderField(`${prefix}FirstName` as keyof UnifiedFormData, 'First name')}
-                                {renderField(`${prefix}MiddleName` as keyof UnifiedFormData, 'Middle name')}
-                                {renderField(`${prefix}LastName` as keyof UnifiedFormData, 'Last name')}
-                                {renderField(`${prefix}NameChange` as keyof UnifiedFormData, 'Name change in the last 3 years?', 'radio', ['Yes', 'No'])}
-                              </div>
+                  {/* Address Section */}
+                  <Card>
+                    <CardHeader>
+                      <CardTitle>Addresses - {getApplicantName(applicantNumber)}</CardTitle>
+                    </CardHeader>
+                    <CardContent className="space-y-4">
+                      <div className="grid grid-cols-1 gap-4">
+                        {renderField(`${getFieldPrefix(applicantNumber)}CurrentAddress`, 'Current Address', formData[`${getFieldPrefix(applicantNumber)}CurrentAddress` as keyof UnifiedFormData], (value) => handleInputChange(`${getFieldPrefix(applicantNumber)}CurrentAddress`, value))}
+                        {renderField(`${getFieldPrefix(applicantNumber)}Postcode`, 'Postcode', formData[`${getFieldPrefix(applicantNumber)}Postcode` as keyof UnifiedFormData], (value) => handleInputChange(`${getFieldPrefix(applicantNumber)}Postcode`, value))}
+                      </div>
+                      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                        {renderField(`${getFieldPrefix(applicantNumber)}MoveInDate`, 'Move In Date', formData[`${getFieldPrefix(applicantNumber)}MoveInDate` as keyof UnifiedFormData], (value) => handleInputChange(`${getFieldPrefix(applicantNumber)}MoveInDate`, value))}
+                        {renderField(`${getFieldPrefix(applicantNumber)}CurrentAddressYears`, 'Years at Address', formData[`${getFieldPrefix(applicantNumber)}CurrentAddressYears` as keyof UnifiedFormData], (value) => handleInputChange(`${getFieldPrefix(applicantNumber)}CurrentAddressYears`, value))}
+                        {renderField(`${getFieldPrefix(applicantNumber)}CurrentAddressMonths`, 'Months at Address', formData[`${getFieldPrefix(applicantNumber)}CurrentAddressMonths` as keyof UnifiedFormData], (value) => handleInputChange(`${getFieldPrefix(applicantNumber)}CurrentAddressMonths`, value))}
+                      </div>
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        {renderField(`${getFieldPrefix(applicantNumber)}CurrentResidencyStatus`, 'Current Residency Status', formData[`${getFieldPrefix(applicantNumber)}CurrentResidencyStatus` as keyof UnifiedFormData], (value) => handleInputChange(`${getFieldPrefix(applicantNumber)}CurrentResidencyStatus`, value), 'select', ['Owner occupier with mortgage', 'Owner occupier without mortgage', 'Renting', 'Living with family'])}
+                      </div>
+                    </CardContent>
+                  </Card>
 
-                              <div className="space-y-4">
-                                <Label>Date of birth</Label>
-                                <div className="grid grid-cols-3 gap-4">
-                                  {renderField(`${prefix}BirthDay` as keyof UnifiedFormData, 'Day')}
-                                  {renderField(`${prefix}BirthMonth` as keyof UnifiedFormData, 'Month')}
-                                  {renderField(`${prefix}BirthYear` as keyof UnifiedFormData, 'Year')}
-                                </div>
-                              </div>
+                  {/* Income Section */}
+                  <Card>
+                    <CardHeader>
+                      <CardTitle>Employment & Income - {getApplicantName(applicantNumber)}</CardTitle>
+                    </CardHeader>
+                    <CardContent className="space-y-4">
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        {renderField(`${getFieldPrefix(applicantNumber)}EmploymentStatus`, 'Employment Status', formData[`${getFieldPrefix(applicantNumber)}EmploymentStatus` as keyof UnifiedFormData], (value) => handleInputChange(`${getFieldPrefix(applicantNumber)}EmploymentStatus`, value), 'select', ['Employed', 'Self-employed', 'Retired', 'Student', 'Unemployed'])}
+                        {renderField(`${getFieldPrefix(applicantNumber)}GrossBasicIncome`, 'Gross Basic Income', formData[`${getFieldPrefix(applicantNumber)}GrossBasicIncome` as keyof UnifiedFormData], (value) => handleInputChange(`${getFieldPrefix(applicantNumber)}GrossBasicIncome`, value))}
+                        {renderField(`${getFieldPrefix(applicantNumber)}JobTitle`, 'Job Title', formData[`${getFieldPrefix(applicantNumber)}JobTitle` as keyof UnifiedFormData], (value) => handleInputChange(`${getFieldPrefix(applicantNumber)}JobTitle`, value))}
+                        {renderField(`${getFieldPrefix(applicantNumber)}EmployerName`, 'Employer Name', formData[`${getFieldPrefix(applicantNumber)}EmployerName` as keyof UnifiedFormData], (value) => handleInputChange(`${getFieldPrefix(applicantNumber)}EmployerName`, value))}
+                        {renderField(`${getFieldPrefix(applicantNumber)}EmploymentType`, 'Employment Type', formData[`${getFieldPrefix(applicantNumber)}EmploymentType` as keyof UnifiedFormData], (value) => handleInputChange(`${getFieldPrefix(applicantNumber)}EmploymentType`, value), 'select', ['Permanent', 'Fixed Term', 'Temporary', 'Probationary'])}
+                        {renderField(`${getFieldPrefix(applicantNumber)}ExpectedRetirementAge`, 'Expected Retirement Age', formData[`${getFieldPrefix(applicantNumber)}ExpectedRetirementAge` as keyof UnifiedFormData], (value) => handleInputChange(`${getFieldPrefix(applicantNumber)}ExpectedRetirementAge`, value))}
+                      </div>
+                    </CardContent>
+                  </Card>
 
-                              {renderField(`${prefix}Nationality` as keyof UnifiedFormData, 'Nationality', 'radio', ['UK Resident', 'EEA or Swiss National', 'Non EEA'])}
-                            </CardContent>
-                          </Card>
+                  {/* Commitments Section */}
+                  <Card>
+                    <CardHeader>
+                      <CardTitle>Commitments - {getApplicantName(applicantNumber)}</CardTitle>
+                    </CardHeader>
+                    <CardContent className="space-y-4">
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        {renderField(`${getFieldPrefix(applicantNumber)}CommitmentType`, 'Commitment Type', formData[`${getFieldPrefix(applicantNumber)}CommitmentType` as keyof UnifiedFormData], (value) => handleInputChange(`${getFieldPrefix(applicantNumber)}CommitmentType`, value), 'select', ['Credit card', 'Personal loan', 'Car loan', 'Store card', 'Other'])}
+                        {renderField(`${getFieldPrefix(applicantNumber)}Provider`, 'Provider', formData[`${getFieldPrefix(applicantNumber)}Provider` as keyof UnifiedFormData], (value) => handleInputChange(`${getFieldPrefix(applicantNumber)}Provider`, value))}
+                        {renderField(`${getFieldPrefix(applicantNumber)}MonthlyPayment`, 'Monthly Payment', formData[`${getFieldPrefix(applicantNumber)}MonthlyPayment` as keyof UnifiedFormData], (value) => handleInputChange(`${getFieldPrefix(applicantNumber)}MonthlyPayment`, value))}
+                        {renderField(`${getFieldPrefix(applicantNumber)}RemainingBalance`, 'Remaining Balance', formData[`${getFieldPrefix(applicantNumber)}RemainingBalance` as keyof UnifiedFormData], (value) => handleInputChange(`${getFieldPrefix(applicantNumber)}RemainingBalance`, value))}
+                      </div>
+                    </CardContent>
+                  </Card>
+                </div>
+              </div>
+            ))}
+          </TabsContent>
 
-                          <Card>
-                            <CardHeader>
-                              <CardTitle>Addresses - {getApplicantName(applicantNum)}</CardTitle>
-                            </CardHeader>
-                            <CardContent className="space-y-6">
-                              <div className="space-y-4">
-                                <h3 className="text-lg font-medium">Current address</h3>
-                                {renderField(`${prefix}CurrentAddress` as keyof UnifiedFormData, 'Address')}
-                                {renderField(`${prefix}Postcode` as keyof UnifiedFormData, 'Postcode')}
-                                {renderField(`${prefix}MoveInDate` as keyof UnifiedFormData, 'When did the applicant move in')}
-                                <div className="grid grid-cols-2 gap-4">
-                                  {renderField(`${prefix}CurrentAddressYears` as keyof UnifiedFormData, 'Years')}
-                                  {renderField(`${prefix}CurrentAddressMonths` as keyof UnifiedFormData, 'Months')}
-                                </div>
-                                {renderField(`${prefix}CurrentResidencyStatus` as keyof UnifiedFormData, 'Current residency status', 'select', [
-                                  'Owner occupation with mortgage',
-                                  'Owner occupier with mortgage',
-                                  'Owner occupation without mortgage',
-                                  'Privately rented',
-                                  'Living with parents',
-                                  'Council rented',
-                                  'Housing association rented',
-                                  'Other'
-                                ])}
-                                {renderField(`${prefix}SalePrice` as keyof UnifiedFormData, 'Sale price')}
-                                {renderField(`${prefix}CurrentLender` as keyof UnifiedFormData, 'Current lender')}
-                                {renderField(`${prefix}OutstandingMortgageBalance` as keyof UnifiedFormData, 'Outstanding mortgage balance')}
-                                {renderField(`${prefix}PlansForProperty` as keyof UnifiedFormData, 'Plans for property')}
-                                {renderField(`${prefix}ExpectedRemainingBalance` as keyof UnifiedFormData, 'Expected remaining balance')}
-                              </div>
+          {/* Review & Submit Tab */}
+          <TabsContent value="review-submit" className="space-y-6">
+            <Card>
+              <CardHeader>
+                <CardTitle>Application Summary</CardTitle>
+                <CardDescription>Review your information before submitting</CardDescription>
+              </CardHeader>
+              <CardContent>
+                <div className="space-y-4">
+                  <div className="text-center p-8 border border-dashed border-gray-300 rounded-lg">
+                    <h3 className="text-lg font-medium mb-2">Ready to Submit</h3>
+                    <p className="text-gray-600 mb-4">All required information has been collected.</p>
+                    <div className="flex gap-4 justify-center">
+                      <Button variant="outline">Save as Draft</Button>
+                      <Button>Submit Application</Button>
+                    </div>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+          </TabsContent>
+        </Tabs>
+      </div>
 
-                              <div className="space-y-4">
-                                <h3 className="text-lg font-medium">Previous address</h3>
-                                {renderField(`${prefix}PreviousAddress` as keyof UnifiedFormData, 'Address')}
-                                <div className="grid grid-cols-2 gap-4">
-                                  {renderField(`${prefix}PreviousAddressYears` as keyof UnifiedFormData, 'Years')}
-                                  {renderField(`${prefix}PreviousAddressMonths` as keyof UnifiedFormData, 'Months')}
-                                </div>
-                              </div>
-                            </CardContent>
-                          </Card>
-
-                          <Card>
-                            <CardHeader>
-                              <CardTitle>Income - {getApplicantName(applicantNum)}</CardTitle>
-                            </CardHeader>
-                            <CardContent className="space-y-6">
-                              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                                {renderField(`${prefix}EmploymentStatus` as keyof UnifiedFormData, 'Employment status', 'select', ['Employed', 'Self-employed', 'Unemployed', 'Retired'])}
-                                {renderField(`${prefix}GrossBasicIncome` as keyof UnifiedFormData, 'Gross basic income')}
-                                {renderField(`${prefix}Frequency` as keyof UnifiedFormData, 'Payment frequency of gross basic income', 'select', ['Weekly', 'Monthly', 'Yearly'])}
-                                {renderField(`${prefix}AnnualAmount` as keyof UnifiedFormData, 'Annual amount')}
-                                {renderField(`${prefix}MonthlyNetSalary` as keyof UnifiedFormData, 'Monthly net salary/net income')}
-                                {renderField(`${prefix}JobTitle` as keyof UnifiedFormData, 'Job title')}
-                                {renderField(`${prefix}EmployerName` as keyof UnifiedFormData, 'Employer name')}
-                                {renderField(`${prefix}EmploymentType` as keyof UnifiedFormData, 'Employment nature', 'radio', ['Permanent', 'Contract'])}
-                              </div>
-
-                              <div className="space-y-4">
-                                <Label>Start date of permanent employment</Label>
-                                <div className="grid grid-cols-2 gap-4">
-                                  {renderField(`${prefix}StartMonth` as keyof UnifiedFormData, 'Month')}
-                                  {renderField(`${prefix}StartYear` as keyof UnifiedFormData, 'Year')}
-                                </div>
-                              </div>
-
-                              {renderField(`${prefix}ExpectedRetirementAge` as keyof UnifiedFormData, 'Expected retirement age')}
-
-                              <div className="space-y-4">
-                                <h3 className="text-lg font-medium">Please add all additional income sources relevant to this applicant:</h3>
-                                <div className="grid grid-cols-3 gap-4">
-                                  <div>
-                                    <Label>Income source</Label>
-                                    <Select defaultValue="Before tax return">
-                                      <SelectTrigger>
-                                        <SelectValue />
-                                      </SelectTrigger>
-                                      <SelectContent>
-                                        <SelectItem value="Before tax return">Before tax return</SelectItem>
-                                      </SelectContent>
-                                    </Select>
-                                  </div>
-                                  <div>
-                                    <Label>Amount</Label>
-                                    <Input placeholder="£" />
-                                  </div>
-                                  <div>
-                                    <Label>Frequency</Label>
-                                    <Select defaultValue="Yearly">
-                                      <SelectTrigger>
-                                        <SelectValue />
-                                      </SelectTrigger>
-                                      <SelectContent>
-                                        <SelectItem value="Yearly">Yearly</SelectItem>
-                                        <SelectItem value="Monthly">Monthly</SelectItem>
-                                      </SelectContent>
-                                    </Select>
-                                  </div>
-                                </div>
-                                <Button variant="outline" className="w-full">
-                                  <Plus className="w-4 h-4 mr-2" />
-                                  Add an income source
-                                </Button>
-                              </div>
-                            </CardContent>
-                          </Card>
-
-                          <Card>
-                            <CardHeader>
-                              <CardTitle>Commitments - {getApplicantName(applicantNum)}</CardTitle>
-                            </CardHeader>
-                            <CardContent className="space-y-6">
-                              <p className="text-sm text-muted-foreground">
-                                Please add all current commitments related to this applicant, even if they will be redeemed or consolidated upon completion.
-                                Please also include, but are not limited to: credit cards, hire purchase, commercial finance, student finance payments, etc.
-                              </p>
-
-                              <div className="grid grid-cols-4 gap-4">
-                                {renderField(`${prefix}CommitmentType` as keyof UnifiedFormData, 'Commitment type', 'select', ['Credit card', 'Personal loan', 'Hire purchase', 'Student loan'])}
-                                {renderField(`${prefix}Provider` as keyof UnifiedFormData, 'Provider', 'select', ['Bank', 'Building Society', 'Finance Company'])}
-                                {renderField(`${prefix}MonthlyPayment` as keyof UnifiedFormData, 'Monthly payment')}
-                                {renderField(`${prefix}RemainingBalance` as keyof UnifiedFormData, 'Remaining balance')}
-                              </div>
-
-                              <Button variant="outline" className="w-full">
-                                <Plus className="w-4 h-4 mr-2" />
-                                Add a commitment
-                              </Button>
-                            </CardContent>
-                          </Card>
-                        </div>
-                      );
-                    })}
-                  </TabsContent>
-
-                  <TabsContent value="submission" className="space-y-6">
-                    <Card>
-                      <CardHeader>
-                        <CardTitle>Review & Submit Application</CardTitle>
-                      </CardHeader>
-                      <CardContent className="space-y-6">
-                        <div className="bg-muted p-4 rounded-lg">
-                          <h3 className="text-lg font-medium mb-4">Application Summary</h3>
-                          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
-                            <div>
-                              <strong>Property Purchase Price:</strong> {formData.totalPurchasePrice}
-                            </div>
-                            <div>
-                              <strong>Loan Amount:</strong> {formData.requiredLoanAmount}
-                            </div>
-                            <div>
-                              <strong>Applicant 1:</strong> {getApplicantName(1)}
-                            </div>
-                            <div>
-                              <strong>Applicant 2:</strong> {getApplicantName(2)}
-                            </div>
-                            <div>
-                              <strong>Application Type:</strong> {formData.applicationType}
-                            </div>
-                            <div>
-                              <strong>Term:</strong> {formData.termYears} years
-                            </div>
-                          </div>
-                        </div>
-                        
-                        <div className="space-y-4">
-                          <h4 className="text-md font-medium">Declaration</h4>
-                          <p className="text-sm text-muted-foreground">
-                            By submitting this application, you confirm that all information provided is accurate and complete.
-                            You understand that any false or misleading information may result in the rejection of your application.
-                          </p>
-                        </div>
-
-                        <div className="flex gap-4">
-                          <Button variant="outline" className="flex-1">
-                            Save as Draft
-                          </Button>
-                          <Button className="flex-1" disabled={!isEditMode || hasUnsavedChanges}>
-                            Submit Application
-                          </Button>
-                        </div>
-                      </CardContent>
-                    </Card>
-        </TabsContent>
-      </Tabs>
-
+      {/* Field Comparison Modal */}
       {comparisonField && (
         <FieldComparisonModal
           open={!!comparisonField}
