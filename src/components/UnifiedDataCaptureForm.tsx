@@ -11,8 +11,10 @@ import { useEditMode } from '@/contexts/EditModeContext';
 import { useAudit } from '@/contexts/AuditContext';
 import { useToast } from '@/hooks/use-toast';
 import { useApplicantData } from '@/contexts/ApplicantDataContext';
-import { Clock, Plus, ArrowLeft, ArrowRight } from 'lucide-react';
+import { Clock, Plus, ArrowLeft, Check, AlertTriangle } from 'lucide-react';
 import { FieldComparisonModal } from '@/components/FieldComparisonModal';
+import { SidebarProvider, SidebarInset } from "@/components/ui/sidebar";
+import { ScrollArea } from "@/components/ui/scroll-area";
 
 interface UnifiedFormData {
   // Mortgage Details
@@ -427,343 +429,458 @@ export const UnifiedDataCaptureForm: React.FC = () => {
     return applicantNum === 1 ? 'james' : 'jane';
   };
 
+  const navigationItems = [
+    {
+      title: 'Mortgage',
+      items: [
+        { label: 'Mortgage details', key: 'mortgage-details', status: 'complete' as const },
+        { label: 'Household details', key: 'household-details', status: 'complete' as const }
+      ]
+    },
+    {
+      title: 'James Taylor',
+      items: [
+        { label: 'Personal details', key: 'james-personal', status: 'complete' as const },
+        { label: 'Income & employment', key: 'james-employment', status: 'complete' as const },
+        { label: 'Credit information', key: 'james-credit', status: 'complete' as const },
+        { label: 'Commitments & expenses', key: 'james-commitments', status: 'complete' as const }
+      ]
+    },
+    {
+      title: 'Jane Taylor',
+      items: [
+        { label: 'Personal details', key: 'jane-personal', status: 'complete' as const },
+        { label: 'Income & employment', key: 'jane-employment', status: 'complete' as const },
+        { label: 'Credit information', key: 'jane-credit', status: 'complete' as const },
+        { label: 'Commitments & expenses', key: 'jane-commitments', status: 'complete' as const }
+      ]
+    },
+    {
+      title: 'Submission',
+      items: [
+        { label: 'Declarations', key: 'declarations', status: 'warning' as const }
+      ]
+    }
+  ];
+
+  const getCurrentSectionFromKey = (key: string) => {
+    if (key.startsWith('mortgage') || key.startsWith('household')) return 'mortgage';
+    if (key.startsWith('james')) return 'applicants';
+    if (key.startsWith('jane')) return 'applicants';
+    if (key === 'declarations') return 'submission';
+    return 'mortgage';
+  };
+
+  const handleNavigationClick = (key: string) => {
+    const section = getCurrentSectionFromKey(key);
+    setActiveTab(section);
+    
+    if (key.startsWith('james')) {
+      setActiveApplicant(1);
+    } else if (key.startsWith('jane')) {
+      setActiveApplicant(2);
+    }
+  };
+
   return (
-    <div className="container mx-auto p-6 space-y-6">
-      <div className="flex justify-between items-center">
-        <h1 className="text-3xl font-bold">Data Capture Form</h1>
-        <div className="flex gap-2">
-          <Button 
-            variant="outline" 
-            onClick={() => navigate(-1)}
-            className="flex items-center gap-2"
-          >
-            <ArrowLeft className="h-4 w-4" />
-            Back to Summary
-          </Button>
-          <Button onClick={handleMainButtonClick} variant={getButtonVariant()}>
-            {getButtonText()}
-          </Button>
-        </div>
-      </div>
-
-      <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-        <TabsList className="grid w-full grid-cols-3">
-          <TabsTrigger value="mortgage">Mortgage Details</TabsTrigger>
-          <TabsTrigger value="applicants">Applicant Information</TabsTrigger>
-          <TabsTrigger value="submission">Review & Submit</TabsTrigger>
-        </TabsList>
-
-        <TabsContent value="mortgage" className="space-y-6">
-          <Card>
-            <CardHeader>
-              <CardTitle>Mortgage details</CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-6">
-              <div className="space-y-4">
-                <h3 className="text-lg font-medium">Have any applicants been subject to:</h3>
-                {renderField('bankruptcySubject', 'A bankruptcy which has not been satisfied for at least 3 years?', 'radio', ['Yes', 'No'])}
-                {renderField('ivaSubject', 'An Individual Voluntary arrangement (IVA) or debt relief order (DRO) that has not been satisfied for at least 3 years?', 'radio', ['Yes', 'No'])}
-                {renderField('propertyRepossessed', 'Property repossession at any time?', 'radio', ['Yes', 'No'])}
-              </div>
-
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                {renderField('applicationPurpose', 'Application purpose', 'radio', ['Residential', 'Buy to Let'])}
-                {renderField('applicationType', 'Application type', 'radio', ['Purchase', 'Remortgage'])}
-                {renderField('residentialSubType', 'Residential purchase sub-type', 'select', ['Standard', 'Help to Buy', 'Shared Ownership'])}
-                {renderField('propertyRegion', 'Region of the property to be mortgaged', 'select', ['North', 'South', 'East', 'West', 'Central'])}
-                {renderField('totalPurchasePrice', 'Total purchase price')}
-                {renderField('depositAmount', 'Deposit amount')}
-                {renderField('requiredLoanAmount', 'Required loan amount')}
-                {renderField('loanToValue', 'Loan to value')}
-                {renderField('termYears', 'Term (years)')}
-                {renderField('repaymentType', 'Repayment type', 'radio', ['Repayment', 'Interest Only', 'Part And Part'])}
-                {renderField('monthlyGroundRent', 'Monthly ground rent/service charge of the property to be purchased')}
-                {renderField('initialFixedTerm', 'Will the initial fixed term be 60 months or more?', 'radio', ['Yes', 'No'])}
-              </div>
-            </CardContent>
-          </Card>
-
-          <Card>
-            <CardHeader>
-              <CardTitle>Household details</CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-6">
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                {renderField('numberOfApplicants', 'Number of applicants', 'radio', ['One', 'Two'])}
-                {renderField('sameAddress', 'Will all applicants live at the same address once the mortgage completes?', 'radio', ['Yes', 'No'])}
-                {renderField('dependentsUnder13', 'Number of household dependents aged 0-13')}
-                {renderField('childBenefit', 'Does the applicant receive child benefit?', 'radio', ['Yes', 'No'])}
-                {renderField('dependents14Plus', 'Number of household dependents aged 14 and over')}
-              </div>
-            </CardContent>
-          </Card>
-
-          <Card>
-            <CardHeader>
-              <CardTitle>Household expenditure</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <p className="text-sm text-muted-foreground mb-4">
-                Newcastle Building Society uses Office of National Statistics (ONS) data to calculate affordability, which considers 
-                typical household expenditure for the region. Alternatively, we can calculate affordability using the applicant's 
-                expected total monthly expenditure.
-              </p>
-              <p className="text-sm text-muted-foreground mb-4">
-                Please select how you would like us to calculate the applicant's affordability:
-              </p>
-              {renderField('expenditureCalculation', 'Calculation method', 'radio', ['ONS', 'Enter expenditure'])}
-            </CardContent>
-          </Card>
-        </TabsContent>
-
-        <TabsContent value="applicants" className="space-y-6">
-          <div className="flex justify-center mb-6">
-            <Tabs value={activeApplicant.toString()} onValueChange={(value) => setActiveApplicant(parseInt(value))}>
-              <TabsList>
-                <TabsTrigger value="1">Applicant 1 - {getApplicantName(1)}</TabsTrigger>
-                <TabsTrigger value="2">Applicant 2 - {getApplicantName(2)}</TabsTrigger>
-              </TabsList>
-            </Tabs>
+    <SidebarProvider>
+      <div className="min-h-screen flex w-full bg-white">
+        {/* Custom Navigation Sidebar */}
+        <aside className="w-[280px] bg-white border-r border-gray-200 flex flex-col">
+          <div className="p-4 border-b border-gray-200">
+            <Button 
+              variant="outline" 
+              onClick={() => navigate(-1)}
+              className="w-full flex items-center gap-2"
+            >
+              <ArrowLeft className="h-4 w-4" />
+              Back to Summary
+            </Button>
           </div>
-
-          {/* Render applicant forms based on activeApplicant */}
-          {[1, 2].map(applicantNum => {
-            if (applicantNum !== activeApplicant) return null;
-            const prefix = getFieldPrefix(applicantNum);
-            
-            return (
-              <div key={applicantNum} className="space-y-6">
-                <Card>
-                  <CardHeader>
-                    <CardTitle>Eligibility - {getApplicantName(applicantNum)}</CardTitle>
-                  </CardHeader>
-                  <CardContent className="space-y-4">
-                    <p className="text-sm text-muted-foreground">
-                      In the last 3 years has this applicant had or satisfied any of the following:
-                    </p>
-                    {renderField(`${prefix}CourtDecree` as keyof UnifiedFormData, 'CCJ (court of decree in Scotland)', 'radio', ['Yes', 'No'])}
-                    {renderField(`${prefix}DebtManagement` as keyof UnifiedFormData, 'Had an active or settled debt management plan', 'radio', ['Yes', 'No'])}
-                  </CardContent>
-                </Card>
-
-                <Card>
-                  <CardHeader>
-                    <CardTitle>Personal details - {getApplicantName(applicantNum)}</CardTitle>
-                  </CardHeader>
-                  <CardContent className="space-y-6">
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                      {renderField(`${prefix}Title` as keyof UnifiedFormData, 'Title', 'select', ['Mr', 'Mrs', 'Miss', 'Ms', 'Dr'])}
-                      {renderField(`${prefix}FirstName` as keyof UnifiedFormData, 'First name')}
-                      {renderField(`${prefix}MiddleName` as keyof UnifiedFormData, 'Middle name')}
-                      {renderField(`${prefix}LastName` as keyof UnifiedFormData, 'Last name')}
-                      {renderField(`${prefix}NameChange` as keyof UnifiedFormData, 'Name change in the last 3 years?', 'radio', ['Yes', 'No'])}
-                    </div>
-
-                    <div className="space-y-4">
-                      <Label>Date of birth</Label>
-                      <div className="grid grid-cols-3 gap-4">
-                        {renderField(`${prefix}BirthDay` as keyof UnifiedFormData, 'Day')}
-                        {renderField(`${prefix}BirthMonth` as keyof UnifiedFormData, 'Month')}
-                        {renderField(`${prefix}BirthYear` as keyof UnifiedFormData, 'Year')}
-                      </div>
-                    </div>
-
-                    {renderField(`${prefix}Nationality` as keyof UnifiedFormData, 'Nationality', 'radio', ['UK Resident', 'EEA or Swiss National', 'Non EEA'])}
-                  </CardContent>
-                </Card>
-
-                <Card>
-                  <CardHeader>
-                    <CardTitle>Addresses - {getApplicantName(applicantNum)}</CardTitle>
-                  </CardHeader>
-                  <CardContent className="space-y-6">
-                    <div className="space-y-4">
-                      <h3 className="text-lg font-medium">Current address</h3>
-                      {renderField(`${prefix}CurrentAddress` as keyof UnifiedFormData, 'Address')}
-                      {renderField(`${prefix}Postcode` as keyof UnifiedFormData, 'Postcode')}
-                      {renderField(`${prefix}MoveInDate` as keyof UnifiedFormData, 'When did the applicant move in')}
-                      <div className="grid grid-cols-2 gap-4">
-                        {renderField(`${prefix}CurrentAddressYears` as keyof UnifiedFormData, 'Years')}
-                        {renderField(`${prefix}CurrentAddressMonths` as keyof UnifiedFormData, 'Months')}
-                      </div>
-                      {renderField(`${prefix}CurrentResidencyStatus` as keyof UnifiedFormData, 'Current residency status', 'select', [
-                        'Owner occupation with mortgage',
-                        'Owner occupier with mortgage',
-                        'Owner occupation without mortgage',
-                        'Privately rented',
-                        'Living with parents',
-                        'Council rented',
-                        'Housing association rented',
-                        'Other'
-                      ])}
-                      {renderField(`${prefix}SalePrice` as keyof UnifiedFormData, 'Sale price')}
-                      {renderField(`${prefix}CurrentLender` as keyof UnifiedFormData, 'Current lender')}
-                      {renderField(`${prefix}OutstandingMortgageBalance` as keyof UnifiedFormData, 'Outstanding mortgage balance')}
-                      {renderField(`${prefix}PlansForProperty` as keyof UnifiedFormData, 'Plans for property')}
-                      {renderField(`${prefix}ExpectedRemainingBalance` as keyof UnifiedFormData, 'Expected remaining balance')}
-                    </div>
-
-                    <div className="space-y-4">
-                      <h3 className="text-lg font-medium">Previous address</h3>
-                      {renderField(`${prefix}PreviousAddress` as keyof UnifiedFormData, 'Address')}
-                      <div className="grid grid-cols-2 gap-4">
-                        {renderField(`${prefix}PreviousAddressYears` as keyof UnifiedFormData, 'Years')}
-                        {renderField(`${prefix}PreviousAddressMonths` as keyof UnifiedFormData, 'Months')}
-                      </div>
-                    </div>
-                  </CardContent>
-                </Card>
-
-                <Card>
-                  <CardHeader>
-                    <CardTitle>Income - {getApplicantName(applicantNum)}</CardTitle>
-                  </CardHeader>
-                  <CardContent className="space-y-6">
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                      {renderField(`${prefix}EmploymentStatus` as keyof UnifiedFormData, 'Employment status', 'select', ['Employed', 'Self-employed', 'Unemployed', 'Retired'])}
-                      {renderField(`${prefix}GrossBasicIncome` as keyof UnifiedFormData, 'Gross basic income')}
-                      {renderField(`${prefix}Frequency` as keyof UnifiedFormData, 'Payment frequency of gross basic income', 'select', ['Weekly', 'Monthly', 'Yearly'])}
-                      {renderField(`${prefix}AnnualAmount` as keyof UnifiedFormData, 'Annual amount')}
-                      {renderField(`${prefix}MonthlyNetSalary` as keyof UnifiedFormData, 'Monthly net salary/net income')}
-                      {renderField(`${prefix}JobTitle` as keyof UnifiedFormData, 'Job title')}
-                      {renderField(`${prefix}EmployerName` as keyof UnifiedFormData, 'Employer name')}
-                      {renderField(`${prefix}EmploymentType` as keyof UnifiedFormData, 'Employment nature', 'radio', ['Permanent', 'Contract'])}
-                    </div>
-
-                    <div className="space-y-4">
-                      <Label>Start date of permanent employment</Label>
-                      <div className="grid grid-cols-2 gap-4">
-                        {renderField(`${prefix}StartMonth` as keyof UnifiedFormData, 'Month')}
-                        {renderField(`${prefix}StartYear` as keyof UnifiedFormData, 'Year')}
-                      </div>
-                    </div>
-
-                    {renderField(`${prefix}ExpectedRetirementAge` as keyof UnifiedFormData, 'Expected retirement age')}
-
-                    <div className="space-y-4">
-                      <h3 className="text-lg font-medium">Please add all additional income sources relevant to this applicant:</h3>
-                      <div className="grid grid-cols-3 gap-4">
-                        <div>
-                          <Label>Income source</Label>
-                          <Select defaultValue="Before tax return">
-                            <SelectTrigger>
-                              <SelectValue />
-                            </SelectTrigger>
-                            <SelectContent>
-                              <SelectItem value="Before tax return">Before tax return</SelectItem>
-                            </SelectContent>
-                          </Select>
-                        </div>
-                        <div>
-                          <Label>Amount</Label>
-                          <Input placeholder="£" />
-                        </div>
-                        <div>
-                          <Label>Frequency</Label>
-                          <Select defaultValue="Yearly">
-                            <SelectTrigger>
-                              <SelectValue />
-                            </SelectTrigger>
-                            <SelectContent>
-                              <SelectItem value="Yearly">Yearly</SelectItem>
-                              <SelectItem value="Monthly">Monthly</SelectItem>
-                            </SelectContent>
-                          </Select>
-                        </div>
-                      </div>
-                      <Button variant="outline" className="w-full">
-                        <Plus className="w-4 h-4 mr-2" />
-                        Add an income source
-                      </Button>
-                    </div>
-                  </CardContent>
-                </Card>
-
-                <Card>
-                  <CardHeader>
-                    <CardTitle>Commitments - {getApplicantName(applicantNum)}</CardTitle>
-                  </CardHeader>
-                  <CardContent className="space-y-6">
-                    <p className="text-sm text-muted-foreground">
-                      Please add all current commitments related to this applicant, even if they will be redeemed or consolidated upon completion.
-                      Please also include, but are not limited to: credit cards, hire purchase, commercial finance, student finance payments, etc.
-                    </p>
-
-                    <div className="grid grid-cols-4 gap-4">
-                      {renderField(`${prefix}CommitmentType` as keyof UnifiedFormData, 'Commitment type', 'select', ['Credit card', 'Personal loan', 'Hire purchase', 'Student loan'])}
-                      {renderField(`${prefix}Provider` as keyof UnifiedFormData, 'Provider', 'select', ['Bank', 'Building Society', 'Finance Company'])}
-                      {renderField(`${prefix}MonthlyPayment` as keyof UnifiedFormData, 'Monthly payment')}
-                      {renderField(`${prefix}RemainingBalance` as keyof UnifiedFormData, 'Remaining balance')}
-                    </div>
-
-                    <Button variant="outline" className="w-full">
-                      <Plus className="w-4 h-4 mr-2" />
-                      Add a commitment
-                    </Button>
-                  </CardContent>
-                </Card>
-              </div>
-            );
-          })}
-        </TabsContent>
-
-        <TabsContent value="submission" className="space-y-6">
-          <Card>
-            <CardHeader>
-              <CardTitle>Review & Submit Application</CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-6">
-              <div className="bg-muted p-4 rounded-lg">
-                <h3 className="text-lg font-medium mb-4">Application Summary</h3>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
-                  <div>
-                    <strong>Property Purchase Price:</strong> {formData.totalPurchasePrice}
-                  </div>
-                  <div>
-                    <strong>Loan Amount:</strong> {formData.requiredLoanAmount}
-                  </div>
-                  <div>
-                    <strong>Applicant 1:</strong> {getApplicantName(1)}
-                  </div>
-                  <div>
-                    <strong>Applicant 2:</strong> {getApplicantName(2)}
-                  </div>
-                  <div>
-                    <strong>Application Type:</strong> {formData.applicationType}
-                  </div>
-                  <div>
-                    <strong>Term:</strong> {formData.termYears} years
+          
+          <ScrollArea className="flex-1">
+            <div className="p-4">
+              {navigationItems.map((section) => (
+                <div key={section.title} className="mb-6">
+                  <h3 className="font-semibold text-blue-700 mb-3 text-base">
+                    {section.title}
+                  </h3>
+                  <div className="space-y-1">
+                    {section.items.map((item) => {
+                      const isActive = 
+                        (item.key.startsWith('jane') && activeTab === 'applicants' && activeApplicant === 2) ||
+                        (item.key.startsWith('james') && activeTab === 'applicants' && activeApplicant === 1) ||
+                        (item.key.startsWith('mortgage') && activeTab === 'mortgage') ||
+                        (item.key.startsWith('household') && activeTab === 'mortgage') ||
+                        (item.key === 'declarations' && activeTab === 'submission');
+                      
+                      return (
+                        <button
+                          key={item.key}
+                          onClick={() => handleNavigationClick(item.key)}
+                          className={`w-full flex items-center gap-3 px-3 py-2 text-sm rounded-md transition-colors text-left ${
+                            isActive 
+                              ? 'bg-blue-50 text-blue-700 font-medium' 
+                              : 'text-gray-700 hover:bg-gray-50'
+                          }`}
+                        >
+                          {item.status === 'complete' && (
+                            <Check className="h-4 w-4 text-green-600" />
+                          )}
+                          {item.status === 'warning' && (
+                            <AlertTriangle className="h-4 w-4 text-orange-500" />
+                          )}
+                          <span className="flex-1">{item.label}</span>
+                        </button>
+                      );
+                    })}
                   </div>
                 </div>
-              </div>
-              
-              <div className="space-y-4">
-                <h4 className="text-md font-medium">Declaration</h4>
-                <p className="text-sm text-muted-foreground">
-                  By submitting this application, you confirm that all information provided is accurate and complete.
-                  You understand that any false or misleading information may result in the rejection of your application.
-                </p>
-              </div>
+              ))}
+            </div>
+          </ScrollArea>
+          
+          <div className="p-4 border-t border-gray-200">
+            <Button onClick={handleMainButtonClick} variant={getButtonVariant()} className="w-full">
+              {getButtonText()}
+            </Button>
+          </div>
+        </aside>
 
-              <div className="flex gap-4">
-                <Button variant="outline" className="flex-1">
-                  Save as Draft
-                </Button>
-                <Button className="flex-1" disabled={!isEditMode || hasUnsavedChanges}>
-                  Submit Application
-                </Button>
-              </div>
-            </CardContent>
-          </Card>
-        </TabsContent>
-      </Tabs>
+        <SidebarInset className="flex-1">
+          <main className="flex-1 bg-[#F7F8FA] overflow-hidden">
+            <ScrollArea className="h-screen">
+              <div className="container mx-auto p-6 space-y-6">
+                <div className="flex justify-between items-center">
+                  <h1 className="text-3xl font-bold">Data Capture Form</h1>
+                </div>
 
-      <FieldComparisonModal
-        open={!!comparisonField}
-        onOpenChange={(open) => !open && setComparisonField(null)}
-        fieldName={comparisonField || ''}
-        auditEntries={auditLog}
-      />
-    </div>
+                <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
+                  {/* Hidden TabsList for programmatic control */}
+                  <TabsList className="hidden">
+                    <TabsTrigger value="mortgage">Mortgage Details</TabsTrigger>
+                    <TabsTrigger value="applicants">Applicant Information</TabsTrigger>
+                    <TabsTrigger value="submission">Review & Submit</TabsTrigger>
+                  </TabsList>
+
+                  <TabsContent value="mortgage" className="space-y-6">
+                    <Card>
+                      <CardHeader>
+                        <CardTitle>Mortgage details</CardTitle>
+                      </CardHeader>
+                      <CardContent className="space-y-6">
+                        <div className="space-y-4">
+                          <h3 className="text-lg font-medium">Have any applicants been subject to:</h3>
+                          {renderField('bankruptcySubject', 'A bankruptcy which has not been satisfied for at least 3 years?', 'radio', ['Yes', 'No'])}
+                          {renderField('ivaSubject', 'An Individual Voluntary arrangement (IVA) or debt relief order (DRO) that has not been satisfied for at least 3 years?', 'radio', ['Yes', 'No'])}
+                          {renderField('propertyRepossessed', 'Property repossession at any time?', 'radio', ['Yes', 'No'])}
+                        </div>
+
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                          {renderField('applicationPurpose', 'Application purpose', 'radio', ['Residential', 'Buy to Let'])}
+                          {renderField('applicationType', 'Application type', 'radio', ['Purchase', 'Remortgage'])}
+                          {renderField('residentialSubType', 'Residential purchase sub-type', 'select', ['Standard', 'Help to Buy', 'Shared Ownership'])}
+                          {renderField('propertyRegion', 'Region of the property to be mortgaged', 'select', ['North', 'South', 'East', 'West', 'Central'])}
+                          {renderField('totalPurchasePrice', 'Total purchase price')}
+                          {renderField('depositAmount', 'Deposit amount')}
+                          {renderField('requiredLoanAmount', 'Required loan amount')}
+                          {renderField('loanToValue', 'Loan to value')}
+                          {renderField('termYears', 'Term (years)')}
+                          {renderField('repaymentType', 'Repayment type', 'radio', ['Repayment', 'Interest Only', 'Part And Part'])}
+                          {renderField('monthlyGroundRent', 'Monthly ground rent/service charge of the property to be purchased')}
+                          {renderField('initialFixedTerm', 'Will the initial fixed term be 60 months or more?', 'radio', ['Yes', 'No'])}
+                        </div>
+                      </CardContent>
+                    </Card>
+
+                    <Card>
+                      <CardHeader>
+                        <CardTitle>Household details</CardTitle>
+                      </CardHeader>
+                      <CardContent className="space-y-6">
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                          {renderField('numberOfApplicants', 'Number of applicants', 'radio', ['One', 'Two'])}
+                          {renderField('sameAddress', 'Will all applicants live at the same address once the mortgage completes?', 'radio', ['Yes', 'No'])}
+                          {renderField('dependentsUnder13', 'Number of household dependents aged 0-13')}
+                          {renderField('childBenefit', 'Does the applicant receive child benefit?', 'radio', ['Yes', 'No'])}
+                          {renderField('dependents14Plus', 'Number of household dependents aged 14 and over')}
+                        </div>
+                      </CardContent>
+                    </Card>
+
+                    <Card>
+                      <CardHeader>
+                        <CardTitle>Household expenditure</CardTitle>
+                      </CardHeader>
+                      <CardContent>
+                        <p className="text-sm text-muted-foreground mb-4">
+                          Newcastle Building Society uses Office of National Statistics (ONS) data to calculate affordability, which considers 
+                          typical household expenditure for the region. Alternatively, we can calculate affordability using the applicant's 
+                          expected total monthly expenditure.
+                        </p>
+                        <p className="text-sm text-muted-foreground mb-4">
+                          Please select how you would like us to calculate the applicant's affordability:
+                        </p>
+                        {renderField('expenditureCalculation', 'Calculation method', 'radio', ['ONS', 'Enter expenditure'])}
+                      </CardContent>
+                    </Card>
+                  </TabsContent>
+
+                  <TabsContent value="applicants" className="space-y-6">
+                    <div className="flex justify-center mb-6">
+                      <Tabs value={activeApplicant.toString()} onValueChange={(value) => setActiveApplicant(parseInt(value))}>
+                        <TabsList>
+                          <TabsTrigger value="1">Applicant 1 - {getApplicantName(1)}</TabsTrigger>
+                          <TabsTrigger value="2">Applicant 2 - {getApplicantName(2)}</TabsTrigger>
+                        </TabsList>
+                      </Tabs>
+                    </div>
+
+                    {/* Render applicant forms based on activeApplicant */}
+                    {[1, 2].map(applicantNum => {
+                      if (applicantNum !== activeApplicant) return null;
+                      const prefix = getFieldPrefix(applicantNum);
+                      
+                      return (
+                        <div key={applicantNum} className="space-y-6">
+                          <Card>
+                            <CardHeader>
+                              <CardTitle>Eligibility - {getApplicantName(applicantNum)}</CardTitle>
+                            </CardHeader>
+                            <CardContent className="space-y-4">
+                              <p className="text-sm text-muted-foreground">
+                                In the last 3 years has this applicant had or satisfied any of the following:
+                              </p>
+                              {renderField(`${prefix}CourtDecree` as keyof UnifiedFormData, 'CCJ (court of decree in Scotland)', 'radio', ['Yes', 'No'])}
+                              {renderField(`${prefix}DebtManagement` as keyof UnifiedFormData, 'Had an active or settled debt management plan', 'radio', ['Yes', 'No'])}
+                            </CardContent>
+                          </Card>
+
+                          <Card>
+                            <CardHeader>
+                              <CardTitle>Personal details - {getApplicantName(applicantNum)}</CardTitle>
+                            </CardHeader>
+                            <CardContent className="space-y-6">
+                              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                {renderField(`${prefix}Title` as keyof UnifiedFormData, 'Title', 'select', ['Mr', 'Mrs', 'Miss', 'Ms', 'Dr'])}
+                                {renderField(`${prefix}FirstName` as keyof UnifiedFormData, 'First name')}
+                                {renderField(`${prefix}MiddleName` as keyof UnifiedFormData, 'Middle name')}
+                                {renderField(`${prefix}LastName` as keyof UnifiedFormData, 'Last name')}
+                                {renderField(`${prefix}NameChange` as keyof UnifiedFormData, 'Name change in the last 3 years?', 'radio', ['Yes', 'No'])}
+                              </div>
+
+                              <div className="space-y-4">
+                                <Label>Date of birth</Label>
+                                <div className="grid grid-cols-3 gap-4">
+                                  {renderField(`${prefix}BirthDay` as keyof UnifiedFormData, 'Day')}
+                                  {renderField(`${prefix}BirthMonth` as keyof UnifiedFormData, 'Month')}
+                                  {renderField(`${prefix}BirthYear` as keyof UnifiedFormData, 'Year')}
+                                </div>
+                              </div>
+
+                              {renderField(`${prefix}Nationality` as keyof UnifiedFormData, 'Nationality', 'radio', ['UK Resident', 'EEA or Swiss National', 'Non EEA'])}
+                            </CardContent>
+                          </Card>
+
+                          <Card>
+                            <CardHeader>
+                              <CardTitle>Addresses - {getApplicantName(applicantNum)}</CardTitle>
+                            </CardHeader>
+                            <CardContent className="space-y-6">
+                              <div className="space-y-4">
+                                <h3 className="text-lg font-medium">Current address</h3>
+                                {renderField(`${prefix}CurrentAddress` as keyof UnifiedFormData, 'Address')}
+                                {renderField(`${prefix}Postcode` as keyof UnifiedFormData, 'Postcode')}
+                                {renderField(`${prefix}MoveInDate` as keyof UnifiedFormData, 'When did the applicant move in')}
+                                <div className="grid grid-cols-2 gap-4">
+                                  {renderField(`${prefix}CurrentAddressYears` as keyof UnifiedFormData, 'Years')}
+                                  {renderField(`${prefix}CurrentAddressMonths` as keyof UnifiedFormData, 'Months')}
+                                </div>
+                                {renderField(`${prefix}CurrentResidencyStatus` as keyof UnifiedFormData, 'Current residency status', 'select', [
+                                  'Owner occupation with mortgage',
+                                  'Owner occupier with mortgage',
+                                  'Owner occupation without mortgage',
+                                  'Privately rented',
+                                  'Living with parents',
+                                  'Council rented',
+                                  'Housing association rented',
+                                  'Other'
+                                ])}
+                                {renderField(`${prefix}SalePrice` as keyof UnifiedFormData, 'Sale price')}
+                                {renderField(`${prefix}CurrentLender` as keyof UnifiedFormData, 'Current lender')}
+                                {renderField(`${prefix}OutstandingMortgageBalance` as keyof UnifiedFormData, 'Outstanding mortgage balance')}
+                                {renderField(`${prefix}PlansForProperty` as keyof UnifiedFormData, 'Plans for property')}
+                                {renderField(`${prefix}ExpectedRemainingBalance` as keyof UnifiedFormData, 'Expected remaining balance')}
+                              </div>
+
+                              <div className="space-y-4">
+                                <h3 className="text-lg font-medium">Previous address</h3>
+                                {renderField(`${prefix}PreviousAddress` as keyof UnifiedFormData, 'Address')}
+                                <div className="grid grid-cols-2 gap-4">
+                                  {renderField(`${prefix}PreviousAddressYears` as keyof UnifiedFormData, 'Years')}
+                                  {renderField(`${prefix}PreviousAddressMonths` as keyof UnifiedFormData, 'Months')}
+                                </div>
+                              </div>
+                            </CardContent>
+                          </Card>
+
+                          <Card>
+                            <CardHeader>
+                              <CardTitle>Income - {getApplicantName(applicantNum)}</CardTitle>
+                            </CardHeader>
+                            <CardContent className="space-y-6">
+                              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                {renderField(`${prefix}EmploymentStatus` as keyof UnifiedFormData, 'Employment status', 'select', ['Employed', 'Self-employed', 'Unemployed', 'Retired'])}
+                                {renderField(`${prefix}GrossBasicIncome` as keyof UnifiedFormData, 'Gross basic income')}
+                                {renderField(`${prefix}Frequency` as keyof UnifiedFormData, 'Payment frequency of gross basic income', 'select', ['Weekly', 'Monthly', 'Yearly'])}
+                                {renderField(`${prefix}AnnualAmount` as keyof UnifiedFormData, 'Annual amount')}
+                                {renderField(`${prefix}MonthlyNetSalary` as keyof UnifiedFormData, 'Monthly net salary/net income')}
+                                {renderField(`${prefix}JobTitle` as keyof UnifiedFormData, 'Job title')}
+                                {renderField(`${prefix}EmployerName` as keyof UnifiedFormData, 'Employer name')}
+                                {renderField(`${prefix}EmploymentType` as keyof UnifiedFormData, 'Employment nature', 'radio', ['Permanent', 'Contract'])}
+                              </div>
+
+                              <div className="space-y-4">
+                                <Label>Start date of permanent employment</Label>
+                                <div className="grid grid-cols-2 gap-4">
+                                  {renderField(`${prefix}StartMonth` as keyof UnifiedFormData, 'Month')}
+                                  {renderField(`${prefix}StartYear` as keyof UnifiedFormData, 'Year')}
+                                </div>
+                              </div>
+
+                              {renderField(`${prefix}ExpectedRetirementAge` as keyof UnifiedFormData, 'Expected retirement age')}
+
+                              <div className="space-y-4">
+                                <h3 className="text-lg font-medium">Please add all additional income sources relevant to this applicant:</h3>
+                                <div className="grid grid-cols-3 gap-4">
+                                  <div>
+                                    <Label>Income source</Label>
+                                    <Select defaultValue="Before tax return">
+                                      <SelectTrigger>
+                                        <SelectValue />
+                                      </SelectTrigger>
+                                      <SelectContent>
+                                        <SelectItem value="Before tax return">Before tax return</SelectItem>
+                                      </SelectContent>
+                                    </Select>
+                                  </div>
+                                  <div>
+                                    <Label>Amount</Label>
+                                    <Input placeholder="£" />
+                                  </div>
+                                  <div>
+                                    <Label>Frequency</Label>
+                                    <Select defaultValue="Yearly">
+                                      <SelectTrigger>
+                                        <SelectValue />
+                                      </SelectTrigger>
+                                      <SelectContent>
+                                        <SelectItem value="Yearly">Yearly</SelectItem>
+                                        <SelectItem value="Monthly">Monthly</SelectItem>
+                                      </SelectContent>
+                                    </Select>
+                                  </div>
+                                </div>
+                                <Button variant="outline" className="w-full">
+                                  <Plus className="w-4 h-4 mr-2" />
+                                  Add an income source
+                                </Button>
+                              </div>
+                            </CardContent>
+                          </Card>
+
+                          <Card>
+                            <CardHeader>
+                              <CardTitle>Commitments - {getApplicantName(applicantNum)}</CardTitle>
+                            </CardHeader>
+                            <CardContent className="space-y-6">
+                              <p className="text-sm text-muted-foreground">
+                                Please add all current commitments related to this applicant, even if they will be redeemed or consolidated upon completion.
+                                Please also include, but are not limited to: credit cards, hire purchase, commercial finance, student finance payments, etc.
+                              </p>
+
+                              <div className="grid grid-cols-4 gap-4">
+                                {renderField(`${prefix}CommitmentType` as keyof UnifiedFormData, 'Commitment type', 'select', ['Credit card', 'Personal loan', 'Hire purchase', 'Student loan'])}
+                                {renderField(`${prefix}Provider` as keyof UnifiedFormData, 'Provider', 'select', ['Bank', 'Building Society', 'Finance Company'])}
+                                {renderField(`${prefix}MonthlyPayment` as keyof UnifiedFormData, 'Monthly payment')}
+                                {renderField(`${prefix}RemainingBalance` as keyof UnifiedFormData, 'Remaining balance')}
+                              </div>
+
+                              <Button variant="outline" className="w-full">
+                                <Plus className="w-4 h-4 mr-2" />
+                                Add a commitment
+                              </Button>
+                            </CardContent>
+                          </Card>
+                        </div>
+                      );
+                    })}
+                  </TabsContent>
+
+                  <TabsContent value="submission" className="space-y-6">
+                    <Card>
+                      <CardHeader>
+                        <CardTitle>Review & Submit Application</CardTitle>
+                      </CardHeader>
+                      <CardContent className="space-y-6">
+                        <div className="bg-muted p-4 rounded-lg">
+                          <h3 className="text-lg font-medium mb-4">Application Summary</h3>
+                          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
+                            <div>
+                              <strong>Property Purchase Price:</strong> {formData.totalPurchasePrice}
+                            </div>
+                            <div>
+                              <strong>Loan Amount:</strong> {formData.requiredLoanAmount}
+                            </div>
+                            <div>
+                              <strong>Applicant 1:</strong> {getApplicantName(1)}
+                            </div>
+                            <div>
+                              <strong>Applicant 2:</strong> {getApplicantName(2)}
+                            </div>
+                            <div>
+                              <strong>Application Type:</strong> {formData.applicationType}
+                            </div>
+                            <div>
+                              <strong>Term:</strong> {formData.termYears} years
+                            </div>
+                          </div>
+                        </div>
+                        
+                        <div className="space-y-4">
+                          <h4 className="text-md font-medium">Declaration</h4>
+                          <p className="text-sm text-muted-foreground">
+                            By submitting this application, you confirm that all information provided is accurate and complete.
+                            You understand that any false or misleading information may result in the rejection of your application.
+                          </p>
+                        </div>
+
+                        <div className="flex gap-4">
+                          <Button variant="outline" className="flex-1">
+                            Save as Draft
+                          </Button>
+                          <Button className="flex-1" disabled={!isEditMode || hasUnsavedChanges}>
+                            Submit Application
+                          </Button>
+                        </div>
+                      </CardContent>
+                    </Card>
+                  </TabsContent>
+                </Tabs>
+
+                {comparisonField && (
+                  <FieldComparisonModal
+                    open={!!comparisonField}
+                    onOpenChange={(open) => !open && setComparisonField(null)}
+                    fieldName={comparisonField}
+                    auditEntries={auditLog}
+                  />
+                )}
+              </div>
+            </ScrollArea>
+          </main>
+        </SidebarInset>
+      </div>
+    </SidebarProvider>
   );
 };
