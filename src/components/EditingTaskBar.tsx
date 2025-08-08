@@ -194,7 +194,9 @@ export const EditingTaskBar: React.FC = () => {
       title: "Changes cancelled",
       description: "All unsaved changes have been discarded.",
     });
-    navigate(location.pathname);
+    const originPath = sessionStorage.getItem('readOnlyOriginPath') || '/';
+    navigate(originPath);
+    sessionStorage.removeItem('readOnlyOriginPath');
     setShowCancelDialog(false);
   };
 
