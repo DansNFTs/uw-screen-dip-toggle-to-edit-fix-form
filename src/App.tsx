@@ -4,6 +4,11 @@ import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { ApplicantDataProvider } from './contexts/ApplicantDataContext';
+import { EditModeProvider } from './contexts/EditModeContext';
+import { CaseNotesProvider } from './contexts/CaseNotesContext';
+import { AuditProvider } from './contexts/AuditContext';
+import { UnifiedDataProvider } from './contexts/UnifiedDataContext';
 import { MainLayout } from "./components/MainLayout";
 import { IncomeEmploymentPage } from "./pages/IncomeEmploymentPage";
 import { SummaryPage } from "./pages/SummaryPage";
@@ -25,29 +30,39 @@ const queryClient = new QueryClient();
 const App = () => (
   <QueryClientProvider client={queryClient}>
     <TooltipProvider>
-      <Toaster />
-      <Sonner />
-      <BrowserRouter>
-        <MainLayout>
-          <Routes>
-            <Route path="/" element={<SummaryPage />} />
-            <Route path="/income-employment" element={<IncomeEmploymentPage />} />
-            <Route path="/loan-details" element={<LoanDetailsPage />} />
-            <Route path="/property-details" element={<PropertyDetailsPage />} />
-            <Route path="/credit-information" element={<CreditInformationPage />} />
-            <Route path="/affordability" element={<AffordabilityPage />} />
-            <Route path="/commitments-expenses" element={<CommitmentsExpensesPage />} />
-            <Route path="/personal-details" element={<PersonalDetailsPage />} />
-            <Route path="/mortgage-details" element={<MortgageDetailsPage />} />
-            <Route path="/detailed-personal/:applicantNumber" element={<DetailedPersonalDetailsPage />} />
-            <Route path="/data-capture/:section?/:applicantNumber?" element={<UnifiedDataCapturePage />} />
-            <Route path="/policy-rules-notes" element={<PolicyRulesNotesPage />} />
-            <Route path="/audit-log" element={<AuditLogPage />} />
-            {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
-            <Route path="*" element={<NotFound />} />
-          </Routes>
-        </MainLayout>
-      </BrowserRouter>
+      <AuditProvider>
+        <UnifiedDataProvider>
+          <EditModeProvider>
+            <ApplicantDataProvider>
+              <CaseNotesProvider>
+                <Toaster />
+                <Sonner />
+                <BrowserRouter>
+                  <MainLayout>
+                    <Routes>
+                      <Route path="/" element={<SummaryPage />} />
+                      <Route path="/income-employment" element={<IncomeEmploymentPage />} />
+                      <Route path="/loan-details" element={<LoanDetailsPage />} />
+                      <Route path="/property-details" element={<PropertyDetailsPage />} />
+                      <Route path="/credit-information" element={<CreditInformationPage />} />
+                      <Route path="/affordability" element={<AffordabilityPage />} />
+                      <Route path="/commitments-expenses" element={<CommitmentsExpensesPage />} />
+                      <Route path="/personal-details" element={<PersonalDetailsPage />} />
+                      <Route path="/mortgage-details" element={<MortgageDetailsPage />} />
+                      <Route path="/detailed-personal/:applicantNumber" element={<DetailedPersonalDetailsPage />} />
+                      <Route path="/data-capture/:section?/:applicantNumber?" element={<UnifiedDataCapturePage />} />
+                      <Route path="/policy-rules-notes" element={<PolicyRulesNotesPage />} />
+                      <Route path="/audit-log" element={<AuditLogPage />} />
+                      {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
+                      <Route path="*" element={<NotFound />} />
+                    </Routes>
+                  </MainLayout>
+                </BrowserRouter>
+              </CaseNotesProvider>
+            </ApplicantDataProvider>
+          </EditModeProvider>
+        </UnifiedDataProvider>
+      </AuditProvider>
     </TooltipProvider>
   </QueryClientProvider>
 );

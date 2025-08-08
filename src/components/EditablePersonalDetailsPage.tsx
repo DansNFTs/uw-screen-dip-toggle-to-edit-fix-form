@@ -13,11 +13,14 @@ import { Clock } from 'lucide-react';
 import { useToast } from "@/hooks/use-toast";
 import { useNavigate } from 'react-router-dom';
 import { FieldComparisonModal } from './FieldComparisonModal';
+import { EnhancedReadOnlyField } from './EnhancedReadOnlyField';
+import { useUnifiedData } from '../contexts/UnifiedDataContext';
 
 export const EditablePersonalDetailsPage: React.FC = () => {
   const { isEditingEnabled, isEditMode, hasUnsavedChanges, hasSavedChanges, setIsEditMode, setHasUnsavedChanges, saveChanges, exitEditMode, storeOriginalState, restoreAllOriginalState } = useEditMode();
   const { addAuditEntry, auditLog, currentSessionId, startAuditSession, endAuditSession, cancelAuditSession } = useAudit();
   const { applicantData, updateApplicantData, getFormattedApplicantNames } = useApplicantData();
+  const { unifiedData, syncFromReadOnly } = useUnifiedData();
   const { toast } = useToast();
   const navigate = useNavigate();
   
@@ -127,7 +130,7 @@ export const EditablePersonalDetailsPage: React.FC = () => {
     janeLastName: applicantData.janeLastName,
   }));
 
-  // Sync form data with applicant data context whenever name fields change
+  // Sync form data with applicant data context and unified data whenever name fields change
   useEffect(() => {
     const applicantFields = {
       jamesTitle: formData.jamesTitle,
@@ -140,8 +143,9 @@ export const EditablePersonalDetailsPage: React.FC = () => {
       janeLastName: formData.janeLastName,
     };
     updateApplicantData(applicantFields);
+    syncFromReadOnly(formData);
   }, [formData.jamesTitle, formData.jamesFirstName, formData.jamesMiddleName, formData.jamesLastName, 
-      formData.janeTitle, formData.janeFirstName, formData.janeMiddleName, formData.janeLastName, updateApplicantData]);
+      formData.janeTitle, formData.janeFirstName, formData.janeMiddleName, formData.janeLastName, updateApplicantData, syncFromReadOnly]);
   const [comparisonModal, setComparisonModal] = useState({ open: false, fieldName: '' });
 
   // Store original state when entering edit mode
@@ -838,119 +842,175 @@ export const EditablePersonalDetailsPage: React.FC = () => {
       );
     }
 
-    // Display view when not editing - restore original summary format
+    // Enhanced read-only view with audit integration
     return (
       <div className="space-y-6">
         <h3 className="text-[#165788] text-lg font-medium">{applicantJamesName}</h3>
         
-        <div className="w-full">
-          {[
-            { label: 'Name change in last 6 years', field: 'jamesNameChange', value: formData.jamesNameChange },
-            { label: 'D.O.B - Age', field: 'jamesDateOfBirthDay', value: `${formData.jamesDateOfBirthDay}/${formData.jamesDateOfBirthMonth}/${formData.jamesDateOfBirthYear}` },
-            { label: 'Current address', field: 'jamesCurrentAddress', value: formData.jamesCurrentAddress },
-            { label: 'Postcode', field: 'jamesPostcode', value: formData.jamesPostcode },
-            { label: 'When did the applicant move in', field: 'jamesMoveInDate', value: formData.jamesMoveInDate },
-            { label: 'Sale price', field: 'jamesSalePrice', value: formData.jamesSalePrice },
-            { label: 'Current residency status', field: 'jamesResidencyStatus', value: formData.jamesResidencyStatus },
-            { label: 'Current lender', field: 'jamesCurrentLender', value: formData.jamesCurrentLender },
-            { label: 'Outstanding mortgage balance', field: 'jamesOutstandingMortgage', value: formData.jamesOutstandingMortgage },
-            { label: 'Plans for property', field: 'jamesPlansForProperty', value: formData.jamesPlansForProperty },
-            { label: 'Expected remaining mortgage balance', field: 'jamesExpectedRemainingBalance', value: formData.jamesExpectedRemainingBalance }
-          ].map((item, index) => {
-            const edited = isFieldEdited(item.field);
-            const fieldClasses = isEditingEnabled 
-              ? `flex w-full gap-4 text-base flex-wrap p-1 cursor-pointer hover:bg-gray-50 ${index % 2 === 0 ? 'bg-[#F7F8FA]' : ''}`
-              : `flex w-full gap-4 text-base flex-wrap p-1 ${index % 2 === 0 ? 'bg-[#F7F8FA]' : ''}`;
-
-            return (
-              <div 
-                key={item.field} 
-                className={fieldClasses}
-                onDoubleClick={() => handleFieldDoubleClick(item.field)}
-                title={isEditingEnabled && !isEditMode ? "Double-click to edit this field" : ""}
-              >
-                <div className="text-[#505A5F] font-normal flex-1 shrink basis-[0%]">
-                  {item.label}
-                </div>
-                <div className="text-black font-medium flex-1 shrink basis-[0%] flex items-center gap-2">
-                  {item.value}
-                  {edited && (
-                    <TooltipProvider>
-                      <Tooltip>
-                        <TooltipTrigger asChild>
-                          <button 
-                            onClick={() => handleFieldComparisonClick(item.field)}
-                            className="text-blue-500 hover:text-blue-700"
-                          >
-                            <Clock className="w-3 h-3" />
-                          </button>
-                        </TooltipTrigger>
-                        <TooltipContent>
-                          <p>This field has been edited. Click to view audit log.</p>
-                        </TooltipContent>
-                      </Tooltip>
-                    </TooltipProvider>
-                  )}
-                </div>
-              </div>
-            );
-          })}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <EnhancedReadOnlyField
+            field="jamesNameChange"
+            value={unifiedData.jamesNameChange || formData.jamesNameChange}
+            label="Name change in last 6 years"
+            onDoubleClick={handleFieldDoubleClick}
+            onAuditClick={handleFieldComparisonClick}
+          />
+          <EnhancedReadOnlyField
+            field="jamesDateOfBirth"
+            value={`${unifiedData.jamesDateOfBirthDay || formData.jamesDateOfBirthDay}/${unifiedData.jamesDateOfBirthMonth || formData.jamesDateOfBirthMonth}/${unifiedData.jamesDateOfBirthYear || formData.jamesDateOfBirthYear}`}
+            label="D.O.B - Age"
+            onDoubleClick={() => handleFieldDoubleClick('jamesDateOfBirthDay')}
+            onAuditClick={handleFieldComparisonClick}
+          />
+          <EnhancedReadOnlyField
+            field="jamesCurrentAddress"
+            value={unifiedData.jamesCurrentAddress || formData.jamesCurrentAddress}
+            label="Current address"
+            onDoubleClick={handleFieldDoubleClick}
+            onAuditClick={handleFieldComparisonClick}
+            className="md:col-span-2"
+          />
+          <EnhancedReadOnlyField
+            field="jamesPostcode"
+            value={unifiedData.jamesPostcode || formData.jamesPostcode}
+            label="Postcode"
+            onDoubleClick={handleFieldDoubleClick}
+            onAuditClick={handleFieldComparisonClick}
+          />
+          <EnhancedReadOnlyField
+            field="jamesMoveInDate"
+            value={unifiedData.jamesMoveInDate || formData.jamesMoveInDate}
+            label="When did the applicant move in"
+            onDoubleClick={handleFieldDoubleClick}
+            onAuditClick={handleFieldComparisonClick}
+          />
+          <EnhancedReadOnlyField
+            field="jamesSalePrice"
+            value={unifiedData.jamesSalePrice || formData.jamesSalePrice}
+            label="Sale price"
+            onDoubleClick={handleFieldDoubleClick}
+            onAuditClick={handleFieldComparisonClick}
+          />
+          <EnhancedReadOnlyField
+            field="jamesResidencyStatus"
+            value={unifiedData.jamesResidencyStatus || formData.jamesResidencyStatus}
+            label="Current residency status"
+            onDoubleClick={handleFieldDoubleClick}
+            onAuditClick={handleFieldComparisonClick}
+          />
+          <EnhancedReadOnlyField
+            field="jamesCurrentLender"
+            value={unifiedData.jamesCurrentLender || formData.jamesCurrentLender}
+            label="Current lender"
+            onDoubleClick={handleFieldDoubleClick}
+            onAuditClick={handleFieldComparisonClick}
+          />
+          <EnhancedReadOnlyField
+            field="jamesOutstandingMortgage"
+            value={unifiedData.jamesOutstandingMortgage || formData.jamesOutstandingMortgage}
+            label="Outstanding mortgage balance"
+            onDoubleClick={handleFieldDoubleClick}
+            onAuditClick={handleFieldComparisonClick}
+          />
+          <EnhancedReadOnlyField
+            field="jamesPlansForProperty"
+            value={unifiedData.jamesPlansForProperty || formData.jamesPlansForProperty}
+            label="Plans for property"
+            onDoubleClick={handleFieldDoubleClick}
+            onAuditClick={handleFieldComparisonClick}
+          />
+          <EnhancedReadOnlyField
+            field="jamesExpectedRemainingBalance"
+            value={unifiedData.jamesExpectedRemainingBalance || formData.jamesExpectedRemainingBalance}
+            label="Expected remaining mortgage balance"
+            onDoubleClick={handleFieldDoubleClick}
+            onAuditClick={handleFieldComparisonClick}
+            className="md:col-span-2"
+          />
         </div>
         
-        <h3 className="text-[#165788] text-lg font-medium">{applicantJaneName}</h3>
+        <h3 className="text-[#165788] text-lg font-medium mt-8">{applicantJaneName}</h3>
         
-        <div className="w-full">
-          {[
-            { label: 'Name change in last 6 years', field: 'janeNameChange', value: 'No' },
-            { label: 'D.O.B - Age', field: 'janeDateOfBirthDay', value: `${formData.janeDateOfBirthDay}/${formData.janeDateOfBirthMonth}/${formData.janeDateOfBirthYear} - 35yrs` },
-            { label: 'Current address', field: 'janeCurrentAddress', value: formData.janeCurrentAddress },
-            { label: 'Postcode', field: 'janePostcode', value: formData.janePostcode },
-            { label: 'When did the applicant move in', field: 'janeMoveInDate', value: formData.janeMoveInDate },
-            { label: 'Sale price', field: 'janeSalePrice', value: formData.janeSalePrice },
-            { label: 'Current residency status', field: 'janeResidencyStatus', value: formData.janeResidencyStatus },
-            { label: 'Current lender', field: 'janeCurrentLender', value: formData.janeCurrentLender },
-            { label: 'Outstanding mortgage balance', field: 'janeOutstandingMortgage', value: formData.janeOutstandingMortgage },
-            { label: 'Plans for property', field: 'janePlansForProperty', value: formData.janePlansForProperty },
-            { label: 'Expected remaining mortgage balance', field: 'janeExpectedRemainingBalance', value: formData.janeExpectedRemainingBalance },
-          ].map((item, index) => {
-            const edited = isFieldEdited(item.field);
-            const fieldClasses = isEditingEnabled 
-              ? `flex w-full gap-4 text-base flex-wrap p-1 cursor-pointer hover:bg-gray-50 ${index % 2 === 0 ? 'bg-[#F7F8FA]' : ''}`
-              : `flex w-full gap-4 text-base flex-wrap p-1 ${index % 2 === 0 ? 'bg-[#F7F8FA]' : ''}`;
-
-            return (
-              <div 
-                key={item.field} 
-                className={fieldClasses}
-                onDoubleClick={() => handleFieldDoubleClick(item.field)}
-                title={isEditingEnabled && !isEditMode ? "Double-click to edit this field" : ""}
-              >
-                <div className="text-[#505A5F] font-normal flex-1 shrink basis-[0%]">
-                  {item.label}
-                </div>
-                <div className="text-black font-medium flex-1 shrink basis-[0%] flex items-center gap-2">
-                  {item.value}
-                  {edited && (
-                    <TooltipProvider>
-                      <Tooltip>
-                        <TooltipTrigger asChild>
-                          <button 
-                            onClick={() => handleFieldComparisonClick(item.field)}
-                            className="text-blue-500 hover:text-blue-700"
-                          >
-                            <Clock className="w-3 h-3" />
-                          </button>
-                        </TooltipTrigger>
-                        <TooltipContent>
-                          <p>This field has been edited. Click to view audit log.</p>
-                        </TooltipContent>
-                      </Tooltip>
-                    </TooltipProvider>
-                  )}
-                </div>
-              </div>
-            );
-          })}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <EnhancedReadOnlyField
+            field="janeNameChange"
+            value="No"
+            label="Name change in last 6 years"
+            onDoubleClick={handleFieldDoubleClick}
+            onAuditClick={handleFieldComparisonClick}
+          />
+          <EnhancedReadOnlyField
+            field="janeDateOfBirth"
+            value={`${unifiedData.janeDateOfBirthDay || formData.janeDateOfBirthDay}/${unifiedData.janeDateOfBirthMonth || formData.janeDateOfBirthMonth}/${unifiedData.janeDateOfBirthYear || formData.janeDateOfBirthYear} - 35yrs`}
+            label="D.O.B - Age"
+            onDoubleClick={() => handleFieldDoubleClick('janeDateOfBirthDay')}
+            onAuditClick={handleFieldComparisonClick}
+          />
+          <EnhancedReadOnlyField
+            field="janeCurrentAddress"
+            value={unifiedData.janeCurrentAddress || formData.janeCurrentAddress}
+            label="Current address"
+            onDoubleClick={handleFieldDoubleClick}
+            onAuditClick={handleFieldComparisonClick}
+            className="md:col-span-2"
+          />
+          <EnhancedReadOnlyField
+            field="janePostcode"
+            value={unifiedData.janePostcode || formData.janePostcode}
+            label="Postcode"
+            onDoubleClick={handleFieldDoubleClick}
+            onAuditClick={handleFieldComparisonClick}
+          />
+          <EnhancedReadOnlyField
+            field="janeMoveInDate"
+            value={unifiedData.janeMoveInDate || formData.janeMoveInDate}
+            label="When did the applicant move in"
+            onDoubleClick={handleFieldDoubleClick}
+            onAuditClick={handleFieldComparisonClick}
+          />
+          <EnhancedReadOnlyField
+            field="janeSalePrice"
+            value={unifiedData.janeSalePrice || formData.janeSalePrice}
+            label="Sale price"
+            onDoubleClick={handleFieldDoubleClick}
+            onAuditClick={handleFieldComparisonClick}
+          />
+          <EnhancedReadOnlyField
+            field="janeResidencyStatus"
+            value={unifiedData.janeResidencyStatus || formData.janeResidencyStatus}
+            label="Current residency status"
+            onDoubleClick={handleFieldDoubleClick}
+            onAuditClick={handleFieldComparisonClick}
+          />
+          <EnhancedReadOnlyField
+            field="janeCurrentLender"
+            value={unifiedData.janeCurrentLender || formData.janeCurrentLender}
+            label="Current lender"
+            onDoubleClick={handleFieldDoubleClick}
+            onAuditClick={handleFieldComparisonClick}
+          />
+          <EnhancedReadOnlyField
+            field="janeOutstandingMortgage"
+            value={unifiedData.janeOutstandingMortgage || formData.janeOutstandingMortgage}
+            label="Outstanding mortgage balance"
+            onDoubleClick={handleFieldDoubleClick}
+            onAuditClick={handleFieldComparisonClick}
+          />
+          <EnhancedReadOnlyField
+            field="janePlansForProperty"
+            value={unifiedData.janePlansForProperty || formData.janePlansForProperty}
+            label="Plans for property"
+            onDoubleClick={handleFieldDoubleClick}
+            onAuditClick={handleFieldComparisonClick}
+          />
+          <EnhancedReadOnlyField
+            field="janeExpectedRemainingBalance"
+            value={unifiedData.janeExpectedRemainingBalance || formData.janeExpectedRemainingBalance}
+            label="Expected remaining mortgage balance"
+            onDoubleClick={handleFieldDoubleClick}
+            onAuditClick={handleFieldComparisonClick}
+            className="md:col-span-2"
+          />
         </div>
       </div>
     );

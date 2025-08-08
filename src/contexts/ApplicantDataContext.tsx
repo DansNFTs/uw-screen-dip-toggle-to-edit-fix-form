@@ -1,4 +1,5 @@
-import React, { createContext, useContext, useState, ReactNode } from 'react';
+import React, { createContext, useContext, useState, ReactNode, useEffect } from 'react';
+import { useUnifiedData } from './UnifiedDataContext';
 
 interface ApplicantData {
   // James Taylor
@@ -42,6 +43,7 @@ export const ApplicantDataProvider: React.FC<{ children: ReactNode }> = ({ child
   const updateApplicantData = (data: Partial<ApplicantData>) => {
     setApplicantData(prev => ({ ...prev, ...data }));
   };
+
 
   const getFormattedApplicantNames = (): string[] => {
     const jamesName = [

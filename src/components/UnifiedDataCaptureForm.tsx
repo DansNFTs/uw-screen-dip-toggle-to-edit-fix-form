@@ -10,11 +10,14 @@ import { Clock } from 'lucide-react';
 import { useEditMode } from '../contexts/EditModeContext';
 import { useAudit } from '../contexts/AuditContext';
 import { useApplicantData } from '../contexts/ApplicantDataContext';
+import { useUnifiedData } from '../contexts/UnifiedDataContext';
+import { isProtectedField } from '../utils/fieldMapping';
 import { useToast } from "@/hooks/use-toast";
 import { useParams, useSearchParams, useNavigate, useLocation } from 'react-router-dom';
 import { FieldComparisonModal } from './FieldComparisonModal';
 
 interface UnifiedFormData {
+  [key: string]: string;
   // Mortgage Details
   bankruptcySubject: string;
   ivaSubject: string;
@@ -146,6 +149,7 @@ export const UnifiedDataCaptureForm: React.FC = () => {
   const { isEditingEnabled, isEditMode, hasUnsavedChanges, setIsEditMode, setHasUnsavedChanges, saveChanges, exitEditMode, storeOriginalState, restoreAllOriginalState } = useEditMode();
   const { addAuditEntry, auditLog, currentSessionId, startAuditSession, endAuditSession, cancelAuditSession } = useAudit();
   const { applicantData, updateApplicantData, getFormattedApplicantNames } = useApplicantData();
+  const { syncFromDataCapture, unifiedData } = useUnifiedData();
   const { toast } = useToast();
   const navigate = useNavigate();
   const location = useLocation();
@@ -346,6 +350,16 @@ export const UnifiedDataCaptureForm: React.FC = () => {
   }, [restoreAllOriginalState, cancelAuditSession, initialFormData]);
 
   const handleInputChange = (field: string, value: string) => {
+    // Don't allow changes to protected fields
+    if (isProtectedField(field)) {
+      toast({
+        title: "Cannot edit field",
+        description: "This field is calculated automatically and cannot be edited.",
+        variant: "destructive",
+      });
+      return;
+    }
+
     const oldValue = formData[field as keyof UnifiedFormData];
     
     setFormData(prev => ({
@@ -360,6 +374,9 @@ export const UnifiedDataCaptureForm: React.FC = () => {
     if (field.includes('Title') || field.includes('FirstName') || field.includes('MiddleName') || field.includes('LastName')) {
       updateApplicantData({ [field]: value });
     }
+    
+    // Sync to unified data context
+    syncFromDataCapture({ ...formData });
   };
 
   // Helper function to navigate back to original page
@@ -374,16 +391,19 @@ export const UnifiedDataCaptureForm: React.FC = () => {
   };
 
   const handleSave = () => {
+    // Final sync to unified data before saving
+    syncFromDataCapture({ ...formData });
+    
     saveChanges();
     endAuditSession();
     
-    // Navigate back to the originating page
-    navigateBackToOriginalPage();
-    
     toast({
-      title: "Changes saved",
+      title: "Changes saved", 
       description: "Your data has been successfully saved.",
     });
+    
+    // Navigate back to the originating page
+    navigateBackToOriginalPage();
   };
 
   const isFieldEdited = (fieldName: string) => {
