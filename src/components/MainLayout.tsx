@@ -52,8 +52,8 @@ const MainLayoutContent: React.FC<MainLayoutProps> = ({ children }) => {
   // Hide task bar on summary, policy rules, and audit log pages
   const showTaskBar = !['/', '/policy-rules-notes', '/audit-log'].includes(location.pathname);
   
-  // Show data capture navigation when in edit mode
-  const showDataCaptureNav = isEditMode && location.pathname.includes('/data-capture');
+  // Show data capture navigation only when actually in the data capture form
+  const showDataCaptureNav = location.pathname.startsWith('/data-capture');
 
   return (
     <SidebarProvider>
