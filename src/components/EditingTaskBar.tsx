@@ -137,6 +137,9 @@ export const EditingTaskBar: React.FC = () => {
   const performSaveAndExit = () => {
     saveChanges();
     exitEditMode();
+    if (isEditingEnabled) {
+      toggleEditingEnabled();
+    }
     toast({
       title: "Changes saved",
       description: "Your changes have been saved and edit mode has been exited.",
@@ -146,6 +149,10 @@ export const EditingTaskBar: React.FC = () => {
   const performSaveAndResubmit = () => {
     const affordabilityChanged = checkAffordabilityFieldsChanged();
     saveAndResubmit();
+    exitEditMode();
+    if (isEditingEnabled) {
+      toggleEditingEnabled();
+    }
     toast({
       title: "Changes saved and resubmitted",
       description: "Your changes have been saved and the case has been resubmitted for review.",
@@ -174,6 +181,9 @@ export const EditingTaskBar: React.FC = () => {
     // Dispatch custom event to notify components to restore their state
     window.dispatchEvent(new CustomEvent('editModeCancel'));
     cancelAndExitEditMode();
+    if (isEditingEnabled) {
+      toggleEditingEnabled();
+    }
     toast({
       title: "Changes cancelled",
       description: "All unsaved changes have been discarded.",
