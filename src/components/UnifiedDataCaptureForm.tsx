@@ -563,18 +563,8 @@ export const UnifiedDataCaptureForm: React.FC = () => {
                   </TabsContent>
 
                   <TabsContent value="applicants" className="space-y-6">
-                    <div className="flex justify-center mb-6">
-                      <Tabs value={activeApplicant.toString()} onValueChange={(value) => setActiveApplicant(parseInt(value))}>
-                        <TabsList>
-                          <TabsTrigger value="1">Applicant 1 - {getApplicantName(1)}</TabsTrigger>
-                          <TabsTrigger value="2">Applicant 2 - {getApplicantName(2)}</TabsTrigger>
-                        </TabsList>
-                      </Tabs>
-                    </div>
-
-                    {/* Render applicant forms based on activeApplicant */}
+                    {/* Render all applicants without tabs */}
                     {[1, 2].map(applicantNum => {
-                      if (applicantNum !== activeApplicant) return null;
                       const prefix = getFieldPrefix(applicantNum);
                       
                       return (
