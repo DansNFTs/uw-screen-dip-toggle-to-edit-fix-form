@@ -84,11 +84,7 @@ export const DataCaptureNavigation: React.FC = () => {
 
   return (
     <Sidebar className="bg-white border-r border-gray-200">
-      <div className="px-3 py-4 border-b border-gray-200 bg-[#165788] text-white">
-        <h2 className="font-medium text-sm">Decision in Principle</h2>
-      </div>
-      
-      <SidebarContent className="py-2">
+      <SidebarContent className="bg-white text-gray-900 p-4">
         {navigationItems.map((section) => (
           <SidebarGroup key={section.title} className="mb-6">
             <SidebarGroupLabel className="text-[#165788] font-semibold text-base mb-3 px-2">
