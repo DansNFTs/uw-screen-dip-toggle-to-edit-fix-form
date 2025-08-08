@@ -510,46 +510,574 @@ export const UnifiedDataCaptureForm: React.FC = () => {
   };
 
   return (
-    <div className="max-w-6xl mx-auto p-6">
+    <div className="max-w-4xl mx-auto p-6">
+      {/* Render different content based on current section */}
+      {currentSection === 'mortgage' && (
+        <div className="space-y-8">
+          {/* Main Header */}
+          <div className="text-center">
+            <h1 className="text-3xl font-bold text-blue-600 mb-2">Mortgage</h1>
+          </div>
+
+          {/* Mortgage Details Section */}
+          <div className="bg-white border border-gray-200 rounded-lg p-6">
+            <h2 className="text-xl font-semibold mb-6 text-gray-900">Mortgage details</h2>
+            
+            {/* Bankruptcy/IVA Questions */}
+            <div className="mb-8">
+              <h3 className="text-base font-medium mb-4 text-gray-900">Have any applicants been subject to:</h3>
+              <div className="space-y-4 ml-4">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">• Bankruptcy</label>
+                  <div className="flex space-x-6">
+                    <label className="flex items-center">
+                      <input
+                        type="radio"
+                        name="bankruptcySubject"
+                        value="Yes"
+                        checked={formData.bankruptcySubject === 'Yes'}
+                        onChange={(e) => handleInputChange('bankruptcySubject', e.target.value)}
+                        className="mr-2 h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300"
+                        disabled={!isEditMode}
+                      />
+                      <span className="text-sm text-gray-700">Yes</span>
+                    </label>
+                    <label className="flex items-center">
+                      <input
+                        type="radio"
+                        name="bankruptcySubject"
+                        value="No"
+                        checked={formData.bankruptcySubject === 'No'}
+                        onChange={(e) => handleInputChange('bankruptcySubject', e.target.value)}
+                        className="mr-2 h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300"
+                        disabled={!isEditMode}
+                      />
+                      <span className="text-sm text-gray-700">No</span>
+                    </label>
+                  </div>
+                </div>
+                
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">• Individual Voluntary Arrangement (IVA)</label>
+                  <div className="flex space-x-6">
+                    <label className="flex items-center">
+                      <input
+                        type="radio"
+                        name="ivaSubject"
+                        value="Yes"
+                        checked={formData.ivaSubject === 'Yes'}
+                        onChange={(e) => handleInputChange('ivaSubject', e.target.value)}
+                        className="mr-2 h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300"
+                        disabled={!isEditMode}
+                      />
+                      <span className="text-sm text-gray-700">Yes</span>
+                    </label>
+                    <label className="flex items-center">
+                      <input
+                        type="radio"
+                        name="ivaSubject"
+                        value="No"
+                        checked={formData.ivaSubject === 'No'}
+                        onChange={(e) => handleInputChange('ivaSubject', e.target.value)}
+                        className="mr-2 h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300"
+                        disabled={!isEditMode}
+                      />
+                      <span className="text-sm text-gray-700">No</span>
+                    </label>
+                  </div>
+                </div>
+                
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">• Property being repossessed</label>
+                  <div className="flex space-x-6">
+                    <label className="flex items-center">
+                      <input
+                        type="radio"
+                        name="propertyRepossessed"
+                        value="Yes"
+                        checked={formData.propertyRepossessed === 'Yes'}
+                        onChange={(e) => handleInputChange('propertyRepossessed', e.target.value)}
+                        className="mr-2 h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300"
+                        disabled={!isEditMode}
+                      />
+                      <span className="text-sm text-gray-700">Yes</span>
+                    </label>
+                    <label className="flex items-center">
+                      <input
+                        type="radio"
+                        name="propertyRepossessed"
+                        value="No"
+                        checked={formData.propertyRepossessed === 'No'}
+                        onChange={(e) => handleInputChange('propertyRepossessed', e.target.value)}
+                        className="mr-2 h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300"
+                        disabled={!isEditMode}
+                      />
+                      <span className="text-sm text-gray-700">No</span>
+                    </label>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* Property and Loan Details */}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">Application purpose</label>
+                <select
+                  value={formData.applicationPurpose}
+                  onChange={(e) => handleInputChange('applicationPurpose', e.target.value)}
+                  disabled={!isEditMode}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white"
+                >
+                  <option value="Purchase">Purchase</option>
+                  <option value="Remortgage">Remortgage</option>
+                  <option value="Transfer of Equity">Transfer of Equity</option>
+                </select>
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">Application type</label>
+                <select
+                  value={formData.applicationType}
+                  onChange={(e) => handleInputChange('applicationType', e.target.value)}
+                  disabled={!isEditMode}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white"
+                >
+                  <option value="Standard Residential">Standard Residential</option>
+                  <option value="Buy to Let">Buy to Let</option>
+                  <option value="Right to Buy">Right to Buy</option>
+                </select>
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">Residential sub-type</label>
+                <select
+                  value={formData.residentialSubType}
+                  onChange={(e) => handleInputChange('residentialSubType', e.target.value)}
+                  disabled={!isEditMode}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white"
+                >
+                  <option value="First Time Buyer">First Time Buyer</option>
+                  <option value="Home Mover">Home Mover</option>
+                  <option value="Remortgage">Remortgage</option>
+                </select>
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">Property region</label>
+                <select
+                  value={formData.propertyRegion}
+                  onChange={(e) => handleInputChange('propertyRegion', e.target.value)}
+                  disabled={!isEditMode}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white"
+                >
+                  <option value="England">England</option>
+                  <option value="Scotland">Scotland</option>
+                  <option value="Wales">Wales</option>
+                  <option value="Northern Ireland">Northern Ireland</option>
+                </select>
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">Total purchase price</label>
+                <input
+                  type="text"
+                  value={formData.totalPurchasePrice}
+                  onChange={(e) => handleInputChange('totalPurchasePrice', e.target.value)}
+                  disabled={!isEditMode}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                />
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">Deposit amount</label>
+                <input
+                  type="text"
+                  value={formData.depositAmount}
+                  onChange={(e) => handleInputChange('depositAmount', e.target.value)}
+                  disabled={!isEditMode}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                />
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">Required loan amount</label>
+                <input
+                  type="text"
+                  value={formData.requiredLoanAmount}
+                  onChange={(e) => handleInputChange('requiredLoanAmount', e.target.value)}
+                  disabled={!isEditMode}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-gray-50"
+                />
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">Loan-to-value</label>
+                <input
+                  type="text"
+                  value={formData.loanToValue}
+                  onChange={(e) => handleInputChange('loanToValue', e.target.value)}
+                  disabled={!isEditMode}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-gray-50"
+                />
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">Term (years)</label>
+                <input
+                  type="text"
+                  value={formData.termYears}
+                  onChange={(e) => handleInputChange('termYears', e.target.value)}
+                  disabled={!isEditMode}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                />
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">Repayment type</label>
+                <select
+                  value={formData.repaymentType}
+                  onChange={(e) => handleInputChange('repaymentType', e.target.value)}
+                  disabled={!isEditMode}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white"
+                >
+                  <option value="Repayment">Repayment</option>
+                  <option value="Interest Only">Interest Only</option>
+                  <option value="Part and Part">Part and Part</option>
+                </select>
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">Monthly ground rent</label>
+                <input
+                  type="text"
+                  value={formData.monthlyGroundRent}
+                  onChange={(e) => handleInputChange('monthlyGroundRent', e.target.value)}
+                  disabled={!isEditMode}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                />
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">Initial fixed term</label>
+                <select
+                  value={formData.initialFixedTerm}
+                  onChange={(e) => handleInputChange('initialFixedTerm', e.target.value)}
+                  disabled={!isEditMode}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white"
+                >
+                  <option value="2 years">2 years</option>
+                  <option value="3 years">3 years</option>
+                  <option value="5 years">5 years</option>
+                  <option value="10 years">10 years</option>
+                </select>
+              </div>
+            </div>
+          </div>
+
+          {/* Household Details Section */}
+          <div className="bg-white border border-gray-200 rounded-lg p-6">
+            <h2 className="text-xl font-semibold mb-6 text-gray-900">Household details</h2>
+            
+            <div className="space-y-6">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-3">Number of applicants</label>
+                <div className="flex space-x-6">
+                  <label className="flex items-center">
+                    <input
+                      type="radio"
+                      name="numberOfApplicants"
+                      value="1"
+                      checked={formData.numberOfApplicants === '1'}
+                      onChange={(e) => handleInputChange('numberOfApplicants', e.target.value)}
+                      className="mr-2 h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300"
+                      disabled={!isEditMode}
+                    />
+                    <span className="text-sm text-gray-700">One</span>
+                  </label>
+                  <label className="flex items-center">
+                    <input
+                      type="radio"
+                      name="numberOfApplicants"
+                      value="2"
+                      checked={formData.numberOfApplicants === '2'}
+                      onChange={(e) => handleInputChange('numberOfApplicants', e.target.value)}
+                      className="mr-2 h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300"
+                      disabled={!isEditMode}
+                    />
+                    <span className="text-sm text-gray-700">Two</span>
+                  </label>
+                </div>
+              </div>
+
+              {formData.numberOfApplicants === '2' && (
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-3">Will all applicants live at the same address?</label>
+                  <div className="flex space-x-6">
+                    <label className="flex items-center">
+                      <input
+                        type="radio"
+                        name="sameAddress"
+                        value="Yes"
+                        checked={formData.sameAddress === 'Yes'}
+                        onChange={(e) => handleInputChange('sameAddress', e.target.value)}
+                        className="mr-2 h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300"
+                        disabled={!isEditMode}
+                      />
+                      <span className="text-sm text-gray-700">Yes</span>
+                    </label>
+                    <label className="flex items-center">
+                      <input
+                        type="radio"
+                        name="sameAddress"
+                        value="No"
+                        checked={formData.sameAddress === 'No'}
+                        onChange={(e) => handleInputChange('sameAddress', e.target.value)}
+                        className="mr-2 h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300"
+                        disabled={!isEditMode}
+                      />
+                      <span className="text-sm text-gray-700">No</span>
+                    </label>
+                  </div>
+                </div>
+              )}
+
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">Number of dependents under 13</label>
+                  <input
+                    type="text"
+                    value={formData.dependentsUnder13}
+                    onChange={(e) => handleInputChange('dependentsUnder13', e.target.value)}
+                    disabled={!isEditMode}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">Number of dependents 14+</label>
+                  <input
+                    type="text"
+                    value={formData.dependents14Plus}
+                    onChange={(e) => handleInputChange('dependents14Plus', e.target.value)}
+                    disabled={!isEditMode}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  />
+                </div>
+              </div>
+
+              {(parseInt(formData.dependentsUnder13) > 0 || parseInt(formData.dependents14Plus) > 0) && (
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-3">Do you receive child benefit?</label>
+                  <div className="flex space-x-6">
+                    <label className="flex items-center">
+                      <input
+                        type="radio"
+                        name="childBenefit"
+                        value="Yes"
+                        checked={formData.childBenefit === 'Yes'}
+                        onChange={(e) => handleInputChange('childBenefit', e.target.value)}
+                        className="mr-2 h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300"
+                        disabled={!isEditMode}
+                      />
+                      <span className="text-sm text-gray-700">Yes</span>
+                    </label>
+                    <label className="flex items-center">
+                      <input
+                        type="radio"
+                        name="childBenefit"
+                        value="No"
+                        checked={formData.childBenefit === 'No'}
+                        onChange={(e) => handleInputChange('childBenefit', e.target.value)}
+                        className="mr-2 h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300"
+                        disabled={!isEditMode}
+                      />
+                      <span className="text-sm text-gray-700">No</span>
+                    </label>
+                  </div>
+                </div>
+              )}
+            </div>
+          </div>
+
+          {/* Household Expenditure Section */}
+          <div className="bg-white border border-gray-200 rounded-lg p-6">
+            <h2 className="text-xl font-semibold mb-6 text-gray-900">Household expenditure</h2>
+            
+            <div className="space-y-6">
+              <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
+                <p className="text-sm text-blue-800">
+                  We can use the Office for National Statistics (ONS) data to calculate your household expenditure, or you can enter your own figures if you prefer.
+                </p>
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-3">How would you like to calculate expenditure?</label>
+                <div className="flex space-x-6">
+                  <label className="flex items-center">
+                    <input
+                      type="radio"
+                      name="expenditureCalculation"
+                      value="ONS"
+                      checked={formData.expenditureCalculation === 'ONS'}
+                      onChange={(e) => handleInputChange('expenditureCalculation', e.target.value)}
+                      className="mr-2 h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300"
+                      disabled={!isEditMode}
+                    />
+                    <span className="text-sm text-gray-700">Use ONS data</span>
+                  </label>
+                  <label className="flex items-center">
+                    <input
+                      type="radio"
+                      name="expenditureCalculation"
+                      value="Manual"
+                      checked={formData.expenditureCalculation === 'Manual'}
+                      onChange={(e) => handleInputChange('expenditureCalculation', e.target.value)}
+                      className="mr-2 h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300"
+                      disabled={!isEditMode}
+                    />
+                    <span className="text-sm text-gray-700">Enter expenditure manually</span>
+                  </label>
+                </div>
+              </div>
+
+              <div className="pt-6 border-t border-gray-200">
+                <Button 
+                  className="w-full md:w-auto px-8 py-2 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-md"
+                  disabled={!isEditMode}
+                >
+                  Continue
+                </Button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
       <div className="space-y-6">
-        {/* Render different content based on current section */}
-        {currentSection === 'mortgage' && (
-          <>
+        {/* Applicant Information Section */}
+        {currentSection === 'applicants' && (
+          <div className="space-y-6">
+            <div className="flex items-center justify-between mb-6">
+              <h2 className="text-xl font-semibold">
+                {getApplicantName(currentApplicant)} Information
+              </h2>
+            </div>
+
+            {/* Eligibility Section */}
             <Card>
               <CardHeader>
-                <CardTitle>Mortgage Information</CardTitle>
-                <CardDescription>Basic loan and property details</CardDescription>
+                <CardTitle>Eligibility - {getApplicantName(currentApplicant)}</CardTitle>
               </CardHeader>
               <CardContent className="space-y-4">
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  {renderField('applicationPurpose', 'Application Purpose', formData.applicationPurpose, (value) => handleInputChange('applicationPurpose', value), 'select', ['Purchase', 'Remortgage', 'Transfer of Equity'])}
-                  {renderField('applicationType', 'Application Type', formData.applicationType, (value) => handleInputChange('applicationType', value), 'select', ['Standard Residential', 'Buy to Let', 'Right to Buy'])}
-                  {renderField('totalPurchasePrice', 'Total Purchase Price', formData.totalPurchasePrice, (value) => handleInputChange('totalPurchasePrice', value))}
-                  {renderField('depositAmount', 'Deposit Amount', formData.depositAmount, (value) => handleInputChange('depositAmount', value))}
-                  {renderField('requiredLoanAmount', 'Required Loan Amount', formData.requiredLoanAmount, (value) => handleInputChange('requiredLoanAmount', value))}
-                  {renderField('loanToValue', 'Loan to Value', formData.loanToValue, (value) => handleInputChange('loanToValue', value))}
-                  {renderField('termYears', 'Term (Years)', formData.termYears, (value) => handleInputChange('termYears', value))}
-                  {renderField('repaymentType', 'Repayment Type', formData.repaymentType, (value) => handleInputChange('repaymentType', value), 'select', ['Repayment', 'Interest Only', 'Part and Part'])}
+                  {renderField(`${getFieldPrefix(currentApplicant)}CourtDecree`, 'Court Decree', formData[`${getFieldPrefix(currentApplicant)}CourtDecree` as keyof UnifiedFormData], (value) => handleInputChange(`${getFieldPrefix(currentApplicant)}CourtDecree`, value), 'radio', ['Yes', 'No'])}
+                  {renderField(`${getFieldPrefix(currentApplicant)}DebtManagement`, 'Debt Management Plan', formData[`${getFieldPrefix(currentApplicant)}DebtManagement` as keyof UnifiedFormData], (value) => handleInputChange(`${getFieldPrefix(currentApplicant)}DebtManagement`, value), 'radio', ['Yes', 'No'])}
                 </div>
               </CardContent>
             </Card>
 
+            {/* Personal Details Section */}
             <Card>
               <CardHeader>
-                <CardTitle>Household Information</CardTitle>
-                <CardDescription>Applicant and dependency details</CardDescription>
+                <CardTitle>Personal Details - {getApplicantName(currentApplicant)}</CardTitle>
               </CardHeader>
               <CardContent className="space-y-4">
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                  {renderField(`${getFieldPrefix(currentApplicant)}Title`, 'Title', formData[`${getFieldPrefix(currentApplicant)}Title` as keyof UnifiedFormData], (value) => handleInputChange(`${getFieldPrefix(currentApplicant)}Title`, value), 'select', ['Mr', 'Mrs', 'Miss', 'Ms', 'Dr'])}
+                  {renderField(`${getFieldPrefix(currentApplicant)}FirstName`, 'First Name', formData[`${getFieldPrefix(currentApplicant)}FirstName` as keyof UnifiedFormData], (value) => handleInputChange(`${getFieldPrefix(currentApplicant)}FirstName`, value))}
+                  {renderField(`${getFieldPrefix(currentApplicant)}MiddleName`, 'Middle Name', formData[`${getFieldPrefix(currentApplicant)}MiddleName` as keyof UnifiedFormData], (value) => handleInputChange(`${getFieldPrefix(currentApplicant)}MiddleName`, value))}
+                </div>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  {renderField('numberOfApplicants', 'Number of Applicants', formData.numberOfApplicants, (value) => handleInputChange('numberOfApplicants', value), 'select', ['1', '2', '3', '4'])}
-                  {renderField('sameAddress', 'Same Address', formData.sameAddress, (value) => handleInputChange('sameAddress', value), 'radio', ['Yes', 'No'])}
-                  {renderField('dependentsUnder13', 'Dependents Under 13', formData.dependentsUnder13, (value) => handleInputChange('dependentsUnder13', value))}
-                  {renderField('dependents14Plus', 'Dependents 14+', formData.dependents14Plus, (value) => handleInputChange('dependents14Plus', value))}
-                  {renderField('childBenefit', 'Child Benefit', formData.childBenefit, (value) => handleInputChange('childBenefit', value), 'radio', ['Yes', 'No'])}
+                  {renderField(`${getFieldPrefix(currentApplicant)}LastName`, 'Last Name', formData[`${getFieldPrefix(currentApplicant)}LastName` as keyof UnifiedFormData], (value) => handleInputChange(`${getFieldPrefix(currentApplicant)}LastName`, value))}
+                  {renderField(`${getFieldPrefix(currentApplicant)}NameChange`, 'Name Change in Last 6 Years', formData[`${getFieldPrefix(currentApplicant)}NameChange` as keyof UnifiedFormData], (value) => handleInputChange(`${getFieldPrefix(currentApplicant)}NameChange`, value), 'radio', ['Yes', 'No'])}
+                </div>
+                <div className="grid grid-cols-3 gap-4">
+                  {renderField(`${getFieldPrefix(currentApplicant)}BirthDay`, 'Day', formData[`${getFieldPrefix(currentApplicant)}BirthDay` as keyof UnifiedFormData], (value) => handleInputChange(`${getFieldPrefix(currentApplicant)}BirthDay`, value))}
+                  {renderField(`${getFieldPrefix(currentApplicant)}BirthMonth`, 'Month', formData[`${getFieldPrefix(currentApplicant)}BirthMonth` as keyof UnifiedFormData], (value) => handleInputChange(`${getFieldPrefix(currentApplicant)}BirthMonth`, value))}
+                  {renderField(`${getFieldPrefix(currentApplicant)}BirthYear`, 'Year', formData[`${getFieldPrefix(currentApplicant)}BirthYear` as keyof UnifiedFormData], (value) => handleInputChange(`${getFieldPrefix(currentApplicant)}BirthYear`, value))}
+                </div>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  {renderField(`${getFieldPrefix(currentApplicant)}Nationality`, 'Nationality', formData[`${getFieldPrefix(currentApplicant)}Nationality` as keyof UnifiedFormData], (value) => handleInputChange(`${getFieldPrefix(currentApplicant)}Nationality`, value), 'select', ['UK Resident', 'EU Citizen', 'Other'])}
                 </div>
               </CardContent>
             </Card>
-          </>
+
+            {/* Address Section */}
+            <Card>
+              <CardHeader>
+                <CardTitle>Addresses - {getApplicantName(currentApplicant)}</CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <div className="grid grid-cols-1 gap-4">
+                  {renderField(`${getFieldPrefix(currentApplicant)}CurrentAddress`, 'Current Address', formData[`${getFieldPrefix(currentApplicant)}CurrentAddress` as keyof UnifiedFormData], (value) => handleInputChange(`${getFieldPrefix(currentApplicant)}CurrentAddress`, value))}
+                  {renderField(`${getFieldPrefix(currentApplicant)}Postcode`, 'Postcode', formData[`${getFieldPrefix(currentApplicant)}Postcode` as keyof UnifiedFormData], (value) => handleInputChange(`${getFieldPrefix(currentApplicant)}Postcode`, value))}
+                </div>
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                  {renderField(`${getFieldPrefix(currentApplicant)}MoveInDate`, 'Move In Date', formData[`${getFieldPrefix(currentApplicant)}MoveInDate` as keyof UnifiedFormData], (value) => handleInputChange(`${getFieldPrefix(currentApplicant)}MoveInDate`, value))}
+                  {renderField(`${getFieldPrefix(currentApplicant)}CurrentAddressYears`, 'Years at Address', formData[`${getFieldPrefix(currentApplicant)}CurrentAddressYears` as keyof UnifiedFormData], (value) => handleInputChange(`${getFieldPrefix(currentApplicant)}CurrentAddressYears`, value))}
+                  {renderField(`${getFieldPrefix(currentApplicant)}CurrentAddressMonths`, 'Months at Address', formData[`${getFieldPrefix(currentApplicant)}CurrentAddressMonths` as keyof UnifiedFormData], (value) => handleInputChange(`${getFieldPrefix(currentApplicant)}CurrentAddressMonths`, value))}
+                </div>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  {renderField(`${getFieldPrefix(currentApplicant)}CurrentResidencyStatus`, 'Current Residency Status', formData[`${getFieldPrefix(currentApplicant)}CurrentResidencyStatus` as keyof UnifiedFormData], (value) => handleInputChange(`${getFieldPrefix(currentApplicant)}CurrentResidencyStatus`, value), 'select', ['Owner occupier with mortgage', 'Owner occupier without mortgage', 'Renting', 'Living with family'])}
+                </div>
+              </CardContent>
+            </Card>
+
+            {/* Income Section */}
+            <Card>
+              <CardHeader>
+                <CardTitle>Employment & Income - {getApplicantName(currentApplicant)}</CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  {renderField(`${getFieldPrefix(currentApplicant)}EmploymentStatus`, 'Employment Status', formData[`${getFieldPrefix(currentApplicant)}EmploymentStatus` as keyof UnifiedFormData], (value) => handleInputChange(`${getFieldPrefix(currentApplicant)}EmploymentStatus`, value), 'select', ['Employed', 'Self-employed', 'Retired', 'Student', 'Unemployed'])}
+                  {renderField(`${getFieldPrefix(currentApplicant)}GrossBasicIncome`, 'Gross Basic Income', formData[`${getFieldPrefix(currentApplicant)}GrossBasicIncome` as keyof UnifiedFormData], (value) => handleInputChange(`${getFieldPrefix(currentApplicant)}GrossBasicIncome`, value))}
+                  {renderField(`${getFieldPrefix(currentApplicant)}JobTitle`, 'Job Title', formData[`${getFieldPrefix(currentApplicant)}JobTitle` as keyof UnifiedFormData], (value) => handleInputChange(`${getFieldPrefix(currentApplicant)}JobTitle`, value))}
+                  {renderField(`${getFieldPrefix(currentApplicant)}EmployerName`, 'Employer Name', formData[`${getFieldPrefix(currentApplicant)}EmployerName` as keyof UnifiedFormData], (value) => handleInputChange(`${getFieldPrefix(currentApplicant)}EmployerName`, value))}
+                  {renderField(`${getFieldPrefix(currentApplicant)}EmploymentType`, 'Employment Type', formData[`${getFieldPrefix(currentApplicant)}EmploymentType` as keyof UnifiedFormData], (value) => handleInputChange(`${getFieldPrefix(currentApplicant)}EmploymentType`, value), 'select', ['Permanent', 'Fixed Term', 'Temporary', 'Probationary'])}
+                  {renderField(`${getFieldPrefix(currentApplicant)}ExpectedRetirementAge`, 'Expected Retirement Age', formData[`${getFieldPrefix(currentApplicant)}ExpectedRetirementAge` as keyof UnifiedFormData], (value) => handleInputChange(`${getFieldPrefix(currentApplicant)}ExpectedRetirementAge`, value))}
+                </div>
+              </CardContent>
+            </Card>
+
+            {/* Commitments Section */}
+            <Card>
+              <CardHeader>
+                <CardTitle>Commitments - {getApplicantName(currentApplicant)}</CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  {renderField(`${getFieldPrefix(currentApplicant)}CommitmentType`, 'Commitment Type', formData[`${getFieldPrefix(currentApplicant)}CommitmentType` as keyof UnifiedFormData], (value) => handleInputChange(`${getFieldPrefix(currentApplicant)}CommitmentType`, value), 'select', ['Credit card', 'Personal loan', 'Car loan', 'Store card', 'Other'])}
+                  {renderField(`${getFieldPrefix(currentApplicant)}Provider`, 'Provider', formData[`${getFieldPrefix(currentApplicant)}Provider` as keyof UnifiedFormData], (value) => handleInputChange(`${getFieldPrefix(currentApplicant)}Provider`, value))}
+                  {renderField(`${getFieldPrefix(currentApplicant)}MonthlyPayment`, 'Monthly Payment', formData[`${getFieldPrefix(currentApplicant)}MonthlyPayment` as keyof UnifiedFormData], (value) => handleInputChange(`${getFieldPrefix(currentApplicant)}MonthlyPayment`, value))}
+                  {renderField(`${getFieldPrefix(currentApplicant)}RemainingBalance`, 'Remaining Balance', formData[`${getFieldPrefix(currentApplicant)}RemainingBalance` as keyof UnifiedFormData], (value) => handleInputChange(`${getFieldPrefix(currentApplicant)}RemainingBalance`, value))}
+                </div>
+              </CardContent>
+            </Card>
+          </div>
+        )}
+
+        {/* Review & Submit Section */}
+        {currentSection === 'submission' && (
+          <Card>
+            <CardHeader>
+              <CardTitle>Application Summary</CardTitle>
+              <CardDescription>Review your information before submitting</CardDescription>
+            </CardHeader>
+            <CardContent>
+              <div className="space-y-4">
+                <div className="text-center p-8 border border-dashed border-gray-300 rounded-lg">
+                  <h3 className="text-lg font-medium mb-2">Ready to Submit</h3>
+                  <p className="text-gray-600 mb-4">All required information has been collected.</p>
+                  <div className="flex gap-4 justify-center">
+                    <Button variant="outline">Save as Draft</Button>
+                    <Button>Submit Application</Button>
+                  </div>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
         )}
 
         {/* Applicant Information Section */}
