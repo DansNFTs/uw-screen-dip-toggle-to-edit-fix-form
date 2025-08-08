@@ -513,336 +513,331 @@ export const UnifiedDataCaptureForm: React.FC = () => {
     <div className="max-w-4xl mx-auto p-6">
       {/* Render different content based on current section */}
       {currentSection === 'mortgage' && (
-        <div className="space-y-8">
-          {/* Main Header */}
-          <div className="text-center">
-            <h1 className="text-3xl font-bold text-blue-600 mb-2">Mortgage</h1>
-          </div>
-
-          {/* Mortgage Details Section */}
-          <div className="bg-white border border-gray-200 rounded-lg p-6">
-            <h2 className="text-xl font-semibold mb-6 text-gray-900">Mortgage details</h2>
-            
-            {/* Bankruptcy/IVA Questions */}
+        <Card className="mb-8">
+          <CardContent className="pt-6">
+            {/* Mortgage Details Section */}
             <div className="mb-8">
-              <h3 className="text-base font-medium mb-4 text-gray-900">Have any applicants been subject to:</h3>
-              <div className="space-y-4 ml-4">
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">• Bankruptcy</label>
-                  <div className="flex space-x-6">
-                    <label className="flex items-center">
-                      <input
-                        type="radio"
-                        name="bankruptcySubject"
-                        value="Yes"
-                        checked={formData.bankruptcySubject === 'Yes'}
-                        onChange={(e) => handleInputChange('bankruptcySubject', e.target.value)}
-                        className="mr-2 h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300"
-                        disabled={!isEditMode}
-                      />
-                      <span className="text-sm text-gray-700">Yes</span>
-                    </label>
-                    <label className="flex items-center">
-                      <input
-                        type="radio"
-                        name="bankruptcySubject"
-                        value="No"
-                        checked={formData.bankruptcySubject === 'No'}
-                        onChange={(e) => handleInputChange('bankruptcySubject', e.target.value)}
-                        className="mr-2 h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300"
-                        disabled={!isEditMode}
-                      />
-                      <span className="text-sm text-gray-700">No</span>
-                    </label>
+              <h2 className="text-xl font-semibold mb-6">Mortgage details</h2>
+              
+              {/* Bankruptcy/IVA Questions */}
+              <div className="mb-8">
+                <h3 className="text-base font-medium mb-4 text-gray-900">Have any applicants been subject to:</h3>
+                <div className="space-y-4 ml-4">
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">• Bankruptcy</label>
+                    <div className="flex space-x-6">
+                      <label className="flex items-center">
+                        <input
+                          type="radio"
+                          name="bankruptcySubject"
+                          value="Yes"
+                          checked={formData.bankruptcySubject === 'Yes'}
+                          onChange={(e) => handleInputChange('bankruptcySubject', e.target.value)}
+                          className="mr-2 h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300"
+                          disabled={!isEditMode}
+                        />
+                        <span className="text-sm text-gray-700">Yes</span>
+                      </label>
+                      <label className="flex items-center">
+                        <input
+                          type="radio"
+                          name="bankruptcySubject"
+                          value="No"
+                          checked={formData.bankruptcySubject === 'No'}
+                          onChange={(e) => handleInputChange('bankruptcySubject', e.target.value)}
+                          className="mr-2 h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300"
+                          disabled={!isEditMode}
+                        />
+                        <span className="text-sm text-gray-700">No</span>
+                      </label>
+                    </div>
+                  </div>
+                  
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">• Individual Voluntary Arrangement (IVA)</label>
+                    <div className="flex space-x-6">
+                      <label className="flex items-center">
+                        <input
+                          type="radio"
+                          name="ivaSubject"
+                          value="Yes"
+                          checked={formData.ivaSubject === 'Yes'}
+                          onChange={(e) => handleInputChange('ivaSubject', e.target.value)}
+                          className="mr-2 h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300"
+                          disabled={!isEditMode}
+                        />
+                        <span className="text-sm text-gray-700">Yes</span>
+                      </label>
+                      <label className="flex items-center">
+                        <input
+                          type="radio"
+                          name="ivaSubject"
+                          value="No"
+                          checked={formData.ivaSubject === 'No'}
+                          onChange={(e) => handleInputChange('ivaSubject', e.target.value)}
+                          className="mr-2 h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300"
+                          disabled={!isEditMode}
+                        />
+                        <span className="text-sm text-gray-700">No</span>
+                      </label>
+                    </div>
+                  </div>
+                  
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">• Property being repossessed</label>
+                    <div className="flex space-x-6">
+                      <label className="flex items-center">
+                        <input
+                          type="radio"
+                          name="propertyRepossessed"
+                          value="Yes"
+                          checked={formData.propertyRepossessed === 'Yes'}
+                          onChange={(e) => handleInputChange('propertyRepossessed', e.target.value)}
+                          className="mr-2 h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300"
+                          disabled={!isEditMode}
+                        />
+                        <span className="text-sm text-gray-700">Yes</span>
+                      </label>
+                      <label className="flex items-center">
+                        <input
+                          type="radio"
+                          name="propertyRepossessed"
+                          value="No"
+                          checked={formData.propertyRepossessed === 'No'}
+                          onChange={(e) => handleInputChange('propertyRepossessed', e.target.value)}
+                          className="mr-2 h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300"
+                          disabled={!isEditMode}
+                        />
+                        <span className="text-sm text-gray-700">No</span>
+                      </label>
+                    </div>
                   </div>
                 </div>
-                
+              </div>
+
+              {/* Property and Loan Details */}
+              <div className="grid grid-cols-1 gap-6">
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">• Individual Voluntary Arrangement (IVA)</label>
-                  <div className="flex space-x-6">
-                    <label className="flex items-center">
-                      <input
-                        type="radio"
-                        name="ivaSubject"
-                        value="Yes"
-                        checked={formData.ivaSubject === 'Yes'}
-                        onChange={(e) => handleInputChange('ivaSubject', e.target.value)}
-                        className="mr-2 h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300"
-                        disabled={!isEditMode}
-                      />
-                      <span className="text-sm text-gray-700">Yes</span>
-                    </label>
-                    <label className="flex items-center">
-                      <input
-                        type="radio"
-                        name="ivaSubject"
-                        value="No"
-                        checked={formData.ivaSubject === 'No'}
-                        onChange={(e) => handleInputChange('ivaSubject', e.target.value)}
-                        className="mr-2 h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300"
-                        disabled={!isEditMode}
-                      />
-                      <span className="text-sm text-gray-700">No</span>
-                    </label>
-                  </div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">Application purpose</label>
+                  <select
+                    value={formData.applicationPurpose}
+                    onChange={(e) => handleInputChange('applicationPurpose', e.target.value)}
+                    disabled={!isEditMode}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white"
+                  >
+                    <option value="Purchase">Purchase</option>
+                    <option value="Remortgage">Remortgage</option>
+                    <option value="Transfer of Equity">Transfer of Equity</option>
+                  </select>
                 </div>
-                
+
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">• Property being repossessed</label>
-                  <div className="flex space-x-6">
-                    <label className="flex items-center">
-                      <input
-                        type="radio"
-                        name="propertyRepossessed"
-                        value="Yes"
-                        checked={formData.propertyRepossessed === 'Yes'}
-                        onChange={(e) => handleInputChange('propertyRepossessed', e.target.value)}
-                        className="mr-2 h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300"
-                        disabled={!isEditMode}
-                      />
-                      <span className="text-sm text-gray-700">Yes</span>
-                    </label>
-                    <label className="flex items-center">
-                      <input
-                        type="radio"
-                        name="propertyRepossessed"
-                        value="No"
-                        checked={formData.propertyRepossessed === 'No'}
-                        onChange={(e) => handleInputChange('propertyRepossessed', e.target.value)}
-                        className="mr-2 h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300"
-                        disabled={!isEditMode}
-                      />
-                      <span className="text-sm text-gray-700">No</span>
-                    </label>
-                  </div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">Application type</label>
+                  <select
+                    value={formData.applicationType}
+                    onChange={(e) => handleInputChange('applicationType', e.target.value)}
+                    disabled={!isEditMode}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white"
+                  >
+                    <option value="Standard Residential">Standard Residential</option>
+                    <option value="Buy to Let">Buy to Let</option>
+                    <option value="Right to Buy">Right to Buy</option>
+                  </select>
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">Residential sub-type</label>
+                  <select
+                    value={formData.residentialSubType}
+                    onChange={(e) => handleInputChange('residentialSubType', e.target.value)}
+                    disabled={!isEditMode}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white"
+                  >
+                    <option value="First Time Buyer">First Time Buyer</option>
+                    <option value="Home Mover">Home Mover</option>
+                    <option value="Remortgage">Remortgage</option>
+                  </select>
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">Property region</label>
+                  <select
+                    value={formData.propertyRegion}
+                    onChange={(e) => handleInputChange('propertyRegion', e.target.value)}
+                    disabled={!isEditMode}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white"
+                  >
+                    <option value="England">England</option>
+                    <option value="Scotland">Scotland</option>
+                    <option value="Wales">Wales</option>
+                    <option value="Northern Ireland">Northern Ireland</option>
+                  </select>
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">Total purchase price</label>
+                  <input
+                    type="text"
+                    value={formData.totalPurchasePrice}
+                    onChange={(e) => handleInputChange('totalPurchasePrice', e.target.value)}
+                    disabled={!isEditMode}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">Deposit amount</label>
+                  <input
+                    type="text"
+                    value={formData.depositAmount}
+                    onChange={(e) => handleInputChange('depositAmount', e.target.value)}
+                    disabled={!isEditMode}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">Required loan amount</label>
+                  <input
+                    type="text"
+                    value={formData.requiredLoanAmount}
+                    onChange={(e) => handleInputChange('requiredLoanAmount', e.target.value)}
+                    disabled={!isEditMode}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-gray-50"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">Loan-to-value</label>
+                  <input
+                    type="text"
+                    value={formData.loanToValue}
+                    onChange={(e) => handleInputChange('loanToValue', e.target.value)}
+                    disabled={!isEditMode}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-gray-50"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">Term (years)</label>
+                  <input
+                    type="text"
+                    value={formData.termYears}
+                    onChange={(e) => handleInputChange('termYears', e.target.value)}
+                    disabled={!isEditMode}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">Repayment type</label>
+                  <select
+                    value={formData.repaymentType}
+                    onChange={(e) => handleInputChange('repaymentType', e.target.value)}
+                    disabled={!isEditMode}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white"
+                  >
+                    <option value="Repayment">Repayment</option>
+                    <option value="Interest Only">Interest Only</option>
+                    <option value="Part and Part">Part and Part</option>
+                  </select>
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">Monthly ground rent</label>
+                  <input
+                    type="text"
+                    value={formData.monthlyGroundRent}
+                    onChange={(e) => handleInputChange('monthlyGroundRent', e.target.value)}
+                    disabled={!isEditMode}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">Initial fixed term</label>
+                  <select
+                    value={formData.initialFixedTerm}
+                    onChange={(e) => handleInputChange('initialFixedTerm', e.target.value)}
+                    disabled={!isEditMode}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white"
+                  >
+                    <option value="2 years">2 years</option>
+                    <option value="3 years">3 years</option>
+                    <option value="5 years">5 years</option>
+                    <option value="10 years">10 years</option>
+                  </select>
                 </div>
               </div>
             </div>
 
-            {/* Property and Loan Details */}
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">Application purpose</label>
-                <select
-                  value={formData.applicationPurpose}
-                  onChange={(e) => handleInputChange('applicationPurpose', e.target.value)}
-                  disabled={!isEditMode}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white"
-                >
-                  <option value="Purchase">Purchase</option>
-                  <option value="Remortgage">Remortgage</option>
-                  <option value="Transfer of Equity">Transfer of Equity</option>
-                </select>
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">Application type</label>
-                <select
-                  value={formData.applicationType}
-                  onChange={(e) => handleInputChange('applicationType', e.target.value)}
-                  disabled={!isEditMode}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white"
-                >
-                  <option value="Standard Residential">Standard Residential</option>
-                  <option value="Buy to Let">Buy to Let</option>
-                  <option value="Right to Buy">Right to Buy</option>
-                </select>
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">Residential sub-type</label>
-                <select
-                  value={formData.residentialSubType}
-                  onChange={(e) => handleInputChange('residentialSubType', e.target.value)}
-                  disabled={!isEditMode}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white"
-                >
-                  <option value="First Time Buyer">First Time Buyer</option>
-                  <option value="Home Mover">Home Mover</option>
-                  <option value="Remortgage">Remortgage</option>
-                </select>
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">Property region</label>
-                <select
-                  value={formData.propertyRegion}
-                  onChange={(e) => handleInputChange('propertyRegion', e.target.value)}
-                  disabled={!isEditMode}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white"
-                >
-                  <option value="England">England</option>
-                  <option value="Scotland">Scotland</option>
-                  <option value="Wales">Wales</option>
-                  <option value="Northern Ireland">Northern Ireland</option>
-                </select>
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">Total purchase price</label>
-                <input
-                  type="text"
-                  value={formData.totalPurchasePrice}
-                  onChange={(e) => handleInputChange('totalPurchasePrice', e.target.value)}
-                  disabled={!isEditMode}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                />
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">Deposit amount</label>
-                <input
-                  type="text"
-                  value={formData.depositAmount}
-                  onChange={(e) => handleInputChange('depositAmount', e.target.value)}
-                  disabled={!isEditMode}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                />
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">Required loan amount</label>
-                <input
-                  type="text"
-                  value={formData.requiredLoanAmount}
-                  onChange={(e) => handleInputChange('requiredLoanAmount', e.target.value)}
-                  disabled={!isEditMode}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-gray-50"
-                />
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">Loan-to-value</label>
-                <input
-                  type="text"
-                  value={formData.loanToValue}
-                  onChange={(e) => handleInputChange('loanToValue', e.target.value)}
-                  disabled={!isEditMode}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-gray-50"
-                />
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">Term (years)</label>
-                <input
-                  type="text"
-                  value={formData.termYears}
-                  onChange={(e) => handleInputChange('termYears', e.target.value)}
-                  disabled={!isEditMode}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                />
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">Repayment type</label>
-                <select
-                  value={formData.repaymentType}
-                  onChange={(e) => handleInputChange('repaymentType', e.target.value)}
-                  disabled={!isEditMode}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white"
-                >
-                  <option value="Repayment">Repayment</option>
-                  <option value="Interest Only">Interest Only</option>
-                  <option value="Part and Part">Part and Part</option>
-                </select>
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">Monthly ground rent</label>
-                <input
-                  type="text"
-                  value={formData.monthlyGroundRent}
-                  onChange={(e) => handleInputChange('monthlyGroundRent', e.target.value)}
-                  disabled={!isEditMode}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                />
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">Initial fixed term</label>
-                <select
-                  value={formData.initialFixedTerm}
-                  onChange={(e) => handleInputChange('initialFixedTerm', e.target.value)}
-                  disabled={!isEditMode}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white"
-                >
-                  <option value="2 years">2 years</option>
-                  <option value="3 years">3 years</option>
-                  <option value="5 years">5 years</option>
-                  <option value="10 years">10 years</option>
-                </select>
-              </div>
-            </div>
-          </div>
-
-          {/* Household Details Section */}
-          <div className="bg-white border border-gray-200 rounded-lg p-6">
-            <h2 className="text-xl font-semibold mb-6 text-gray-900">Household details</h2>
-            
-            <div className="space-y-6">
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-3">Number of applicants</label>
-                <div className="flex space-x-6">
-                  <label className="flex items-center">
-                    <input
-                      type="radio"
-                      name="numberOfApplicants"
-                      value="1"
-                      checked={formData.numberOfApplicants === '1'}
-                      onChange={(e) => handleInputChange('numberOfApplicants', e.target.value)}
-                      className="mr-2 h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300"
-                      disabled={!isEditMode}
-                    />
-                    <span className="text-sm text-gray-700">One</span>
-                  </label>
-                  <label className="flex items-center">
-                    <input
-                      type="radio"
-                      name="numberOfApplicants"
-                      value="2"
-                      checked={formData.numberOfApplicants === '2'}
-                      onChange={(e) => handleInputChange('numberOfApplicants', e.target.value)}
-                      className="mr-2 h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300"
-                      disabled={!isEditMode}
-                    />
-                    <span className="text-sm text-gray-700">Two</span>
-                  </label>
-                </div>
-              </div>
-
-              {formData.numberOfApplicants === '2' && (
+            {/* Household Details Section */}
+            <div className="border-t pt-8 mb-8">
+              <h2 className="text-xl font-semibold mb-6">Household details</h2>
+              
+              <div className="space-y-6">
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-3">Will all applicants live at the same address?</label>
+                  <label className="block text-sm font-medium text-gray-700 mb-3">Number of applicants</label>
                   <div className="flex space-x-6">
                     <label className="flex items-center">
                       <input
                         type="radio"
-                        name="sameAddress"
-                        value="Yes"
-                        checked={formData.sameAddress === 'Yes'}
-                        onChange={(e) => handleInputChange('sameAddress', e.target.value)}
+                        name="numberOfApplicants"
+                        value="1"
+                        checked={formData.numberOfApplicants === '1'}
+                        onChange={(e) => handleInputChange('numberOfApplicants', e.target.value)}
                         className="mr-2 h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300"
                         disabled={!isEditMode}
                       />
-                      <span className="text-sm text-gray-700">Yes</span>
+                      <span className="text-sm text-gray-700">One</span>
                     </label>
                     <label className="flex items-center">
                       <input
                         type="radio"
-                        name="sameAddress"
-                        value="No"
-                        checked={formData.sameAddress === 'No'}
-                        onChange={(e) => handleInputChange('sameAddress', e.target.value)}
+                        name="numberOfApplicants"
+                        value="2"
+                        checked={formData.numberOfApplicants === '2'}
+                        onChange={(e) => handleInputChange('numberOfApplicants', e.target.value)}
                         className="mr-2 h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300"
                         disabled={!isEditMode}
                       />
-                      <span className="text-sm text-gray-700">No</span>
+                      <span className="text-sm text-gray-700">Two</span>
                     </label>
                   </div>
                 </div>
-              )}
 
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                {formData.numberOfApplicants === '2' && (
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-3">Will all applicants live at the same address?</label>
+                    <div className="flex space-x-6">
+                      <label className="flex items-center">
+                        <input
+                          type="radio"
+                          name="sameAddress"
+                          value="Yes"
+                          checked={formData.sameAddress === 'Yes'}
+                          onChange={(e) => handleInputChange('sameAddress', e.target.value)}
+                          className="mr-2 h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300"
+                          disabled={!isEditMode}
+                        />
+                        <span className="text-sm text-gray-700">Yes</span>
+                      </label>
+                      <label className="flex items-center">
+                        <input
+                          type="radio"
+                          name="sameAddress"
+                          value="No"
+                          checked={formData.sameAddress === 'No'}
+                          onChange={(e) => handleInputChange('sameAddress', e.target.value)}
+                          className="mr-2 h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300"
+                          disabled={!isEditMode}
+                        />
+                        <span className="text-sm text-gray-700">No</span>
+                      </label>
+                    </div>
+                  </div>
+                )}
+
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">Number of dependents under 13</label>
                   <input
@@ -864,94 +859,94 @@ export const UnifiedDataCaptureForm: React.FC = () => {
                     className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                   />
                 </div>
-              </div>
 
-              {(parseInt(formData.dependentsUnder13) > 0 || parseInt(formData.dependents14Plus) > 0) && (
+                {(parseInt(formData.dependentsUnder13) > 0 || parseInt(formData.dependents14Plus) > 0) && (
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-3">Do you receive child benefit?</label>
+                    <div className="flex space-x-6">
+                      <label className="flex items-center">
+                        <input
+                          type="radio"
+                          name="childBenefit"
+                          value="Yes"
+                          checked={formData.childBenefit === 'Yes'}
+                          onChange={(e) => handleInputChange('childBenefit', e.target.value)}
+                          className="mr-2 h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300"
+                          disabled={!isEditMode}
+                        />
+                        <span className="text-sm text-gray-700">Yes</span>
+                      </label>
+                      <label className="flex items-center">
+                        <input
+                          type="radio"
+                          name="childBenefit"
+                          value="No"
+                          checked={formData.childBenefit === 'No'}
+                          onChange={(e) => handleInputChange('childBenefit', e.target.value)}
+                          className="mr-2 h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300"
+                          disabled={!isEditMode}
+                        />
+                        <span className="text-sm text-gray-700">No</span>
+                      </label>
+                    </div>
+                  </div>
+                )}
+              </div>
+            </div>
+
+            {/* Household Expenditure Section */}
+            <div className="border-t pt-8 mb-8">
+              <h2 className="text-xl font-semibold mb-6">Household expenditure</h2>
+              
+              <div className="space-y-6">
+                <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
+                  <p className="text-sm text-blue-800">
+                    We can use the Office for National Statistics (ONS) data to calculate your household expenditure, or you can enter your own figures if you prefer.
+                  </p>
+                </div>
+
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-3">Do you receive child benefit?</label>
+                  <label className="block text-sm font-medium text-gray-700 mb-3">How would you like to calculate expenditure?</label>
                   <div className="flex space-x-6">
                     <label className="flex items-center">
                       <input
                         type="radio"
-                        name="childBenefit"
-                        value="Yes"
-                        checked={formData.childBenefit === 'Yes'}
-                        onChange={(e) => handleInputChange('childBenefit', e.target.value)}
+                        name="expenditureCalculation"
+                        value="ONS"
+                        checked={formData.expenditureCalculation === 'ONS'}
+                        onChange={(e) => handleInputChange('expenditureCalculation', e.target.value)}
                         className="mr-2 h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300"
                         disabled={!isEditMode}
                       />
-                      <span className="text-sm text-gray-700">Yes</span>
+                      <span className="text-sm text-gray-700">Use ONS data</span>
                     </label>
                     <label className="flex items-center">
                       <input
                         type="radio"
-                        name="childBenefit"
-                        value="No"
-                        checked={formData.childBenefit === 'No'}
-                        onChange={(e) => handleInputChange('childBenefit', e.target.value)}
+                        name="expenditureCalculation"
+                        value="Manual"
+                        checked={formData.expenditureCalculation === 'Manual'}
+                        onChange={(e) => handleInputChange('expenditureCalculation', e.target.value)}
                         className="mr-2 h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300"
                         disabled={!isEditMode}
                       />
-                      <span className="text-sm text-gray-700">No</span>
+                      <span className="text-sm text-gray-700">Enter expenditure manually</span>
                     </label>
                   </div>
                 </div>
-              )}
-            </div>
-          </div>
 
-          {/* Household Expenditure Section */}
-          <div className="bg-white border border-gray-200 rounded-lg p-6">
-            <h2 className="text-xl font-semibold mb-6 text-gray-900">Household expenditure</h2>
-            
-            <div className="space-y-6">
-              <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
-                <p className="text-sm text-blue-800">
-                  We can use the Office for National Statistics (ONS) data to calculate your household expenditure, or you can enter your own figures if you prefer.
-                </p>
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-3">How would you like to calculate expenditure?</label>
-                <div className="flex space-x-6">
-                  <label className="flex items-center">
-                    <input
-                      type="radio"
-                      name="expenditureCalculation"
-                      value="ONS"
-                      checked={formData.expenditureCalculation === 'ONS'}
-                      onChange={(e) => handleInputChange('expenditureCalculation', e.target.value)}
-                      className="mr-2 h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300"
-                      disabled={!isEditMode}
-                    />
-                    <span className="text-sm text-gray-700">Use ONS data</span>
-                  </label>
-                  <label className="flex items-center">
-                    <input
-                      type="radio"
-                      name="expenditureCalculation"
-                      value="Manual"
-                      checked={formData.expenditureCalculation === 'Manual'}
-                      onChange={(e) => handleInputChange('expenditureCalculation', e.target.value)}
-                      className="mr-2 h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300"
-                      disabled={!isEditMode}
-                    />
-                    <span className="text-sm text-gray-700">Enter expenditure manually</span>
-                  </label>
+                <div className="pt-6 border-t border-gray-200">
+                  <Button 
+                    className="w-full md:w-auto px-8 py-2 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-md"
+                    disabled={!isEditMode}
+                  >
+                    Continue
+                  </Button>
                 </div>
               </div>
-
-              <div className="pt-6 border-t border-gray-200">
-                <Button 
-                  className="w-full md:w-auto px-8 py-2 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-md"
-                  disabled={!isEditMode}
-                >
-                  Continue
-                </Button>
-              </div>
             </div>
-          </div>
-        </div>
+          </CardContent>
+        </Card>
       )}
 
       <div className="space-y-6">
