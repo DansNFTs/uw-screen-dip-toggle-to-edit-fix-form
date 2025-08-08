@@ -427,33 +427,74 @@ export const UnifiedDataCaptureForm: React.FC = () => {
     return applicantNum === 1 ? 'james' : 'jane';
   };
 
-  return (
-    <div className="container mx-auto p-6 space-y-6">
-      <div className="flex justify-between items-center">
-        <h1 className="text-3xl font-bold">Data Capture Form</h1>
-        <div className="flex gap-2">
-          <Button 
-            variant="outline" 
-            onClick={() => navigate(-1)}
-            className="flex items-center gap-2"
-          >
-            <ArrowLeft className="h-4 w-4" />
-            Back to Summary
-          </Button>
-          <Button onClick={handleMainButtonClick} variant={getButtonVariant()}>
-            {getButtonText()}
-          </Button>
+  const navigationItems = [
+    { label: 'Mortgage Details', value: 'mortgage', isActive: activeTab === 'mortgage' },
+    { label: 'Applicant Information', value: 'applicants', isActive: activeTab === 'applicants' },
+    { label: 'Review & Submit', value: 'submission', isActive: activeTab === 'submission' }
+  ];
+
+  const renderNavigationItem = (item: { label: string; value: string; isActive: boolean }) => {
+    if (item.isActive) {
+      return (
+        <div
+          key={item.value}
+          className="items-stretch flex min-h-[33px] w-full gap-2 overflow-hidden font-medium px-4 py-2"
+        >
+          <div className="w-0 shrink-0 h-[17px] bg-white border-white border-solid border-2" />
+          <div className="text-white text-sm flex-1 shrink basis-[0%] my-auto">
+            {item.label}
+          </div>
         </div>
+      );
+    }
+
+    return (
+      <div
+        key={item.value}
+        className="text-white text-sm self-stretch flex-1 shrink basis-[0%] w-full gap-2 px-4 py-2 cursor-pointer hover:bg-[rgba(255,255,255,0.1)]"
+        onClick={() => setActiveTab(item.value)}
+      >
+        {item.label}
       </div>
+    );
+  };
 
-      <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-        <TabsList className="grid w-full grid-cols-3">
-          <TabsTrigger value="mortgage">Mortgage Details</TabsTrigger>
-          <TabsTrigger value="applicants">Applicant Information</TabsTrigger>
-          <TabsTrigger value="submission">Review & Submit</TabsTrigger>
-        </TabsList>
+  return (
+    <div className="flex min-h-screen">
+      {/* Navigation Sidebar */}
+      <nav className="w-[264px] bg-[#165788] flex-shrink-0">
+        <div className="w-full text-sm text-white font-normal bg-[#165788]">
+          <div className="w-full pt-6">
+            {navigationItems.map(renderNavigationItem)}
+          </div>
+          <div className="w-full mt-[360px] max-md:mt-10">
+            <div className="bg-[rgba(22,87,136,1)] flex min-h-20 w-full" />
+          </div>
+        </div>
+      </nav>
 
-        <TabsContent value="mortgage" className="space-y-6">
+      {/* Main Content */}
+      <div className="flex-1 p-6 space-y-6">
+        <div className="flex justify-between items-center">
+          <h1 className="text-3xl font-bold">Data Capture Form</h1>
+          <div className="flex gap-2">
+            <Button 
+              variant="outline" 
+              onClick={() => navigate(-1)}
+              className="flex items-center gap-2"
+            >
+              <ArrowLeft className="h-4 w-4" />
+              Back to Summary
+            </Button>
+            <Button onClick={handleMainButtonClick} variant={getButtonVariant()}>
+              {getButtonText()}
+            </Button>
+          </div>
+        </div>
+
+        {/* Content based on active tab */}
+        {activeTab === 'mortgage' && (
+          <div className="space-y-6">
           <Card>
             <CardHeader>
               <CardTitle>Mortgage details</CardTitle>
@@ -514,9 +555,11 @@ export const UnifiedDataCaptureForm: React.FC = () => {
               {renderField('expenditureCalculation', 'Calculation method', 'radio', ['ONS', 'Enter expenditure'])}
             </CardContent>
           </Card>
-        </TabsContent>
+          </div>
+        )}
 
-        <TabsContent value="applicants" className="space-y-6">
+        {activeTab === 'applicants' && (
+          <div className="space-y-6">
           <div className="flex justify-center mb-6">
             <Tabs value={activeApplicant.toString()} onValueChange={(value) => setActiveApplicant(parseInt(value))}>
               <TabsList>
@@ -705,9 +748,11 @@ export const UnifiedDataCaptureForm: React.FC = () => {
               </div>
             );
           })}
-        </TabsContent>
+          </div>
+        )}
 
-        <TabsContent value="submission" className="space-y-6">
+        {activeTab === 'submission' && (
+          <div className="space-y-6">
           <Card>
             <CardHeader>
               <CardTitle>Review & Submit Application</CardTitle>
@@ -755,8 +800,9 @@ export const UnifiedDataCaptureForm: React.FC = () => {
               </div>
             </CardContent>
           </Card>
-        </TabsContent>
-      </Tabs>
+          </div>
+        )}
+      </div>
 
       <FieldComparisonModal
         open={!!comparisonField}
