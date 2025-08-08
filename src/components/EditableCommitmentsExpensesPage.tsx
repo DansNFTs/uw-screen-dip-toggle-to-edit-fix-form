@@ -270,9 +270,9 @@ export const EditableCommitmentsExpensesPage: React.FC = () => {
 
   const handleFieldDoubleClick = (field: string) => {
     console.log('Double clicked field:', field);
-    // Navigate to detailed personal form - determine applicant number based on field prefix
+    // Navigate to unified data capture form - determine applicant number based on field prefix
     const applicantNumber = field.startsWith('james') ? 1 : 2;
-    navigate(`/detailed-personal/${applicantNumber}`);
+    navigate(`/data-capture/applicants/${applicantNumber}`);
   };
 
   const renderField = (label: string, field: string, value: string, isEven: boolean, section: string = 'Commitments & Expenses', type: 'input' | 'select' = 'input', options?: string[]) => {

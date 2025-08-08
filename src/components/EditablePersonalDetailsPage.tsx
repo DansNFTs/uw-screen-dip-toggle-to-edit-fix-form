@@ -227,16 +227,9 @@ export const EditablePersonalDetailsPage: React.FC = () => {
 
   const handleFieldDoubleClick = (field: string) => {
     console.log('Double clicked field:', field);
-    if (isEditingEnabled && !isEditMode) {
-      setFocusedField(field);
-      setIsEditMode(true);
-      if (!currentSessionId) {
-        startAuditSession();
-        Object.entries(formData).forEach(([key, value]) => {
-          storeOriginalState(`formData.${key}`, value);
-        });
-      }
-    }
+    // Navigate to unified data capture form - determine applicant number based on field prefix
+    const applicantNumber = field.startsWith('james') ? 1 : 2;
+    navigate(`/data-capture/applicants/${applicantNumber}`);
   };
 
   const handleFieldComparisonClick = (fieldName: string) => {
