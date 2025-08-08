@@ -375,8 +375,7 @@ export const UnifiedDataCaptureForm: React.FC = () => {
       updateApplicantData({ [field]: value });
     }
     
-    // Sync to unified data context
-    syncFromDataCapture({ ...formData });
+    // Note: syncFromDataCapture will be called in useEffect to avoid stale data
   };
 
   // Helper function to navigate back to original page
@@ -390,10 +389,12 @@ export const UnifiedDataCaptureForm: React.FC = () => {
     }
   };
 
+  // Sync with unified data context after form data changes
+  useEffect(() => {
+    syncFromDataCapture(formData);
+  }, [formData, syncFromDataCapture]);
+
   const handleSave = () => {
-    // Final sync to unified data before saving
-    syncFromDataCapture({ ...formData });
-    
     saveChanges();
     endAuditSession();
     

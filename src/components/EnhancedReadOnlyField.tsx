@@ -27,7 +27,10 @@ export const EnhancedReadOnlyField: React.FC<EnhancedReadOnlyFieldProps> = ({
   showAuditIcon = true,
 }) => {
   const { auditLog } = useAudit();
-  const { isFieldModified, getFieldLastModified } = useUnifiedData();
+  const { isFieldModified, getFieldLastModified, getFieldValue } = useUnifiedData();
+  
+  // Get value from unified context if available, fallback to prop value
+  const displayValue = getFieldValue(field) || value;
   
   const isEdited = auditLog.some(entry => entry.field === field);
   const isModified = isFieldModified(field);
@@ -125,7 +128,7 @@ export const EnhancedReadOnlyField: React.FC<EnhancedReadOnlyFieldProps> = ({
             onDoubleClick={handleDoubleClick}
             title={isProtected ? "This field is calculated automatically" : "Double-click to edit"}
           >
-            {value || '-'}
+            {displayValue || '-'}
           </div>
         </EditableField>
       </div>
