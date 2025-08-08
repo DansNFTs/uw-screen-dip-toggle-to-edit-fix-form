@@ -50,7 +50,9 @@ const MainLayoutContent: React.FC<MainLayoutProps> = ({ children }) => {
   };
 
   // Hide task bar on summary, policy rules, and audit log pages
-  const showTaskBar = !['/', '/policy-rules-notes', '/audit-log'].includes(location.pathname);
+  const showTaskBar = location.pathname !== '/' && 
+                      !location.pathname.includes('/policy-rules-notes') && 
+                      !location.pathname.includes('/audit-log');
   
   // Show data capture navigation when on data capture routes
   const showDataCaptureNav = location.pathname.includes('/data-capture');
