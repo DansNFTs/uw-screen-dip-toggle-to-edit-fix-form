@@ -144,11 +144,13 @@ export const EditingTaskBar: React.FC = () => {
       title: "Changes saved",
       description: "Your changes have been saved and edit mode has been exited.",
     });
-    navigate(location.pathname);
+    const originPath = sessionStorage.getItem('readOnlyOriginPath') || '/';
+    navigate(originPath);
+    sessionStorage.removeItem('readOnlyOriginPath');
   };
 
   const performSaveAndResubmit = () => {
-    const originPath = location.pathname;
+    const originPath = sessionStorage.getItem('readOnlyOriginPath') || '/';
     saveAndResubmit();
     exitEditMode();
     if (isEditingEnabled) {
@@ -160,6 +162,7 @@ export const EditingTaskBar: React.FC = () => {
     });
     // Return to the read-only view of the same page
     navigate(originPath);
+    sessionStorage.removeItem('readOnlyOriginPath');
   };
 
   const handleReturnToSummary = () => {
@@ -167,6 +170,12 @@ export const EditingTaskBar: React.FC = () => {
   };
 
   const handleEditToggle = () => {
+    // When enabling editing, remember the current read-only page
+    if (!isEditingEnabled) {
+      try {
+        sessionStorage.setItem('readOnlyOriginPath', location.pathname);
+      } catch {}
+    }
     toggleEditingEnabled();
   };
 
