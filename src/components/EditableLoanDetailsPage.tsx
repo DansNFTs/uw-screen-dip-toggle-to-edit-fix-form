@@ -116,9 +116,16 @@ export const EditableLoanDetailsPage: React.FC = () => {
   };
 
   const handleFieldDoubleClick = (field: string) => {
-    console.log('Double clicked field:', field);
-    // Navigate to unified data capture form - mortgage section
-    navigate('/data-capture/mortgage/1');
+    if (isEditingEnabled && !isEditMode) {
+      // Start editing this specific field
+      setIsEditMode(true);
+      if (!currentSessionId) {
+        startAuditSession();
+        Object.entries(formData).forEach(([key, value]) => {
+          storeOriginalState(`formData.${key}`, value);
+        });
+      }
+    }
   };
 
   const handleAuditClick = () => {
