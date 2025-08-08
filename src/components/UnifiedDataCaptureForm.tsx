@@ -288,6 +288,13 @@ export const UnifiedDataCaptureForm: React.FC = () => {
 
   const [formData, setFormData] = useState(initialFormData);
 
+  // Auto-enter edit mode when navigating with a target field
+  useEffect(() => {
+    if (targetField && isEditingEnabled && !isEditMode) {
+      setIsEditMode(true);
+    }
+  }, [targetField, isEditingEnabled, isEditMode, setIsEditMode]);
+
   // Handle field targeting and auto-focus
   useEffect(() => {
     if (targetField && isEditMode) {
