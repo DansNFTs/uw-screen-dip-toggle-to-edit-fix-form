@@ -842,175 +842,89 @@ export const EditablePersonalDetailsPage: React.FC = () => {
       );
     }
 
-    // Enhanced read-only view with audit integration
+    // Simple read-only view matching original styling
     return (
-      <div className="space-y-6">
-        <h3 className="text-[#165788] text-lg font-medium">{applicantJamesName}</h3>
-        
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <EnhancedReadOnlyField
-            field="jamesNameChange"
-            value={unifiedData.jamesNameChange || formData.jamesNameChange}
-            label="Name change in last 6 years"
-            onDoubleClick={handleFieldDoubleClick}
-            onAuditClick={handleFieldComparisonClick}
-          />
-          <EnhancedReadOnlyField
-            field="jamesDateOfBirth"
-            value={`${unifiedData.jamesDateOfBirthDay || formData.jamesDateOfBirthDay}/${unifiedData.jamesDateOfBirthMonth || formData.jamesDateOfBirthMonth}/${unifiedData.jamesDateOfBirthYear || formData.jamesDateOfBirthYear}`}
-            label="D.O.B - Age"
-            onDoubleClick={() => handleFieldDoubleClick('jamesDateOfBirthDay')}
-            onAuditClick={handleFieldComparisonClick}
-          />
-          <EnhancedReadOnlyField
-            field="jamesCurrentAddress"
-            value={unifiedData.jamesCurrentAddress || formData.jamesCurrentAddress}
-            label="Current address"
-            onDoubleClick={handleFieldDoubleClick}
-            onAuditClick={handleFieldComparisonClick}
-            className="md:col-span-2"
-          />
-          <EnhancedReadOnlyField
-            field="jamesPostcode"
-            value={unifiedData.jamesPostcode || formData.jamesPostcode}
-            label="Postcode"
-            onDoubleClick={handleFieldDoubleClick}
-            onAuditClick={handleFieldComparisonClick}
-          />
-          <EnhancedReadOnlyField
-            field="jamesMoveInDate"
-            value={unifiedData.jamesMoveInDate || formData.jamesMoveInDate}
-            label="When did the applicant move in"
-            onDoubleClick={handleFieldDoubleClick}
-            onAuditClick={handleFieldComparisonClick}
-          />
-          <EnhancedReadOnlyField
-            field="jamesSalePrice"
-            value={unifiedData.jamesSalePrice || formData.jamesSalePrice}
-            label="Sale price"
-            onDoubleClick={handleFieldDoubleClick}
-            onAuditClick={handleFieldComparisonClick}
-          />
-          <EnhancedReadOnlyField
-            field="jamesResidencyStatus"
-            value={unifiedData.jamesResidencyStatus || formData.jamesResidencyStatus}
-            label="Current residency status"
-            onDoubleClick={handleFieldDoubleClick}
-            onAuditClick={handleFieldComparisonClick}
-          />
-          <EnhancedReadOnlyField
-            field="jamesCurrentLender"
-            value={unifiedData.jamesCurrentLender || formData.jamesCurrentLender}
-            label="Current lender"
-            onDoubleClick={handleFieldDoubleClick}
-            onAuditClick={handleFieldComparisonClick}
-          />
-          <EnhancedReadOnlyField
-            field="jamesOutstandingMortgage"
-            value={unifiedData.jamesOutstandingMortgage || formData.jamesOutstandingMortgage}
-            label="Outstanding mortgage balance"
-            onDoubleClick={handleFieldDoubleClick}
-            onAuditClick={handleFieldComparisonClick}
-          />
-          <EnhancedReadOnlyField
-            field="jamesPlansForProperty"
-            value={unifiedData.jamesPlansForProperty || formData.jamesPlansForProperty}
-            label="Plans for property"
-            onDoubleClick={handleFieldDoubleClick}
-            onAuditClick={handleFieldComparisonClick}
-          />
-          <EnhancedReadOnlyField
-            field="jamesExpectedRemainingBalance"
-            value={unifiedData.jamesExpectedRemainingBalance || formData.jamesExpectedRemainingBalance}
-            label="Expected remaining mortgage balance"
-            onDoubleClick={handleFieldDoubleClick}
-            onAuditClick={handleFieldComparisonClick}
-            className="md:col-span-2"
-          />
+      <div className="space-y-8">
+        <div>
+          <h3 className="text-[#165788] text-lg font-medium mb-4">{applicantJamesName}</h3>
+          
+          <div className="grid grid-cols-2 gap-x-8 gap-y-3">
+            <div className="text-sm text-gray-600">Name change in last 6 years</div>
+            <div className="text-sm text-gray-900">{unifiedData.jamesNameChange || formData.jamesNameChange || 'No'}</div>
+            
+            <div className="text-sm text-gray-600">D.O.B - Age</div>
+            <div className="text-sm text-gray-900">
+              {`${unifiedData.jamesDateOfBirthDay || formData.jamesDateOfBirthDay}/${unifiedData.jamesDateOfBirthMonth || formData.jamesDateOfBirthMonth}/${unifiedData.jamesDateOfBirthYear || formData.jamesDateOfBirthYear}`}
+            </div>
+            
+            <div className="text-sm text-gray-600">Current address</div>
+            <div className="text-sm text-gray-900">{unifiedData.jamesCurrentAddress || formData.jamesCurrentAddress}</div>
+            
+            <div className="text-sm text-gray-600">Postcode</div>
+            <div className="text-sm text-gray-900">{unifiedData.jamesPostcode || formData.jamesPostcode}</div>
+            
+            <div className="text-sm text-gray-600">When did the applicant move in</div>
+            <div className="text-sm text-gray-900">{unifiedData.jamesMoveInDate || formData.jamesMoveInDate}</div>
+            
+            <div className="text-sm text-gray-600">Sale price</div>
+            <div className="text-sm text-gray-900">{unifiedData.jamesSalePrice || formData.jamesSalePrice}</div>
+            
+            <div className="text-sm text-gray-600">Current residency status</div>
+            <div className="text-sm text-gray-900">{unifiedData.jamesResidencyStatus || formData.jamesResidencyStatus}</div>
+            
+            <div className="text-sm text-gray-600">Current lender</div>
+            <div className="text-sm text-gray-900">{unifiedData.jamesCurrentLender || formData.jamesCurrentLender}</div>
+            
+            <div className="text-sm text-gray-600">Outstanding mortgage balance</div>
+            <div className="text-sm text-gray-900">{unifiedData.jamesOutstandingMortgage || formData.jamesOutstandingMortgage}</div>
+            
+            <div className="text-sm text-gray-600">Plans for property</div>
+            <div className="text-sm text-gray-900">{unifiedData.jamesPlansForProperty || formData.jamesPlansForProperty}</div>
+            
+            <div className="text-sm text-gray-600">Expected remaining mortgage balance</div>
+            <div className="text-sm text-gray-900">{unifiedData.jamesExpectedRemainingBalance || formData.jamesExpectedRemainingBalance}</div>
+          </div>
         </div>
         
-        <h3 className="text-[#165788] text-lg font-medium mt-8">{applicantJaneName}</h3>
-        
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <EnhancedReadOnlyField
-            field="janeNameChange"
-            value="No"
-            label="Name change in last 6 years"
-            onDoubleClick={handleFieldDoubleClick}
-            onAuditClick={handleFieldComparisonClick}
-          />
-          <EnhancedReadOnlyField
-            field="janeDateOfBirth"
-            value={`${unifiedData.janeDateOfBirthDay || formData.janeDateOfBirthDay}/${unifiedData.janeDateOfBirthMonth || formData.janeDateOfBirthMonth}/${unifiedData.janeDateOfBirthYear || formData.janeDateOfBirthYear} - 35yrs`}
-            label="D.O.B - Age"
-            onDoubleClick={() => handleFieldDoubleClick('janeDateOfBirthDay')}
-            onAuditClick={handleFieldComparisonClick}
-          />
-          <EnhancedReadOnlyField
-            field="janeCurrentAddress"
-            value={unifiedData.janeCurrentAddress || formData.janeCurrentAddress}
-            label="Current address"
-            onDoubleClick={handleFieldDoubleClick}
-            onAuditClick={handleFieldComparisonClick}
-            className="md:col-span-2"
-          />
-          <EnhancedReadOnlyField
-            field="janePostcode"
-            value={unifiedData.janePostcode || formData.janePostcode}
-            label="Postcode"
-            onDoubleClick={handleFieldDoubleClick}
-            onAuditClick={handleFieldComparisonClick}
-          />
-          <EnhancedReadOnlyField
-            field="janeMoveInDate"
-            value={unifiedData.janeMoveInDate || formData.janeMoveInDate}
-            label="When did the applicant move in"
-            onDoubleClick={handleFieldDoubleClick}
-            onAuditClick={handleFieldComparisonClick}
-          />
-          <EnhancedReadOnlyField
-            field="janeSalePrice"
-            value={unifiedData.janeSalePrice || formData.janeSalePrice}
-            label="Sale price"
-            onDoubleClick={handleFieldDoubleClick}
-            onAuditClick={handleFieldComparisonClick}
-          />
-          <EnhancedReadOnlyField
-            field="janeResidencyStatus"
-            value={unifiedData.janeResidencyStatus || formData.janeResidencyStatus}
-            label="Current residency status"
-            onDoubleClick={handleFieldDoubleClick}
-            onAuditClick={handleFieldComparisonClick}
-          />
-          <EnhancedReadOnlyField
-            field="janeCurrentLender"
-            value={unifiedData.janeCurrentLender || formData.janeCurrentLender}
-            label="Current lender"
-            onDoubleClick={handleFieldDoubleClick}
-            onAuditClick={handleFieldComparisonClick}
-          />
-          <EnhancedReadOnlyField
-            field="janeOutstandingMortgage"
-            value={unifiedData.janeOutstandingMortgage || formData.janeOutstandingMortgage}
-            label="Outstanding mortgage balance"
-            onDoubleClick={handleFieldDoubleClick}
-            onAuditClick={handleFieldComparisonClick}
-          />
-          <EnhancedReadOnlyField
-            field="janePlansForProperty"
-            value={unifiedData.janePlansForProperty || formData.janePlansForProperty}
-            label="Plans for property"
-            onDoubleClick={handleFieldDoubleClick}
-            onAuditClick={handleFieldComparisonClick}
-          />
-          <EnhancedReadOnlyField
-            field="janeExpectedRemainingBalance"
-            value={unifiedData.janeExpectedRemainingBalance || formData.janeExpectedRemainingBalance}
-            label="Expected remaining mortgage balance"
-            onDoubleClick={handleFieldDoubleClick}
-            onAuditClick={handleFieldComparisonClick}
-            className="md:col-span-2"
-          />
+        <div>
+          <h3 className="text-[#165788] text-lg font-medium mb-4">{applicantJaneName}</h3>
+          
+          <div className="grid grid-cols-2 gap-x-8 gap-y-3">
+            <div className="text-sm text-gray-600">Name change in last 6 years</div>
+            <div className="text-sm text-gray-900">No</div>
+            
+            <div className="text-sm text-gray-600">D.O.B - Age</div>
+            <div className="text-sm text-gray-900">
+              {`${unifiedData.janeDateOfBirthDay || formData.janeDateOfBirthDay}/${unifiedData.janeDateOfBirthMonth || formData.janeDateOfBirthMonth}/${unifiedData.janeDateOfBirthYear || formData.janeDateOfBirthYear}`}
+            </div>
+            
+            <div className="text-sm text-gray-600">Current address</div>
+            <div className="text-sm text-gray-900">{unifiedData.janeCurrentAddress || formData.janeCurrentAddress}</div>
+            
+            <div className="text-sm text-gray-600">Postcode</div>
+            <div className="text-sm text-gray-900">{unifiedData.janePostcode || formData.janePostcode}</div>
+            
+            <div className="text-sm text-gray-600">When did the applicant move in</div>
+            <div className="text-sm text-gray-900">{unifiedData.janeMoveInDate || formData.janeMoveInDate}</div>
+            
+            <div className="text-sm text-gray-600">Sale price</div>
+            <div className="text-sm text-gray-900">{unifiedData.janeSalePrice || formData.janeSalePrice}</div>
+            
+            <div className="text-sm text-gray-600">Current residency status</div>
+            <div className="text-sm text-gray-900">{unifiedData.janeResidencyStatus || formData.janeResidencyStatus}</div>
+            
+            <div className="text-sm text-gray-600">Current lender</div>
+            <div className="text-sm text-gray-900">{unifiedData.janeCurrentLender || formData.janeCurrentLender}</div>
+            
+            <div className="text-sm text-gray-600">Outstanding mortgage balance</div>
+            <div className="text-sm text-gray-900">{unifiedData.janeOutstandingMortgage || formData.janeOutstandingMortgage}</div>
+            
+            <div className="text-sm text-gray-600">Plans for property</div>
+            <div className="text-sm text-gray-900">{unifiedData.janePlansForProperty || formData.janePlansForProperty}</div>
+            
+            <div className="text-sm text-gray-600">Expected remaining mortgage balance</div>
+            <div className="text-sm text-gray-900">{unifiedData.janeExpectedRemainingBalance || formData.janeExpectedRemainingBalance}</div>
+          </div>
         </div>
       </div>
     );
