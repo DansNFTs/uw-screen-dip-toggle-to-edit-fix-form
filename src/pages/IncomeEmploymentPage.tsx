@@ -1,7 +1,6 @@
-
 import React from 'react';
-import { EditableIncomeEmploymentPage } from '@/components/EditableIncomeEmploymentPage';
+import { Navigate } from 'react-router-dom';
 
 export const IncomeEmploymentPage: React.FC = () => {
-  return <EditableIncomeEmploymentPage />;
+  return <Navigate to="/data-capture/applicants/1" replace />;
 };

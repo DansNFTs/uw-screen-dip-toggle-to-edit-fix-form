@@ -1,6 +1,6 @@
 import React from 'react';
-import { EditableCommitmentsExpensesPage } from '@/components/EditableCommitmentsExpensesPage';
+import { Navigate } from 'react-router-dom';
 
 export const CommitmentsExpensesPage: React.FC = () => {
-  return <EditableCommitmentsExpensesPage />;
+  return <Navigate to="/data-capture/applicants/1" replace />;
 };
