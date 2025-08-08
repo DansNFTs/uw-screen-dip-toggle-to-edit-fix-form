@@ -152,7 +152,9 @@ export const EditableIncomeEmploymentPage: React.FC = () => {
 
   const handleFieldDoubleClick = (field: string) => {
     console.log('Double clicked field:', field);
-    navigate('/income-employment');
+    // Navigate to detailed personal form - determine applicant number based on field prefix
+    const applicantNumber = field.startsWith('james') ? 1 : 2;
+    navigate(`/detailed-personal/${applicantNumber}`);
   };
 
   const renderField = (label: string, field: string, value: string, isEven: boolean, section: string = 'Employment', type: 'input' | 'select' = 'input', options?: string[]) => {
