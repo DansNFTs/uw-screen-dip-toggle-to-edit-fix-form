@@ -246,7 +246,7 @@ export const UnifiedDataCaptureForm: React.FC = () => {
   const [comparisonField, setComparisonField] = useState<string | null>(null);
   const fieldRefs = useRef<Record<string, HTMLElement | null>>({});
 
-  const { isEditMode, setIsEditMode, hasUnsavedChanges, setHasUnsavedChanges } = useEditMode();
+  const { isEditingEnabled, isEditMode, setIsEditMode, hasUnsavedChanges, setHasUnsavedChanges } = useEditMode();
   const { startAuditSession, endAuditSession, addAuditEntry, auditLog } = useAudit();
   const { toast } = useToast();
 
@@ -268,6 +268,7 @@ export const UnifiedDataCaptureForm: React.FC = () => {
   }, [originalFormData, endAuditSession]);
 
   const handleInputChange = (field: string, value: string) => {
+    if (!isEditMode) return; // block changes unless in edit mode
     const oldValue = formData[field as keyof UnifiedFormData];
     if (oldValue !== value) {
       setFormData(prev => ({ ...prev, [field]: value }));
@@ -303,19 +304,15 @@ export const UnifiedDataCaptureForm: React.FC = () => {
   };
 
   const getButtonText = () => {
-    if (!isEditMode) return "Edit";
     return hasUnsavedChanges ? "Save" : "Exit Edit Mode";
   };
 
   const getButtonVariant = () => {
-    if (!isEditMode) return "default";
     return hasUnsavedChanges ? "default" : "outline";
   };
 
   const handleMainButtonClick = () => {
-    if (!isEditMode) {
-      setIsEditMode(true);
-    } else if (hasUnsavedChanges) {
+    if (hasUnsavedChanges) {
       handleSave();
     } else {
       setIsEditMode(false);
@@ -333,87 +330,134 @@ export const UnifiedDataCaptureForm: React.FC = () => {
 
     if (type === 'select') {
       return (
-        <div className="space-y-2">
-          <Label htmlFor={fieldName}>{label}</Label>
-          <Select
-            value={value}
-            onValueChange={(newValue) => handleInputChange(fieldName, newValue)}
-          >
-            <SelectTrigger
-              ref={(el) => { fieldRefs.current[fieldName] = el; }}
-              className="w-full"
+        <div
+          onDoubleClick={() => {
+            if (!isEditingEnabled) {
+              toast({ title: 'Enable editing to make changes' });
+              return;
+            }
+            if (!isEditMode) {
+              setIsEditMode(true);
+              setTimeout(() => {
+                const el = fieldRefs.current[fieldName] as HTMLElement | null;
+                el?.focus?.();
+              }, 0);
+            }
+          }}
+          className="select-none"
+        >
+          <div className="space-y-2">
+            <Label htmlFor={fieldName}>{label}</Label>
+            <Select
+              value={value}
+              onValueChange={(newValue) => handleInputChange(fieldName, newValue)}
             >
-              <SelectValue />
-            </SelectTrigger>
-            <SelectContent>
-              {options?.map((option) => {
-                const optionValue = typeof option === 'string' ? option : option.value;
-                const optionLabel = typeof option === 'string' ? option : option.label;
-                return (
-                  <SelectItem key={optionValue} value={optionValue}>
-                    {optionLabel}
-                  </SelectItem>
-                );
-              })}
-            </SelectContent>
-          </Select>
-          {isFieldEdited(fieldName) && (
-            <Clock
-              className="h-4 w-4 text-muted-foreground cursor-pointer inline-block ml-2"
-              onClick={() => handleFieldComparisonClick(fieldName)}
-            />
-          )}
+              <SelectTrigger
+                ref={(el) => { fieldRefs.current[fieldName] = el; }}
+                className={`w-full ${!isEditMode ? 'opacity-60 pointer-events-none' : ''}`}
+              >
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                {options?.map((option) => {
+                  const optionValue = typeof option === 'string' ? option : option.value;
+                  const optionLabel = typeof option === 'string' ? option : option.label;
+                  return (
+                    <SelectItem key={optionValue} value={optionValue}>
+                      {optionLabel}
+                    </SelectItem>
+                  );
+                })}
+              </SelectContent>
+            </Select>
+            {isFieldEdited(fieldName) && (
+              <Clock
+                className="h-4 w-4 text-muted-foreground cursor-pointer inline-block ml-2"
+                onClick={() => handleFieldComparisonClick(fieldName)}
+              />
+            )}
+          </div>
         </div>
       );
     }
 
     if (type === 'radio' && options) {
       return (
-        <div className="space-y-2">
-          <Label>{label}</Label>
-          <RadioGroup
-            value={value}
-            onValueChange={(newValue) => handleInputChange(fieldName, newValue)}
-            className="flex gap-4"
-          >
-            {options.map((option) => {
-              const optionValue = typeof option === 'string' ? option : option.value;
-              const optionLabel = typeof option === 'string' ? option : option.label;
-              return (
-                <div key={optionValue} className="flex items-center space-x-2">
-                  <RadioGroupItem value={optionValue} id={`${fieldName}-${optionValue}`} />
-                  <Label htmlFor={`${fieldName}-${optionValue}`}>{optionLabel}</Label>
-                </div>
-              );
-            })}
-          </RadioGroup>
-          {isFieldEdited(fieldName) && (
-            <Clock
-              className="h-4 w-4 text-muted-foreground cursor-pointer inline-block ml-2"
-              onClick={() => handleFieldComparisonClick(fieldName)}
-            />
-          )}
+        <div
+          onDoubleClick={() => {
+            if (!isEditingEnabled) {
+              toast({ title: 'Enable editing to make changes' });
+              return;
+            }
+            if (!isEditMode) {
+              setIsEditMode(true);
+            }
+          }}
+          className="select-none"
+        >
+          <div className="space-y-2">
+            <Label>{label}</Label>
+            <RadioGroup
+              value={value}
+              onValueChange={(newValue) => handleInputChange(fieldName, newValue)}
+              className={`flex gap-4 ${!isEditMode ? 'opacity-60 pointer-events-none' : ''}`}
+            >
+              {options.map((option) => {
+                const optionValue = typeof option === 'string' ? option : option.value;
+                const optionLabel = typeof option === 'string' ? option : option.label;
+                return (
+                  <div key={optionValue} className="flex items-center space-x-2">
+                    <RadioGroupItem value={optionValue} id={`${fieldName}-${optionValue}`} />
+                    <Label htmlFor={`${fieldName}-${optionValue}`}>{optionLabel}</Label>
+                  </div>
+                );
+              })}
+            </RadioGroup>
+            {isFieldEdited(fieldName) && (
+              <Clock
+                className="h-4 w-4 text-muted-foreground cursor-pointer inline-block ml-2"
+                onClick={() => handleFieldComparisonClick(fieldName)}
+              />
+            )}
+          </div>
         </div>
       );
     }
 
     return (
-      <div className="space-y-2">
-        <Label htmlFor={fieldName}>{label}</Label>
-        <div className="flex items-center gap-2">
-          <Input
-            ref={(el) => { fieldRefs.current[fieldName] = el; }}
-            id={fieldName}
-            value={value}
-            onChange={(e) => handleInputChange(fieldName, e.target.value)}
-            className="w-full"
-          />
-          {isFieldEdited(fieldName) && (
-            <Clock
-              className="h-4 w-4 text-muted-foreground cursor-pointer"
-              onClick={() => handleFieldComparisonClick(fieldName)}
+      <div
+        onDoubleClick={() => {
+          if (!isEditingEnabled) {
+            toast({ title: 'Enable editing to make changes' });
+            return;
+          }
+          if (!isEditMode) {
+            setIsEditMode(true);
+            setTimeout(() => {
+              const el = fieldRefs.current[fieldName] as HTMLElement | null;
+              el?.focus?.();
+            }, 0);
+          }
+        }}
+        className="select-none"
+      >
+        <div className="space-y-2">
+          <Label htmlFor={fieldName}>{label}</Label>
+          <div className="flex items-center gap-2">
+            <Input
+              ref={(el) => { fieldRefs.current[fieldName] = el; }}
+              id={fieldName}
+              value={value}
+              onChange={(e) => handleInputChange(fieldName, e.target.value)}
+              className={`w-full ${!isEditMode ? 'opacity-60 pointer-events-none' : ''}`}
             />
-          )}
+            {isFieldEdited(fieldName) && (
+              <Clock
+                className="h-4 w-4 text-muted-foreground cursor-pointer"
+                onClick={() => handleFieldComparisonClick(fieldName)}
+              />
+            )}
+          </div>
         </div>
       </div>
     );
@@ -486,9 +530,6 @@ export const UnifiedDataCaptureForm: React.FC = () => {
     <div className="container mx-auto p-6 space-y-6">
       <div className="flex justify-between items-center">
         <h1 className="text-3xl font-bold">Data Capture Form</h1>
-        <Button onClick={handleMainButtonClick} variant={getButtonVariant()}>
-          {getButtonText()}
-        </Button>
       </div>
 
       <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
