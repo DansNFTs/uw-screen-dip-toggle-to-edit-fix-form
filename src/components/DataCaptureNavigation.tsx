@@ -38,13 +38,13 @@ export const DataCaptureNavigation: React.FC = () => {
   };
 
   return (
-    <aside className="w-[280px] bg-white border-r border-gray-200 flex flex-col">
-      <div className="p-4 border-b border-gray-200 bg-blue-600 text-white">
-        <h2 className="font-semibold text-lg">Decision in Principle</h2>
+    <aside className="w-[200px] bg-white border-r border-gray-200 flex flex-col">
+      <div className="px-3 py-4 border-b border-gray-200 bg-blue-700 text-white">
+        <h2 className="font-medium text-sm">Decision in Principle</h2>
       </div>
       
       <ScrollArea className="flex-1">
-        <div className="py-2">
+        <div className="py-1">
           {navigationItems.map((item, index) => {
             const active = isActive(item.key);
             
@@ -52,17 +52,17 @@ export const DataCaptureNavigation: React.FC = () => {
               <button
                 key={item.key}
                 onClick={() => handleNavigationClick(item.key)}
-                className={`w-full flex items-center gap-3 px-4 py-3 text-sm transition-colors text-left border-b border-gray-100 ${
+                className={`w-full flex items-center gap-2 px-3 py-2 text-xs transition-colors text-left hover:bg-gray-50 ${
                   active 
-                    ? 'bg-blue-50 text-blue-700 font-medium border-l-4 border-l-blue-600' 
-                    : 'text-gray-700 hover:bg-gray-50'
+                    ? 'bg-blue-50 text-blue-700 font-medium' 
+                    : 'text-gray-600'
                 }`}
               >
                 {item.status === 'complete' && (
-                  <Check className="h-4 w-4 text-green-600 flex-shrink-0" />
+                  <div className="w-2 h-2 bg-green-500 rounded-full flex-shrink-0" />
                 )}
                 {item.status === 'warning' && (
-                  <AlertTriangle className="h-4 w-4 text-orange-500 flex-shrink-0" />
+                  <div className="w-2 h-2 bg-orange-400 rounded-full flex-shrink-0" />
                 )}
                 <span className="flex-1">{item.label}</span>
               </button>
