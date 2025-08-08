@@ -375,9 +375,13 @@ export const UnifiedDataCaptureForm: React.FC = () => {
       updateApplicantData({ [field]: value });
     }
     
-    // Sync to unified data context
-    syncFromDataCapture({ ...formData });
+    // Sync will happen via useEffect when formData updates
   };
+
+  // Sync with unified context whenever formData changes
+  useEffect(() => {
+    syncFromDataCapture(formData);
+  }, [formData, syncFromDataCapture]);
 
   // Helper function to navigate back to original page
   const navigateBackToOriginalPage = () => {

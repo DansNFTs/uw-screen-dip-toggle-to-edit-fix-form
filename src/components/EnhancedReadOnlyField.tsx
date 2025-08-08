@@ -9,7 +9,7 @@ import { isProtectedField } from '../utils/fieldMapping';
 
 interface EnhancedReadOnlyFieldProps {
   field: string;
-  value: string;
+  value?: string;
   label: string;
   className?: string;
   onDoubleClick?: (field: string) => void;
@@ -19,7 +19,7 @@ interface EnhancedReadOnlyFieldProps {
 
 export const EnhancedReadOnlyField: React.FC<EnhancedReadOnlyFieldProps> = ({
   field,
-  value,
+  value: propValue,
   label,
   className = "",
   onDoubleClick,
@@ -27,7 +27,10 @@ export const EnhancedReadOnlyField: React.FC<EnhancedReadOnlyFieldProps> = ({
   showAuditIcon = true,
 }) => {
   const { auditLog } = useAudit();
-  const { isFieldModified, getFieldLastModified } = useUnifiedData();
+  const { isFieldModified, getFieldLastModified, getFieldValue } = useUnifiedData();
+  
+  // Get value from unified context, fallback to prop value
+  const value = getFieldValue(field) || propValue || '';
   
   const isEdited = auditLog.some(entry => entry.field === field);
   const isModified = isFieldModified(field);
