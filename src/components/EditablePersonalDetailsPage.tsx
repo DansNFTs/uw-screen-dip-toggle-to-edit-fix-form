@@ -227,7 +227,8 @@ export const EditablePersonalDetailsPage: React.FC = () => {
 
   const handleFieldDoubleClick = (field: string) => {
     console.log('Double clicked field:', field);
-    // Navigate to unified data capture form - determine applicant number based on field prefix
+    // Enter edit mode and navigate to unified data capture form for the correct applicant
+    setIsEditMode(true);
     const applicantNumber = field.startsWith('james') ? 1 : 2;
     navigate(`/data-capture/applicants/${applicantNumber}`);
   };
