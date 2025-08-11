@@ -11,6 +11,7 @@ import { useAudit } from '@/contexts/AuditContext';
 import { useToast } from '@/hooks/use-toast';
 import { Clock } from 'lucide-react';
 import { FieldComparisonModal } from '@/components/FieldComparisonModal';
+import { useUnifiedData } from '@/contexts/UnifiedDataContext';
 
 export const EditableMortgageDetailsPage: React.FC = () => {
   const navigate = useNavigate();
@@ -50,6 +51,7 @@ export const EditableMortgageDetailsPage: React.FC = () => {
   const { isEditMode, setIsEditMode, hasUnsavedChanges, setHasUnsavedChanges } = useEditMode();
   const { startAuditSession, endAuditSession, addAuditEntry, auditLog } = useAudit();
   const { toast } = useToast();
+  const { getFieldValue } = useUnifiedData();
 
   useEffect(() => {
     if (isEditMode) {
@@ -162,6 +164,7 @@ export const EditableMortgageDetailsPage: React.FC = () => {
   ) => {
     const value = formData[field];
     const fieldName = field as string;
+    const displayValue = getFieldValue(fieldName) || value;
 
     if (isEditMode) {
       if (type === 'select') {
@@ -236,7 +239,7 @@ export const EditableMortgageDetailsPage: React.FC = () => {
       <div className="space-y-2" onDoubleClick={() => handleFieldDoubleClick(fieldName)}>
         <Label className="text-muted-foreground">{label}</Label>
         <div className="flex items-center gap-2">
-          <span className="text-sm">{value}</span>
+          <span className="text-sm">{displayValue}</span>
           {isFieldEdited(fieldName) && (
             <Clock
               className="h-4 w-4 text-muted-foreground cursor-pointer"
