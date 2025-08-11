@@ -74,13 +74,20 @@ export const EditModeProvider: React.FC<EditModeProviderProps> = ({ children }) 
   };
 
   const saveChanges = () => {
+    // Notify pages to sync their local form state into the unified data store before saving
+    try {
+      window.dispatchEvent(new CustomEvent('beforeGlobalSave'));
+    } catch {}
     setHasUnsavedChanges(false);
     setHasSavedChanges(true);
     // Clear original state after saving
     originalStateRef.current = {};
   };
-
   const saveAndResubmit = () => {
+    // Notify pages to sync their local form state into the unified data store before resubmitting
+    try {
+      window.dispatchEvent(new CustomEvent('beforeGlobalSave'));
+    } catch {}
     setHasUnsavedChanges(false);
     setHasSavedChanges(false); // No longer a draft
     setCaseVersion(prev => prev + 1); // Increment version
@@ -88,7 +95,6 @@ export const EditModeProvider: React.FC<EditModeProviderProps> = ({ children }) 
     // Clear original state after saving
     originalStateRef.current = {};
   };
-
   const exitEditMode = () => {
     setIsEditMode(false);
     setHasUnsavedChanges(false);

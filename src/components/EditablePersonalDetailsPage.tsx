@@ -148,6 +148,17 @@ export const EditablePersonalDetailsPage: React.FC = () => {
       formData.janeTitle, formData.janeFirstName, formData.janeMiddleName, formData.janeLastName, updateApplicantData, syncFromReadOnly]);
   const [comparisonModal, setComparisonModal] = useState({ open: false, fieldName: '' });
 
+  // Ensure page data syncs to unified store on global save/resubmit
+  React.useEffect(() => {
+    const handleBeforeSave = () => {
+      syncFromReadOnly(formData as any);
+    };
+    window.addEventListener('beforeGlobalSave', handleBeforeSave);
+    return () => {
+      window.removeEventListener('beforeGlobalSave', handleBeforeSave);
+    };
+  }, [formData, syncFromReadOnly]);
+
   // Store original state when entering edit mode
   React.useEffect(() => {
     if (isEditMode && !currentSessionId) {
