@@ -11,6 +11,7 @@ import { Clock } from 'lucide-react';
 import { useToast } from "@/hooks/use-toast";
 import { useNavigate } from 'react-router-dom';
 import { FieldComparisonModal } from './FieldComparisonModal';
+import { useUnifiedData } from '../contexts/UnifiedDataContext';
 
 
 export const EditableIncomeEmploymentPage: React.FC = () => {
@@ -67,33 +68,45 @@ export const EditableIncomeEmploymentPage: React.FC = () => {
     }
   }, [isEditMode, currentSessionId, storeOriginalState, startAuditSession]);
 
-  // Listen for cancel events to restore original state
-  React.useEffect(() => {
-    const handleRestore = () => {
-      const originalState = restoreAllOriginalState();
-      const restoredFormData: any = {};
-      
-      Object.keys(initialFormData).forEach(key => {
-        const originalValue = originalState[`formData.${key}`];
-        if (originalValue !== undefined) {
-          restoredFormData[key] = originalValue;
-        } else {
-          restoredFormData[key] = initialFormData[key as keyof typeof initialFormData];
-        }
-      });
-      
-      setFormData(restoredFormData);
-      cancelAuditSession(); // Remove all audit entries from this session
-    };
-
-    // We need a way to detect when cancel is pressed
-    // For now, we'll use a custom event listener
-    window.addEventListener('editModeCancel', handleRestore);
+// Listen for cancel events to restore original state
+React.useEffect(() => {
+  const handleRestore = () => {
+    const originalState = restoreAllOriginalState();
+    const restoredFormData: any = {};
     
-    return () => {
-      window.removeEventListener('editModeCancel', handleRestore);
-    };
-  }, [restoreAllOriginalState, cancelAuditSession]);
+    Object.keys(initialFormData).forEach(key => {
+      const originalValue = originalState[`formData.${key}`];
+      if (originalValue !== undefined) {
+        restoredFormData[key] = originalValue;
+      } else {
+        restoredFormData[key] = initialFormData[key as keyof typeof initialFormData];
+      }
+    });
+    
+    setFormData(restoredFormData);
+    cancelAuditSession(); // Remove all audit entries from this session
+  };
+
+  // We need a way to detect when cancel is pressed
+  // For now, we'll use a custom event listener
+  window.addEventListener('editModeCancel', handleRestore);
+  
+  return () => {
+    window.removeEventListener('editModeCancel', handleRestore);
+  };
+}, [restoreAllOriginalState, cancelAuditSession]);
+
+// Ensure page data syncs to unified store on global save/resubmit
+const { syncFromReadOnly } = useUnifiedData();
+React.useEffect(() => {
+  const handleBeforeSave = () => {
+    syncFromReadOnly(formData as any);
+  };
+  window.addEventListener('beforeGlobalSave', handleBeforeSave);
+  return () => {
+    window.removeEventListener('beforeGlobalSave', handleBeforeSave);
+  };
+}, [formData, syncFromReadOnly]);
 
   const handleInputChange = (field: string, value: string, section: string = 'Employment') => {
     const oldValue = formData[field as keyof typeof formData];

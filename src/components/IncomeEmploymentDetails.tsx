@@ -3,12 +3,15 @@ import { EmploymentSection } from './EmploymentSection';
 import { SecondJobSection } from './SecondJobSection';
 import { AdditionalIncomeSection } from './AdditionalIncomeSection';
 import { useApplicantData } from '@/contexts/ApplicantDataContext';
+import { useUnifiedData } from '@/contexts/UnifiedDataContext';
 
 export const IncomeEmploymentDetails: React.FC = () => {
   const { getFormattedApplicantNames } = useApplicantData();
   const [jamesName] = getFormattedApplicantNames();
+  const { getFieldValue } = useUnifiedData();
+
   const employmentData = {
-    employmentStatus: 'Employed',
+    employmentStatus: getFieldValue('jamesEmploymentStatus') || 'Employed',
     mostRecentYearNetProfit: '€150,000.00',
     previousYearNetProfit: '€100,000.00',
     previousYearPercentage: '100.00%',
