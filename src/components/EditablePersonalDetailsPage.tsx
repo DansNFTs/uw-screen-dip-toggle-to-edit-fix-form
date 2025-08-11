@@ -221,6 +221,8 @@ export const EditablePersonalDetailsPage: React.FC = () => {
   };
 
   const handleSave = () => {
+    // Sync all current read-only form values into the unified data store
+    syncFromReadOnly(formData as any);
     saveChanges();
     endAuditSession();
     toast({

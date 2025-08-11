@@ -38,7 +38,7 @@ export const FIELD_MAPPINGS: FieldMapping[] = [
   { dataCapture: 'jamesAddressLine2', readOnly: 'jamesAddressLine2', section: 'Address Details' },
   { dataCapture: 'jamesPostcode', readOnly: 'jamesPostcode', section: 'Address Details' },
   { dataCapture: 'jamesMoveInDate', readOnly: 'jamesMoveInDate', section: 'Address Details' },
-  { dataCapture: 'jamesResidencyStatus', readOnly: 'jamesResidencyStatus', section: 'Address Details' },
+  { dataCapture: 'jamesCurrentResidencyStatus', readOnly: 'jamesResidencyStatus', section: 'Address Details' },
   
   // James Taylor - Employment
   { dataCapture: 'jamesEmploymentStatus', readOnly: 'jamesEmploymentStatus', section: 'Employment Details' },
