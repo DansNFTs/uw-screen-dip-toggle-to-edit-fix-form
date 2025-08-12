@@ -158,13 +158,8 @@ export const EditablePersonalDetailsPage: React.FC = () => {
       window.removeEventListener('beforeGlobalSave', handleBeforeSave);
     };
   }, [formData, syncFromReadOnly]);
-
-  // Keep unified data in sync with form changes
-  React.useEffect(() => {
-    syncFromReadOnly(formData as any);
-  }, [formData.jamesCurrentLender, formData.janeCurrentLender, syncFromReadOnly]);
-
-  // Store original state when entering edit mode
+  // Do not mirror lenders into unified data on change here.
+// Store original state when entering edit mode
   React.useEffect(() => {
     if (isEditMode && !currentSessionId) {
       startAuditSession();

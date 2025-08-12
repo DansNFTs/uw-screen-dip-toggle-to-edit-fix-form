@@ -144,6 +144,17 @@ export const UnifiedDataProvider: React.FC<{ children: ReactNode }> = ({ childre
     });
 
     setUnifiedData(prev => ({ ...prev, ...updates }));
+    setModifiedFields(prev => {
+      const next = new Set(prev);
+      Object.keys(updates).forEach(k => next.add(k));
+      return next;
+    });
+    setFieldTimestamps(prev => {
+      const next = new Map(prev);
+      const now = new Date();
+      Object.keys(updates).forEach(k => next.set(k, now));
+      return next;
+    });
   }, []);
 
   const syncFromReadOnly = useCallback((readOnlyData: UnifiedData) => {
@@ -163,6 +174,17 @@ export const UnifiedDataProvider: React.FC<{ children: ReactNode }> = ({ childre
     });
 
     setUnifiedData(prev => ({ ...prev, ...updates }));
+    setModifiedFields(prev => {
+      const next = new Set(prev);
+      Object.keys(updates).forEach(k => next.add(k));
+      return next;
+    });
+    setFieldTimestamps(prev => {
+      const next = new Map(prev);
+      const now = new Date();
+      Object.keys(updates).forEach(k => next.set(k, now));
+      return next;
+    });
   }, []);
 
   const isFieldModified = useCallback((field: string): boolean => {

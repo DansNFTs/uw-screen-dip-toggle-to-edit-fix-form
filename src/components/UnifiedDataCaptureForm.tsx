@@ -378,7 +378,23 @@ export const UnifiedDataCaptureForm: React.FC = () => {
     // Note: syncFromDataCapture will be called in useEffect to avoid stale data
   };
 
-  // Helper function to navigate back to original page
+  
+  // Hydrate form with latest unified data when entering edit mode
+  useEffect(() => {
+    if (isEditMode && unifiedData) {
+      setFormData(prev => ({ ...prev, ...unifiedData }));
+    }
+  }, [isEditMode, unifiedData]);
+
+  // Commit local form data to unified store only when a global save is triggered
+  useEffect(() => {
+    const handler = () => {
+      syncFromDataCapture(formData);
+    };
+    window.addEventListener('beforeGlobalSave', handler);
+    return () => window.removeEventListener('beforeGlobalSave', handler);
+  }, [formData, syncFromDataCapture]);
+// Helper function to navigate back to original page
   const navigateBackToOriginalPage = () => {
     const referrer = searchParams.get('from');
     if (referrer) {
@@ -389,10 +405,6 @@ export const UnifiedDataCaptureForm: React.FC = () => {
     }
   };
 
-  // Sync with unified data context after form data changes
-  useEffect(() => {
-    syncFromDataCapture(formData);
-  }, [formData, syncFromDataCapture]);
 
   const handleSave = () => {
     saveChanges();
