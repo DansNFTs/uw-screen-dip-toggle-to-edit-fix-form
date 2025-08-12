@@ -40,6 +40,13 @@ export const FIELD_MAPPINGS: FieldMapping[] = [
   { dataCapture: 'jamesMoveInDate', readOnly: 'jamesMoveInDate', section: 'Address Details' },
   { dataCapture: 'jamesCurrentResidencyStatus', readOnly: 'jamesResidencyStatus', section: 'Address Details' },
   
+  // James Taylor - Property/Mortgage
+  { dataCapture: 'jamesSalePrice', readOnly: 'jamesSalePrice', section: 'Property Details' },
+  { dataCapture: 'jamesCurrentLender', readOnly: 'jamesCurrentLender', section: 'Property Details' },
+  { dataCapture: 'jamesOutstandingMortgageBalance', readOnly: 'jamesOutstandingMortgage', section: 'Property Details' },
+  { dataCapture: 'jamesPlansForProperty', readOnly: 'jamesPlansForProperty', section: 'Property Details' },
+  { dataCapture: 'jamesExpectedRemainingBalance', readOnly: 'jamesExpectedRemainingBalance', section: 'Property Details' },
+
   // James Taylor - Employment
   { dataCapture: 'jamesEmploymentStatus', readOnly: 'jamesEmploymentStatus', section: 'Employment Details' },
   { dataCapture: 'jamesJobTitle', readOnly: 'jamesJobTitle', section: 'Employment Details' },
@@ -57,6 +64,13 @@ export const FIELD_MAPPINGS: FieldMapping[] = [
   { dataCapture: 'janeBirthYear', readOnly: 'janeDateOfBirthYear', section: 'Personal Details' },
   { dataCapture: 'janeNationality', readOnly: 'janeNationality', section: 'Personal Details' },
   
+  // Jane Taylor - Property/Mortgage
+  { dataCapture: 'janeSalePrice', readOnly: 'janeSalePrice', section: 'Property Details' },
+  { dataCapture: 'janeCurrentLender', readOnly: 'janeCurrentLender', section: 'Property Details' },
+  { dataCapture: 'janeOutstandingMortgageBalance', readOnly: 'janeOutstandingMortgage', section: 'Property Details' },
+  { dataCapture: 'janePlansForProperty', readOnly: 'janePlansForProperty', section: 'Property Details' },
+  { dataCapture: 'janeExpectedRemainingBalance', readOnly: 'janeExpectedRemainingBalance', section: 'Property Details' },
+
   // Jane Taylor - Employment
   { dataCapture: 'janeEmploymentStatus', readOnly: 'janeEmploymentStatus', section: 'Employment Details' },
   { dataCapture: 'janeJobTitle', readOnly: 'janeJobTitle', section: 'Employment Details' },

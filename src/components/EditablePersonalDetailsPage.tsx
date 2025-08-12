@@ -957,7 +957,7 @@ export const EditablePersonalDetailsPage: React.FC = () => {
             <div className="text-sm text-gray-900">
               <EnhancedReadOnlyField
                 field="jamesCurrentLender"
-                value=""
+                value={formData.jamesCurrentLender}
                 label=""
                 onDoubleClick={handleFieldDoubleClick}
                 onAuditClick={handleFieldComparisonClick}
@@ -1106,7 +1106,7 @@ export const EditablePersonalDetailsPage: React.FC = () => {
             <div className="text-sm text-gray-900">
               <EnhancedReadOnlyField
                 field="janeCurrentLender"
-                value=""
+                value={formData.janeCurrentLender}
                 label=""
                 onDoubleClick={handleFieldDoubleClick}
                 onAuditClick={handleFieldComparisonClick}
