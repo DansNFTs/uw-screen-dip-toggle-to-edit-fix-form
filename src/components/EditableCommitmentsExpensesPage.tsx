@@ -15,6 +15,7 @@ import { useToast } from "@/hooks/use-toast";
 import { useNavigate } from 'react-router-dom';
 import { FieldComparisonModal } from './FieldComparisonModal';
 import { AffordabilityWarningDialog } from './AffordabilityWarningDialog';
+import { useFormSync } from '../hooks/useFormSync';
 
 export const EditableCommitmentsExpensesPage: React.FC = () => {
   const { isEditingEnabled, isEditMode, hasUnsavedChanges, hasSavedChanges, toggleEditMode, setHasUnsavedChanges, saveChanges, saveAndResubmit, exitEditMode, storeOriginalState, restoreAllOriginalState } = useEditMode();
@@ -58,6 +59,12 @@ export const EditableCommitmentsExpensesPage: React.FC = () => {
   };
 
   const [formData, setFormData] = useState(initialFormData);
+  
+  // Enable form sync for real-time updates to unified data
+  const { syncField } = useFormSync({ 
+    formData, 
+    enabled: isEditMode 
+  });
   const [comparisonModal, setComparisonModal] = useState({ open: false, fieldName: '' });
   const [jamesRevolvingOpen, setJamesRevolvingOpen] = useState(true);
   const [jamesNonRevolvingOpen, setJamesNonRevolvingOpen] = useState(true);
@@ -109,6 +116,9 @@ export const EditableCommitmentsExpensesPage: React.FC = () => {
       ...prev,
       [field]: value
     }));
+    
+    // Sync individual field to unified data
+    syncField(field, value);
     
     // Check if this is a commitment field that requires recalculation
     const commitmentFields = [

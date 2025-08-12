@@ -11,6 +11,7 @@ import { useToast } from '@/hooks/use-toast';
 import { useApplicantData } from '@/contexts/ApplicantDataContext';
 import { Clock, Plus } from 'lucide-react';
 import { FieldComparisonModal } from '@/components/FieldComparisonModal';
+import { useFormSync } from '@/hooks/useFormSync';
 
 interface PersonalData {
   // Eligibility
@@ -129,6 +130,12 @@ export const EditableDetailedPersonalPage: React.FC<EditableDetailedPersonalPage
   const { isEditMode, setIsEditMode, hasUnsavedChanges, setHasUnsavedChanges } = useEditMode();
   const { startAuditSession, endAuditSession, addAuditEntry, auditLog } = useAudit();
   const { toast } = useToast();
+  
+  // Enable form sync for real-time updates to unified data
+  const { syncField } = useFormSync({ 
+    formData, 
+    enabled: isEditMode 
+  });
 
   useEffect(() => {
     if (isEditMode) {
@@ -190,6 +197,10 @@ export const EditableDetailedPersonalPage: React.FC<EditableDetailedPersonalPage
     const oldValue = formData[field as keyof PersonalData];
     if (oldValue !== value) {
       setFormData(prev => ({ ...prev, [field]: value }));
+      
+      // Sync individual field to unified data
+      syncField(field, value);
+      
       addAuditEntry(field, oldValue, value, `${applicantName} Personal Details`);
       setHasUnsavedChanges(true);
       

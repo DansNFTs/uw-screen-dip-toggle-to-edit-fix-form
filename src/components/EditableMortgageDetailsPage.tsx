@@ -12,6 +12,7 @@ import { useToast } from '@/hooks/use-toast';
 import { Clock } from 'lucide-react';
 import { FieldComparisonModal } from '@/components/FieldComparisonModal';
 import { useUnifiedData } from '@/contexts/UnifiedDataContext';
+import { useFormSync } from '@/hooks/useFormSync';
 
 export const EditableMortgageDetailsPage: React.FC = () => {
   const navigate = useNavigate();
@@ -52,6 +53,12 @@ export const EditableMortgageDetailsPage: React.FC = () => {
   const { startAuditSession, endAuditSession, addAuditEntry, auditLog } = useAudit();
   const { toast } = useToast();
   const { getFieldValue } = useUnifiedData();
+  
+  // Enable form sync for real-time updates to unified data
+  const { syncField } = useFormSync({ 
+    formData, 
+    enabled: isEditMode 
+  });
 
   useEffect(() => {
     if (isEditMode) {
@@ -107,6 +114,10 @@ export const EditableMortgageDetailsPage: React.FC = () => {
     const oldValue = formData[field as keyof typeof formData];
     if (oldValue !== value) {
       setFormData(prev => ({ ...prev, [field]: value }));
+      
+      // Sync individual field to unified data
+      syncField(field, value);
+      
       addAuditEntry(field, oldValue, value, 'Mortgage Details');
       setHasUnsavedChanges(true);
     }

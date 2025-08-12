@@ -12,6 +12,7 @@ import { useToast } from "@/hooks/use-toast";
 import { useNavigate } from 'react-router-dom';
 import { FieldComparisonModal } from './FieldComparisonModal';
 import { useUnifiedData } from '../contexts/UnifiedDataContext';
+import { useFormSync } from '../hooks/useFormSync';
 
 
 export const EditableIncomeEmploymentPage: React.FC = () => {
@@ -57,6 +58,12 @@ export const EditableIncomeEmploymentPage: React.FC = () => {
 
   const [formData, setFormData] = useState(initialFormData);
   const [comparisonModal, setComparisonModal] = useState({ open: false, fieldName: '' });
+  
+  // Enable form sync for real-time updates to unified data
+  const { syncField } = useFormSync({ 
+    formData, 
+    enabled: isEditMode 
+  });
 
   // Store original state when entering edit mode
   React.useEffect(() => {
@@ -96,17 +103,7 @@ React.useEffect(() => {
   };
 }, [restoreAllOriginalState, cancelAuditSession]);
 
-// Ensure page data syncs to unified store on global save/resubmit
-const { syncFromReadOnly } = useUnifiedData();
-React.useEffect(() => {
-  const handleBeforeSave = () => {
-    syncFromReadOnly(formData as any);
-  };
-  window.addEventListener('beforeGlobalSave', handleBeforeSave);
-  return () => {
-    window.removeEventListener('beforeGlobalSave', handleBeforeSave);
-  };
-}, [formData, syncFromReadOnly]);
+// Form sync is now handled by useFormSync hook
 
   const handleInputChange = (field: string, value: string, section: string = 'Employment') => {
     const oldValue = formData[field as keyof typeof formData];
@@ -114,6 +111,9 @@ React.useEffect(() => {
       ...prev,
       [field]: value
     }));
+    
+    // Sync individual field to unified data
+    syncField(field, value);
     
     console.log('Field changed:', { field, oldValue, value, section, currentSessionId });
     

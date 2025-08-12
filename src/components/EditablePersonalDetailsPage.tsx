@@ -15,12 +15,13 @@ import { useNavigate } from 'react-router-dom';
 import { FieldComparisonModal } from './FieldComparisonModal';
 import { EnhancedReadOnlyField } from './EnhancedReadOnlyField';
 import { useUnifiedData } from '../contexts/UnifiedDataContext';
+import { useFormSync } from '../hooks/useFormSync';
 
 export const EditablePersonalDetailsPage: React.FC = () => {
   const { isEditingEnabled, isEditMode, hasUnsavedChanges, hasSavedChanges, setIsEditMode, setHasUnsavedChanges, saveChanges, exitEditMode, storeOriginalState, restoreAllOriginalState } = useEditMode();
   const { addAuditEntry, auditLog, currentSessionId, startAuditSession, endAuditSession, cancelAuditSession } = useAudit();
   const { applicantData, updateApplicantData, getFormattedApplicantNames } = useApplicantData();
-  const { unifiedData, syncFromReadOnly } = useUnifiedData();
+  const { unifiedData } = useUnifiedData();
   const { toast } = useToast();
   const navigate = useNavigate();
   
@@ -130,6 +131,13 @@ export const EditablePersonalDetailsPage: React.FC = () => {
     janeLastName: applicantData.janeLastName,
   }));
 
+  // Enable form sync for real-time updates to unified data
+  const { syncField } = useFormSync({ 
+    formData, 
+    enabled: isEditMode 
+  });
+  const { syncFromReadOnly } = useUnifiedData();
+
   // Sync form data with applicant data context and unified data whenever name fields change
   useEffect(() => {
     const applicantFields = {
@@ -225,6 +233,9 @@ export const EditablePersonalDetailsPage: React.FC = () => {
       [field]: value
     }));
     
+    // Sync individual field to unified data
+    syncField(field, value);
+    
     console.log('Field changed:', { field, oldValue, value, section, currentSessionId });
     
     addAuditEntry(field, oldValue, value, section);
@@ -232,8 +243,6 @@ export const EditablePersonalDetailsPage: React.FC = () => {
   };
 
   const handleSave = () => {
-    // Sync all current read-only form values into the unified data store
-    syncFromReadOnly(formData as any);
     saveChanges();
     endAuditSession();
     toast({

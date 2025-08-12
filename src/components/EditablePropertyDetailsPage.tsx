@@ -10,6 +10,7 @@ import { Clock } from 'lucide-react';
 import { useToast } from "@/hooks/use-toast";
 import { useNavigate } from 'react-router-dom';
 import { FieldComparisonModal } from './FieldComparisonModal';
+import { useFormSync } from '../hooks/useFormSync';
 
 export const EditablePropertyDetailsPage: React.FC = () => {
   const { isEditingEnabled, isEditMode, hasUnsavedChanges, hasSavedChanges, setIsEditMode, setHasUnsavedChanges, saveChanges, exitEditMode, storeOriginalState, restoreAllOriginalState } = useEditMode();
@@ -32,6 +33,12 @@ export const EditablePropertyDetailsPage: React.FC = () => {
   const [comparisonModal, setComparisonModal] = useState({ open: false, fieldName: '' });
   const [focusedField, setFocusedField] = useState<string | null>(null);
   const fieldRefs = useRef<{ [key: string]: HTMLInputElement | HTMLButtonElement | null }>({});
+  
+  // Enable form sync for real-time updates to unified data
+  const { syncField } = useFormSync({ 
+    formData, 
+    enabled: isEditMode 
+  });
 
   // Store original state when entering edit mode
   React.useEffect(() => {
@@ -77,6 +84,9 @@ export const EditablePropertyDetailsPage: React.FC = () => {
       ...prev,
       [field]: value
     }));
+    
+    // Sync individual field to unified data
+    syncField(field, value);
     
     console.log('Field changed:', { field, oldValue, value, section, currentSessionId });
     
