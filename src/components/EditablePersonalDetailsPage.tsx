@@ -159,6 +159,11 @@ export const EditablePersonalDetailsPage: React.FC = () => {
     };
   }, [formData, syncFromReadOnly]);
 
+  // Keep unified data in sync with form changes
+  React.useEffect(() => {
+    syncFromReadOnly(formData as any);
+  }, [formData.jamesCurrentLender, formData.janeCurrentLender, syncFromReadOnly]);
+
   // Store original state when entering edit mode
   React.useEffect(() => {
     if (isEditMode && !currentSessionId) {

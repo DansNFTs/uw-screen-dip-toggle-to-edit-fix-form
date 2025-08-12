@@ -61,6 +61,20 @@ const initialData: UnifiedData = {
   janeEmployerName: 'Newcastle Primary School',
   janeBasicIncome: '£35000.00',
   
+  // James Property Details
+  jamesCurrentLender: 'Barclays',
+  jamesSalePrice: '',
+  jamesOutstandingMortgage: '',
+  jamesPlansForProperty: '',
+  jamesExpectedRemainingBalance: '',
+  
+  // Jane Property Details
+  janeCurrentLender: '',
+  janeSalePrice: '',
+  janeOutstandingMortgage: '',
+  janePlansForProperty: '',
+  janeExpectedRemainingBalance: '',
+  
   // Mortgage Details
   loanAmount: '£300000',
   loanTerm: '25',
